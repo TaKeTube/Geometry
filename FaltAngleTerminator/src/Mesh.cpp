@@ -12,6 +12,12 @@ Vertex::Vertex(Vector3f v) : Vector3f(v) {}
 Vertex::Vertex(){}
 Vertex::~Vertex(){}
 
+Edge::Edge() {}
+Edge::Edge(size_t v1, size_t v2) : v1Idx(v1), v2Idx(v2) {}
+
+EdgeInfo::EdgeInfo() : isSplit(false) {}
+EdgeInfo::EdgeInfo(size_t cellIdx) : isSplit(false){ cellIdxVec.push_back(cellIdx); }
+
 Mesh::Mesh(const std::vector<Vertex>& v, const std::vector<Cell>& c, const CellType cellType)
 : V(v)
 , C(c)
@@ -42,6 +48,23 @@ inline void Mesh::addQuadCell(size_t v1, size_t v2, size_t v3, size_t v4){
 inline void Mesh::deleteCell(size_t idx){
     auto iter = C.begin()+idx;
     C.erase(iter);
+}
+
+void Mesh::getE(){
+    for(size_t cellIdx = 0; cellIdx < C.size(); cellIdx++){
+        if (cellType == QUAD){
+            Edge e;
+            for (int i = 0; i < QUAD_SIZE; i++){
+                e.v1Idx = C.at(cellIdx).at(MOD(i, QUAD_SIZE));
+                e.v2Idx = C.at(cellIdx).at(MOD(i+1, QUAD_SIZE));
+                if(E.find(e) == E.end()){
+                    E[e] = EdgeInfo(cellIdx);
+                }else{
+                    E[e].cellIdxVec.push_back(cellIdx);
+                }
+            }
+        }
+    }
 }
 
 /* 
@@ -103,6 +126,10 @@ int Mesh::removeFlatAngle(){
                 addQuadCell(v1Idx, v2Idx, edgeCenter1Idx, baryCenterIdx);
                 addQuadCell(v1Idx, baryCenterIdx, edgeCenter2Idx, v3Idx);
                 addQuadCell(baryCenterIdx, edgeCenter1Idx, v4Idx, edgeCenter2Idx);
+
+                /* update edge info */
+                E.at(Edge(v2Idx, v4Idx)).isSplit = true;
+                E.at(Edge(v3Idx, v4Idx)).isSplit = true;
 
                 break;
             }
