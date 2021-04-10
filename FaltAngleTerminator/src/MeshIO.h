@@ -4,5 +4,6 @@
 #include "Mesh.h"
 
 void vtkReader(const char* fname , Mesh& mesh);
+void vtkWriter(const char* fname , Mesh& mesh);
 
 #endif

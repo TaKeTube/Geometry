@@ -29,5 +29,7 @@ int main(int argc, char **argv){
     else
         vtkReader(default_file, mesh);
 
+    vtkWriter("output.vtk" , mesh);
+
     return 0;
 }

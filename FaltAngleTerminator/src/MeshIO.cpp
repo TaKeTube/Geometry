@@ -98,3 +98,37 @@ void vtkReader(const char* fname , Mesh& mesh)
         C.resize(C.size());
     }
 }
+
+void vtkWriter(const char* fname , Mesh& mesh)
+{
+    const std::vector<Vertex>& V = mesh.V;
+    const std::vector<Cell>& C = mesh.C;
+    const size_t vnum = V.size();
+    const size_t cnum = C.size();
+
+    std::ofstream ofs(fname);
+    ofs << "# vtk DataFile Version 2.0" << endl
+        << fname << endl
+        << "ASCII" << endl << endl
+        << "DATASET UNSTRUCTURED_GRID" << endl;
+    ofs << "POINTS " << vnum << " float" << endl;
+    for (size_t i = 0; i < vnum; i++)
+        ofs << std::fixed << setprecision(7) << V.at(i).x << " " << V.at(i).y << " " << V.at(i).z << endl;
+    ofs << "CELLS " << cnum << " ";
+
+    vtkIdType idType = VTK_TRIANGLE;
+    if (mesh.cellType == TRIANGLE) ofs << 4*cnum << std::endl;
+    else if (mesh.cellType == QUAD) {idType = VTK_QUAD;  ofs << 5*cnum << std::endl;}
+    else if (mesh.cellType == TETRAHEDRA) {idType = VTK_TETRA; ofs << 5*cnum << std::endl;}
+    else if (mesh.cellType == HEXAHEDRA) {idType = VTK_HEXAHEDRON; ofs << 9*cnum << std::endl;}
+
+    for (size_t i = 0; i < cnum; i++){
+        ofs << C.at(i).size();
+        for (size_t j = 0; j < C.at(i).size(); j++)
+            ofs << " " << C.at(i).at(j);
+        ofs << std::endl;
+    }
+    ofs << "CELL_TYPES " << cnum << endl;
+    for (size_t i = 0; i < cnum; i++)
+        ofs << idType << std::endl;
+}
