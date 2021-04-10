@@ -4,8 +4,7 @@
 
 #include "MeshIO.h"
 #include "Mesh.h"
-
-#define MOD(x, n)   (((x%n)+n)%n)
+#include "global.h"
 
 int main(int argc, char **argv){
     char* input_file = NULL;

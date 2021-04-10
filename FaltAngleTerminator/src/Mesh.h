@@ -18,6 +18,7 @@ public:
     Vertex(float xx);
     Vertex(float xx, float yy, float zz);
     Vertex(float xx, float yy, float zz, std::vector<int>& neighbor);
+    Vertex(Vector3f v);
     ~Vertex();
 };
 
@@ -32,6 +33,11 @@ public:
     Mesh(const Mesh& mesh);
     Mesh();
     ~Mesh();
+
+    size_t addVertex(Vertex v);
+    void addQuadCell(size_t v1, size_t v2, size_t v3, size_t v4);
+    void deleteCell(size_t idx);
+    int removeFlatAngle();
 };
 
 #endif
