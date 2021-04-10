@@ -18,9 +18,23 @@ using namespace std;
 #include <vtkGenericDataObjectReader.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridReader.h>
+#include <vtkOBJReader.h>
 
 #include "MeshIO.h"
 #include "Mesh.h"
+
+int meshReader(const char* fname, Mesh& mesh)
+{
+    string fstring(fname);
+
+    if (fstring.find(".vtk") != fstring.npos)
+        vtkReader(fname, mesh);
+    else if (fstring.find(".obj") != fstring.npos)
+        objReader(fname, mesh);
+    else
+        return -1;
+    return 0;
+}
 
 void vtkReader(const char* fname , Mesh& mesh)
 {
@@ -97,6 +111,47 @@ void vtkReader(const char* fname , Mesh& mesh)
         }
         C.resize(C.size());
     }
+}
+
+void objReader(const char* fname , Mesh& mesh)
+{
+    // Get all data from the file
+    vtkSmartPointer<vtkOBJReader> reader = vtkSmartPointer<vtkOBJReader>::New();
+    reader->SetFileName(fname);
+    reader->Update();
+
+    vtkPolyData* output = reader->GetOutput();
+    const vtkIdType vnum = output->GetNumberOfPoints();
+    const vtkIdType cnum = output->GetNumberOfPolys();
+    std::cout << "PolyData: " << vnum << " points " << cnum << " polys" << std::endl;
+    std::vector<Vertex>& V = mesh.V;
+    V.resize(vnum);
+    double p[3];
+    for (vtkIdType i = 0; i < vnum; i++)
+    {
+        output->GetPoint(i, p);
+        V.at(i).x = p[0];
+        V.at(i).y = p[1];
+        V.at(i).z = p[2];
+    }
+    // Read CellType
+    const vtkIdType cellType = output->GetCellType(0);
+    if (cellType == VTK_TRIANGLE) mesh.cellType = TRIANGLE;
+    else if (cellType == VTK_QUAD) mesh.cellType = QUAD;
+    else if (cellType == VTK_POLYGON) mesh.cellType = POLYGON;
+
+    std::vector<Cell>& C = mesh.C;
+    for (vtkIdType i = 0; i < cnum; i++)
+    {
+        vtkSmartPointer<vtkIdList> idList = vtkSmartPointer<vtkIdList>::New();
+        output->GetCellPoints(i, idList);
+        const vtkIdType csize = idList->GetNumberOfIds();
+        Cell c(csize);
+        for (vtkIdType j = 0; j < csize; j++)
+            c.at(j) = idList->GetId(j);
+        C.push_back(c);
+    }
+    C.resize(C.size());
 }
 
 void vtkWriter(const char* fname , Mesh& mesh)

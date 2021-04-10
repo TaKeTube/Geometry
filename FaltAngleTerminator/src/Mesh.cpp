@@ -27,11 +27,11 @@ Mesh::~Mesh(){}
 
 inline size_t Mesh::addVertex(Vertex v){
     V.push_back(v);
-    return V.size();
+    return V.size()-1;
 }
 
 inline void Mesh::addQuadCell(size_t v1, size_t v2, size_t v3, size_t v4){
-    Cell c(QUAD_SIZE);
+    Cell c;
     c.push_back(v1);
     c.push_back(v2);
     c.push_back(v3);
@@ -64,23 +64,22 @@ int Mesh::removeFlatAngle(){
     size_t cnum = C.size();
     std::vector<size_t> abandonedCell;
 
-    for(size_t i = 0; i < cnum; i++){
-        Cell &cell = C.at(i);
-        int flatNum = 0;
+    for(size_t cellIdx = 0; cellIdx < cnum; cellIdx++){
+        Cell &cell = C.at(cellIdx);
         /* traverse 4 angles of the quad cell */
         for(size_t i = 0; i < QUAD_SIZE; i++){
             /* get three vertexes of an angle */
-            Vertex& v1 = V.at(cell.at(i));
-            Vertex& v2 = V.at(cell.at(MOD(i+1, QUAD_SIZE)));
-            Vertex& v3 = V.at(cell.at(MOD(i-1, QUAD_SIZE)));
+            Vertex v1 = V.at(cell.at(i));
+            Vertex v2 = V.at(cell.at(MOD(i+1, QUAD_SIZE)));
+            Vertex v3 = V.at(cell.at(MOD(i-1, QUAD_SIZE)));
 
             /* check whether the angle v2-v1-v3 is close to flat angle, if so, remove it by spliting the cell */
-            if(cosDist(v2-v1, v3-v1) < -0.75){
+            if(cosDist(v2-v1, v3-v1) < THRESHOLD){
                 /* add the bad cell index into abandoned cell vector to be deleted */
-                abandonedCell.push_back(i);
+                abandonedCell.push_back(cellIdx);
 
                 /* get the opposite vertex of the flat angle */
-                Vertex& v4 = V.at(cell.at(MOD(i+2, QUAD_SIZE)));
+                Vertex v4 = V.at(cell.at(MOD(i+2, QUAD_SIZE)));
                 
                 /* get the barycenter of the quad cell then add it into the mesh */
                 Vertex baryCenter = (v1+v2+v3+v4)/4;
@@ -101,17 +100,18 @@ int Mesh::removeFlatAngle(){
                 size_t v4Idx = cell.at(MOD(i+2, QUAD_SIZE));
 
                 /* add 3 new cells into the mesh */
-                addQuadCell(v1Idx, v2Idx, edgeCenter2Idx, baryCenterIdx);
+                addQuadCell(v1Idx, v2Idx, edgeCenter1Idx, baryCenterIdx);
                 addQuadCell(v1Idx, baryCenterIdx, edgeCenter2Idx, v3Idx);
                 addQuadCell(baryCenterIdx, edgeCenter1Idx, v4Idx, edgeCenter2Idx);
 
-                
+                break;
             }
         }
     }
 
     /* delete all abandoned cells */
-    for(auto cellIdx : abandonedCell)
-        deleteCell(cellIdx);
+    for(int i = abandonedCell.size()-1; i >=0; i--)
+        deleteCell(abandonedCell.at(i));
 
+    return 0;
 }
