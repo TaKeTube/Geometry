@@ -12,7 +12,7 @@ using namespace std;
 #include <sstream>
 #include <string>
 #include <vector>
-#include <string.h>
+#include <cstring>
 
 #include <vtkPolyData.h>
 #include <vtkGenericDataObjectReader.h>
@@ -35,8 +35,8 @@ void vtkReader(const char* fname , Mesh& mesh)
         vtkPolyData* output = reader->GetPolyDataOutput();
         const vtkIdType vnum = output->GetNumberOfPoints();
         const vtkIdType cnum = output->GetNumberOfPolys();
-        std::cout << "PolyData: " << vnum << " points " << cnum << " polys" << std::endl;
-        std::vector<Vertex>& V = mesh.V;
+        cout << "PolyData: " << vnum << " points " << cnum << " polys" << endl;
+        vector<Vertex>& V = mesh.V;
         V.resize(vnum);
         double p[3];
         for (vtkIdType i = 0; i < vnum; i++)
@@ -47,7 +47,7 @@ void vtkReader(const char* fname , Mesh& mesh)
             V.at(i).z = p[2];
         }
         mesh.cellType = POLYGON;
-        std::vector<Cell>& C = mesh.C;
+        vector<Cell>& C = mesh.C;
         for (vtkIdType i = 0; i < cnum; i++)
         {
             vtkSmartPointer<vtkIdList> idList = vtkSmartPointer<vtkIdList>::New();
@@ -65,8 +65,8 @@ void vtkReader(const char* fname , Mesh& mesh)
         vtkUnstructuredGrid* output = reader->GetUnstructuredGridOutput();
         const vtkIdType vnum = output->GetNumberOfPoints();
         const vtkIdType cnum = output->GetNumberOfCells();
-        std::cout << "UnstructuredGrid: " << vnum << " points " << cnum << " cells" << std::endl;
-        std::vector<Vertex>& V = mesh.V;
+        cout << "UnstructuredGrid: " << vnum << " points " << cnum << " cells" << endl;
+        vector<Vertex>& V = mesh.V;
         V.resize(vnum);
         // Read V
         double p[3];
@@ -84,7 +84,7 @@ void vtkReader(const char* fname , Mesh& mesh)
         else if (cellType == VTK_TETRA) mesh.cellType = TETRAHEDRA;
         else if (cellType == VTK_HEXAHEDRON) mesh.cellType = HEXAHEDRA;
         // Read C
-        std::vector<Cell>& C = mesh.C;
+        vector<Cell>& C = mesh.C;
         for (vtkIdType i = 0; i < cnum; i++)
         {
             vtkSmartPointer<vtkIdList> idList = vtkSmartPointer<vtkIdList>::New();
@@ -101,34 +101,34 @@ void vtkReader(const char* fname , Mesh& mesh)
 
 void vtkWriter(const char* fname , Mesh& mesh)
 {
-    const std::vector<Vertex>& V = mesh.V;
-    const std::vector<Cell>& C = mesh.C;
+    const vector<Vertex>& V = mesh.V;
+    const vector<Cell>& C = mesh.C;
     const size_t vnum = V.size();
     const size_t cnum = C.size();
 
-    std::ofstream ofs(fname);
+    ofstream ofs(fname);
     ofs << "# vtk DataFile Version 2.0" << endl
         << fname << endl
         << "ASCII" << endl << endl
         << "DATASET UNSTRUCTURED_GRID" << endl;
     ofs << "POINTS " << vnum << " float" << endl;
     for (size_t i = 0; i < vnum; i++)
-        ofs << std::fixed << setprecision(7) << V.at(i).x << " " << V.at(i).y << " " << V.at(i).z << endl;
+        ofs << fixed << setprecision(7) << V.at(i).x << " " << V.at(i).y << " " << V.at(i).z << endl;
     ofs << "CELLS " << cnum << " ";
 
     vtkIdType idType = VTK_TRIANGLE;
-    if (mesh.cellType == TRIANGLE) ofs << 4*cnum << std::endl;
-    else if (mesh.cellType == QUAD) {idType = VTK_QUAD;  ofs << 5*cnum << std::endl;}
-    else if (mesh.cellType == TETRAHEDRA) {idType = VTK_TETRA; ofs << 5*cnum << std::endl;}
-    else if (mesh.cellType == HEXAHEDRA) {idType = VTK_HEXAHEDRON; ofs << 9*cnum << std::endl;}
+    if (mesh.cellType == TRIANGLE) ofs << 4*cnum << endl;
+    else if (mesh.cellType == QUAD) {idType = VTK_QUAD;  ofs << 5*cnum << endl;}
+    else if (mesh.cellType == TETRAHEDRA) {idType = VTK_TETRA; ofs << 5*cnum << endl;}
+    else if (mesh.cellType == HEXAHEDRA) {idType = VTK_HEXAHEDRON; ofs << 9*cnum << endl;}
 
     for (size_t i = 0; i < cnum; i++){
         ofs << C.at(i).size();
         for (size_t j = 0; j < C.at(i).size(); j++)
             ofs << " " << C.at(i).at(j);
-        ofs << std::endl;
+        ofs << endl;
     }
     ofs << "CELL_TYPES " << cnum << endl;
     for (size_t i = 0; i < cnum; i++)
-        ofs << idType << std::endl;
+        ofs << idType << endl;
 }

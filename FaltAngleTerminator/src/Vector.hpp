@@ -51,6 +51,9 @@ inline double Vector3f::operator[](int index) const {
 inline float dotProduct(const Vector3f &a, const Vector3f &b)
 { return a.x * b.x + a.y * b.y + a.z * b.z; }
 
+inline float cosDist(const Vector3f &a, const Vector3f &b)
+{ return dotProduct(a, b)/sqrt(dotProduct(a, a)*dotProduct(b, b)); }
+
 inline Vector3f crossProduct(const Vector3f &a, const Vector3f &b)
 {
     return Vector3f(

@@ -1,9 +1,11 @@
-#include <string.h>
-#include <stdio.h>
-#include <assert.h>
+#include <cstring>
+#include <cstdio>
+#include <cassert>
 
 #include "MeshIO.h"
 #include "Mesh.h"
+
+#define MOD(x, n)   (((x%n)+n)%n)
 
 int main(int argc, char **argv){
     char* input_file = NULL;
@@ -28,6 +30,25 @@ int main(int argc, char **argv){
         vtkReader(input_file, mesh);
     else
         vtkReader(default_file, mesh);
+
+    std::vector<Cell>& C = mesh.C;
+    std::vector<Vertex>& V = mesh.V;
+    int badCell[5] = {0};
+
+    for(auto &cell : C){
+        int flatNum = 0;
+        for(size_t i = 0; i < 4; i++){
+            Vertex& v1 = V.at(cell.at(i));
+            Vertex& v2 = V.at(cell.at(MOD(i+1, 4)));
+            Vertex& v3 = V.at(cell.at(MOD(i-1, 4)));
+            if(cosDist(v2-v1, v3-v1) < -0.75)
+                flatNum++;
+        }
+        badCell[flatNum]++;
+    }
+
+    for(int i = 1; i<=4; i++)
+        std::cout << "number of bad Cells with " << i << " flat angles:" << badCell[i] << std::endl;
 
     vtkWriter("output.vtk" , mesh);
 
