@@ -39,7 +39,7 @@ Vertex Mesh::getCellCenter(Cell c){
     Vertex center = 0;
     for(size_t i = 0; i < c.size(); i++)
         center += V.at(c.at(i));
-    return center;
+    return center/c.size();
 };
 
 inline size_t Mesh::addVertex(Vertex v){
