@@ -24,6 +24,14 @@ using namespace std;
 #include "MeshIO.h"
 #include "Mesh.h"
 
+/*
+ * meshReader()
+ * DESCRIPTION: read mesh from file
+ * INPUT: fname - input filenme
+ *        mesh - reference to the mesh to be load
+ * OUTPUT: mesh
+ * RETURN: -1 if fail, 0 if success
+ */
 int meshReader(const char* fname, Mesh& mesh)
 {
     string fstring(fname);
@@ -37,14 +45,22 @@ int meshReader(const char* fname, Mesh& mesh)
     return 0;
 }
 
+/*
+ * vtkReader()
+ * DESCRIPTION: read mesh from vtk file
+ * INPUT: fname - input filenme
+ *        mesh - reference to the mesh to be load
+ * OUTPUT: mesh
+ * RETURN: none
+ */
 void vtkReader(const char* fname , Mesh& mesh)
 {
-    // Get all data from the file
+    /* read vtk file */
     vtkSmartPointer<vtkGenericDataObjectReader> reader = vtkSmartPointer<vtkGenericDataObjectReader>::New();
     reader->SetFileName(fname);
     reader->Update();
 
-    // All of the standard data types can be checked and obtained like this:
+    /* read polydata */
     if (reader->IsFilePolyData())
     {
         vtkPolyData* output = reader->GetPolyDataOutput();
@@ -75,6 +91,7 @@ void vtkReader(const char* fname , Mesh& mesh)
         }
         C.resize(C.size());
     }
+    /* read unstructured grid */
     else if (reader->IsFileUnstructuredGrid())
     {
         vtkUnstructuredGrid* output = reader->GetUnstructuredGridOutput();
@@ -83,7 +100,8 @@ void vtkReader(const char* fname , Mesh& mesh)
         cout << "UnstructuredGrid: " << vnum << " points " << cnum << " cells" << endl;
         vector<Vertex>& V = mesh.V;
         V.resize(vnum);
-        // Read V
+
+        /* read vertexes */
         double p[3];
         for (vtkIdType i = 0; i < vnum; i++)
         {
@@ -92,13 +110,15 @@ void vtkReader(const char* fname , Mesh& mesh)
             V.at(i).y = p[1];
             V.at(i).z = p[2];
         }
-        // Read CellType
+
+        /* read cell type */
         const vtkIdType cellType = output->GetCellType(0);
         if (cellType == VTK_TRIANGLE) mesh.cellType = TRIANGLE;
         else if (cellType == VTK_QUAD) mesh.cellType = QUAD;
         else if (cellType == VTK_TETRA) mesh.cellType = TETRAHEDRA;
         else if (cellType == VTK_HEXAHEDRON) mesh.cellType = HEXAHEDRA;
-        // Read C
+
+        /* read cells */
         vector<Cell>& C = mesh.C;
         for (vtkIdType i = 0; i < cnum; i++)
         {
@@ -114,6 +134,14 @@ void vtkReader(const char* fname , Mesh& mesh)
     }
 }
 
+/*
+ * objReader()
+ * DESCRIPTION: read mesh from obj file
+ * INPUT: fname - input filenme
+ *        mesh - reference to the mesh to be load
+ * OUTPUT: mesh
+ * RETURN: none
+ */
 void objReader(const char* fname , Mesh& mesh)
 {
     /* read obj file */
@@ -131,6 +159,8 @@ void objReader(const char* fname , Mesh& mesh)
     const vtkIdType vnum = output->GetNumberOfPoints();
     const vtkIdType cnum = output->GetNumberOfPolys();
     std::cout << "PolyData: " << vnum << " points " << cnum << " polys" << std::endl;
+
+    /* read vertexes */
     std::vector<Vertex>& V = mesh.V;
     V.resize(vnum);
     double p[3];
@@ -141,12 +171,14 @@ void objReader(const char* fname , Mesh& mesh)
         V.at(i).y = p[1];
         V.at(i).z = p[2];
     }
-    // Read CellType
+
+    /* read CellType */
     const vtkIdType cellType = output->GetCellType(0);
     if (cellType == VTK_TRIANGLE) mesh.cellType = TRIANGLE;
     else if (cellType == VTK_QUAD) mesh.cellType = QUAD;
     else if (cellType == VTK_POLYGON) mesh.cellType = POLYGON;
 
+    /* read cells */
     std::vector<Cell>& C = mesh.C;
     for (vtkIdType i = 0; i < cnum; i++)
     {
@@ -161,6 +193,14 @@ void objReader(const char* fname , Mesh& mesh)
     C.resize(C.size());
 }
 
+/*
+ * vtkWriter()
+ * DESCRIPTION: write mesh into vtk file
+ * INPUT: fname - output filenme
+ *        mesh - reference to the mesh to be wrote
+ * OUTPUT: vtk file
+ * RETURN: none
+ */
 void vtkWriter(const char* fname , Mesh& mesh)
 {
     const vector<Vertex>& V = mesh.V;
@@ -169,21 +209,26 @@ void vtkWriter(const char* fname , Mesh& mesh)
     const size_t cnum = C.size();
 
     ofstream ofs(fname);
+    /* write standart format */
     ofs << "# vtk DataFile Version 2.0" << endl
         << fname << endl
         << "ASCII" << endl << endl
         << "DATASET UNSTRUCTURED_GRID" << endl;
+
+    /* write vertexes */
     ofs << "POINTS " << vnum << " float" << endl;
     for (size_t i = 0; i < vnum; i++)
         ofs << fixed << setprecision(7) << V.at(i).x << " " << V.at(i).y << " " << V.at(i).z << endl;
-    ofs << "CELLS " << cnum << " ";
 
+    /* write cellType */
+    ofs << "CELLS " << cnum << " ";
     vtkIdType idType = VTK_TRIANGLE;
     if (mesh.cellType == TRIANGLE) ofs << 4*cnum << endl;
     else if (mesh.cellType == QUAD) {idType = VTK_QUAD;  ofs << 5*cnum << endl;}
     else if (mesh.cellType == TETRAHEDRA) {idType = VTK_TETRA; ofs << 5*cnum << endl;}
     else if (mesh.cellType == HEXAHEDRA) {idType = VTK_HEXAHEDRON; ofs << 9*cnum << endl;}
 
+    /* write cells */
     for (size_t i = 0; i < cnum; i++){
         ofs << C.at(i).size();
         for (size_t j = 0; j < C.at(i).size(); j++)

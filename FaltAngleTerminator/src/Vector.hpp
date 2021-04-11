@@ -1,3 +1,5 @@
+/* basic 3D vector class and operations */
+/* modified from GAMES 101 Homework source code */
 #ifndef MY_VECTOR_HPP
 #define MY_VECTOR_HPP
 

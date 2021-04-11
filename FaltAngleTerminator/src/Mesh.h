@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "Vector.hpp"
 
+/* Cell related */
 enum CellType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
 typedef std::vector<int> Cell;
@@ -18,6 +19,7 @@ struct CellInfo
     std::vector<size_t> subCell;
 };
 
+/* Vertex related */
 class Vertex : public Vector3f
 {
 public:
@@ -31,6 +33,7 @@ public:
     ~Vertex();
 };
 
+/* Edge related */
 class Edge
 {
 public:
@@ -51,6 +54,7 @@ struct EdgeInfo
     std::vector<size_t> cellIdxVec;
 };
 
+/* hash function for edge unordered_map */
 namespace std
 {
     template<>
@@ -64,6 +68,7 @@ namespace std
     };
 }
 
+/* Mesh related */
 class Mesh
 {
 public:
@@ -83,7 +88,8 @@ public:
     size_t addVertex(Vertex v);
     int addQuadCell(size_t v1, size_t v2, size_t v3, size_t v4);
     void deleteCell(size_t idx);
-    int removeFlatAngle();
+    void detectFlatAngle();
+    void removeFlatAngle();
 };
 
 #endif
