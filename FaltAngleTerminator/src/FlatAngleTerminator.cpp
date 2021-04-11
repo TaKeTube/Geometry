@@ -46,6 +46,7 @@ int main(int argc, char **argv){
         for(int i = 1; i<=4; i++)
             std::cout << "Number of bad Cells with " << i << " flat angles:" << badCell[i] << std::endl;
 
+        mesh.getE();
         mesh.removeFlatAngle();
 
         vtkWriter("output.vtk" , mesh);

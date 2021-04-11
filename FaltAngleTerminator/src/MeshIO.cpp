@@ -19,6 +19,7 @@ using namespace std;
 #include <vtkUnstructuredGrid.h>
 #include <vtkUnstructuredGridReader.h>
 #include <vtkOBJReader.h>
+#include <vtkCleanPolyData.h>
 
 #include "MeshIO.h"
 #include "Mesh.h"
@@ -115,12 +116,18 @@ void vtkReader(const char* fname , Mesh& mesh)
 
 void objReader(const char* fname , Mesh& mesh)
 {
-    // Get all data from the file
+    /* read obj file */
     vtkSmartPointer<vtkOBJReader> reader = vtkSmartPointer<vtkOBJReader>::New();
     reader->SetFileName(fname);
     reader->Update();
 
-    vtkPolyData* output = reader->GetOutput();
+    /* clean polydata, merge repetitive points */
+    vtkSmartPointer<vtkCleanPolyData> cleanFilter =
+        vtkSmartPointer<vtkCleanPolyData>::New();
+    cleanFilter->SetInputConnection(reader->GetOutputPort());
+    cleanFilter->Update();
+
+    vtkPolyData* output = cleanFilter->GetOutput();
     const vtkIdType vnum = output->GetNumberOfPoints();
     const vtkIdType cnum = output->GetNumberOfPolys();
     std::cout << "PolyData: " << vnum << " points " << cnum << " polys" << std::endl;

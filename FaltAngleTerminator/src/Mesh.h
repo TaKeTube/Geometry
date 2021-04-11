@@ -3,12 +3,20 @@
 
 #include <vector>
 #include <unordered_map>
+#include <queue>
 #include <algorithm>
 #include "Vector.hpp"
 
 enum CellType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
 typedef std::vector<int> Cell;
+
+struct CellInfo
+{
+    bool    isBadCell;
+    int     splitTime;
+    std::vector<size_t> subCell;
+};
 
 class Vertex : public Vector3f
 {
@@ -32,18 +40,15 @@ public:
     Edge(size_t v1, size_t v2);
 
     bool operator == (const Edge& e) const{
-        return (v1Idx == e.v1Idx && v2Idx == e.v2Idx) || (v1Idx == e.v2Idx && v2Idx == e.v1Idx);
+        return ((v1Idx == e.v1Idx) && (v2Idx == e.v2Idx)) || ((v1Idx == e.v2Idx) && (v2Idx == e.v1Idx));
     }
 };
 
-class EdgeInfo
+struct EdgeInfo
 {
-public:
     bool isSplit;
+    size_t centerIdx;
     std::vector<size_t> cellIdxVec;
-
-    EdgeInfo();
-    EdgeInfo(size_t cellIdx);
 };
 
 namespace std
@@ -73,8 +78,10 @@ public:
     ~Mesh();
 
     void getE();
+    Vertex getEdgeCenter(Edge e);
+    Vertex getCellCenter(Cell c);
     size_t addVertex(Vertex v);
-    void addQuadCell(size_t v1, size_t v2, size_t v3, size_t v4);
+    int addQuadCell(size_t v1, size_t v2, size_t v3, size_t v4);
     void deleteCell(size_t idx);
     int removeFlatAngle();
 };
