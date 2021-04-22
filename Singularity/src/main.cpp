@@ -9,7 +9,7 @@ int main(int argc, char **argv){
     char* inputFname = NULL;
     char* innerOutputFname = NULL;
     char* boundaryOutputFname = NULL;
-    char defaultInputFname[] = "../data/bone.ovm";
+    char defaultInputFname[] = "../data/bunny.ovm";
     char defaultInnerOutputFname[] = "innerSingularity.vtk";
     char defaultBoundaryOutputFname[] = "boundarySingularity.vtk";
 
