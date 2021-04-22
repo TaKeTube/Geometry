@@ -37,7 +37,7 @@ int main(int argc, char **argv){
     OpenVolumeMesh::GeometricPolyhedralMeshV3f mMesh;
     OpenVolumeMesh::IO::FileManager fm;
     std::cout << fm.readFile(inputFname == NULL ? defaultInputFname : inputFname, mMesh) << std::endl;
-    
+
     vector<Edge>    innerSingularity;
     vector<Edge>    boundarySingularity;
 

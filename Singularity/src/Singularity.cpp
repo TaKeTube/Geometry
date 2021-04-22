@@ -28,7 +28,7 @@ int findSingularity(
             innerSingularity.push_back(e);
             numInnerSingularity++;
         }
-        else if (isBoundary && valence != 2)
+        else if (isBoundary && valence != 3)
         {
             boundarySingularity.push_back(e);
             numBoundarySingularity++;
