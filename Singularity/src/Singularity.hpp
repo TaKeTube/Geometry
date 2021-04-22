@@ -11,6 +11,7 @@
 typedef OpenVolumeMesh::VectorT<float, 3> Vec3f;
 typedef OpenVolumeMesh::OpenVolumeMeshEdge Edge;
 
+/* find singular lines of a ovm hex mesh */
 int findSingularity(
     OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
     std::vector<Edge> &innerSingularity,

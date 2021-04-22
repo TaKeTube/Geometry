@@ -5,6 +5,13 @@
 
 using namespace std;
 
+/*
+ * Find Inner Singular Line and Surface Singular Line of a given Hex mesh.
+ * Definition:
+ *   - An edge's valence is the number of its adjacent hex cell.
+ *   - An Inner singular edge is an edge whose valence not equal to 4.
+ *   - A surface singular edge is an edge whose valence not equal to 2.
+ */
 int main(int argc, char **argv){
     char* inputFname = NULL;
     char* innerOutputFname = NULL;
@@ -41,8 +48,10 @@ int main(int argc, char **argv){
     vector<Edge>    innerSingularity;
     vector<Edge>    boundarySingularity;
 
+    /* find inner and boundary singular lines */
     findSingularity(mMesh, innerSingularity, boundarySingularity);
 
+    /* write inner and boundary singular lines into vtk files */
     vtkSingularitiesWriter( mMesh, innerSingularity, 
                             innerOutputFname == NULL ? defaultInnerOutputFname : innerOutputFname);
     vtkSingularitiesWriter( mMesh, boundarySingularity, 

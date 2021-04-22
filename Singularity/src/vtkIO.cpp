@@ -1,4 +1,4 @@
-#define USING_VTK   0
+#define USING_VTK   0   /* MACRO, 1 for using vtk library, 0 for not using */
 
 #if USING_VTK
     #include <vtkSmartPointer.h>
@@ -22,8 +22,17 @@
 
 using namespace std;
 
-#if USING_VTK
+#if USING_VTK   /* using vtk library I/O functions */
 
+/*
+ * vtkSingularitiesWriter()
+ * DESCRIPTION: write singular lines into a vtk file
+ * INPUT: mMesh - OpenVolumeMesh hex mesh
+ *        singularity - reference to the vector of singular edges to be wrote
+ *        fname - output filenme
+ * OUTPUT: vtk file
+ * RETURN: none
+ */
 void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
     std::vector<Edge> &singularity, const char* fname)
 {
@@ -61,8 +70,17 @@ void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
     vtkWriter->Write();
 }
 
-#else
+#else   /* using primary I/O functions */
 
+/*
+ * vtkSingularitiesWriter()
+ * DESCRIPTION: write singular lines into a vtk file
+ * INPUT: mMesh - OpenVolumeMesh hex mesh
+ *        singularity - reference to the vector of singular edges to be wrote
+ *        fname - output filenme
+ * OUTPUT: vtk file
+ * RETURN: none
+ */
 void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
     std::vector<Edge> &singularity, const char* fname)
 {
@@ -70,17 +88,21 @@ void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
     const size_t sEdgeNum = singularity.size();
     const size_t sVertexNum = 2*sEdgeNum;
 
+    /* standard vtk file format */
     std::ofstream ofs(fname);
     ofs << "# vtk DataFile Version 2.0" << endl
         << fname << endl
         << "ASCII" << endl << endl
         << "DATASET POLYDATA" << endl;
     ofs << "POINTS " << vNum << " float" << endl;
+
+    /* write points of singular edges */
     for (auto v_iter = mMesh.vertices_begin(); v_iter != mMesh.vertices_end(); ++v_iter){
         Vec3f v = mMesh.vertex(v_iter.cur_handle());
         ofs << std::fixed << setprecision(7) << v.data()[0] << " " << v.data()[1] << " " << v.data()[2] << endl;
     }
 
+    /* write vertices of singular edges */
     // ofs << "VERTICES " << sVertexNum << " " << 2 * sVertexNum << endl;
     // for(size_t i = 0; i < singularity.size(); i++){
     //     Edge e = singularity.at(i);
@@ -90,6 +112,7 @@ void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
     //     ofs << "1 " << v2Idx << std::endl;
     // }
 
+    /* write singular edges */
     ofs << "LINES " << sEdgeNum << " " << 3 * sEdgeNum << endl;
     for(size_t i = 0; i < singularity.size(); i++){
         Edge e = singularity.at(i);
