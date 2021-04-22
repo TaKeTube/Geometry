@@ -3,6 +3,8 @@
 
 #include "Singularity.hpp"
 
-void vtkEdgeWriter(const char* fname , std::vector<Edge>& E);
+void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
+                            std::vector<Edge> &singularity,
+                            const char *fname);
 
 #endif

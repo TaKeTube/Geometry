@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(Test)
+project(Singularity)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -10,6 +10,11 @@ set(OPEN_VOLUME_MESH_USE_STATIC_LIBS ON)
 include_directories("D:/Program Files (x86)/OpenVolumeMesh_mingw/include")
 link_directories("D:/Program Files (x86)/OpenVolumeMesh_mingw/lib")
 
+# vtk
+SET(ENV{VTK_DIR} "D:/Program Files (x86)/VTK") 
+find_package(VTK REQUIRED)
+include(${VTK_USE_FILE})
+
 # gdb debug
 # SET(CMAKE_BUILD_TYPE "Debug")
 # SET(CMAKE_CXX_FLAGS_DEBUG "$ENV{CXXFLAGS} -O0 -Wall -g -ggdb")
@@ -19,6 +24,7 @@ aux_source_directory(src SRC)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
 add_executable(${PROJECT_NAME} ${SRC})
 target_link_libraries(${PROJECT_NAME} OpenVolumeMesh)
+target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})
 
 
 
