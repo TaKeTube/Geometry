@@ -31,3 +31,18 @@ using command line to choose input and output files, a example command is like f
 
 #### Results
 
+Blue lines are inner singular lines, Green lines are surface singular line.
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/38636.png?raw=true" style="zoom:80%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/CAD5_1.png?raw=true" style="zoom:80%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/bunny.png?raw=true" style="zoom:80%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/double_torus.png?raw=true" style="zoom:80%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/dragon.png?raw=true" style="zoom:80%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/rod.png?raw=true" style="zoom:80%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/Singularity/results/sculpt.png?raw=true" style="zoom:80%;" />
