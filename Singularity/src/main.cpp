@@ -15,7 +15,7 @@ int main(int argc, char **argv){
 
     /* 
      *  A standard command: 
-     *      ./FlatAngleTerminator.exe -input "../data/cube.obj" -output "processed_cube.vtk"
+     *      ./Singularity.exe -input "../data/dragon.ovm" -iout "dragonInnerSingular.vtk" -bout "dragonSurfaceSingular.vtk"
      */
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i],"-input")) {

@@ -81,14 +81,14 @@ void vtkSingularitiesWriter(OpenVolumeMesh::GeometricPolyhedralMeshV3f &mMesh,
         ofs << std::fixed << setprecision(7) << v.data()[0] << " " << v.data()[1] << " " << v.data()[2] << endl;
     }
 
-    ofs << "VERTICES " << sVertexNum << " " << 2 * sVertexNum << endl;
-    for(size_t i = 0; i < singularity.size(); i++){
-        Edge e = singularity.at(i);
-        int v1Idx = e.from_vertex().idx();
-        int v2Idx = e.to_vertex().idx();
-        ofs << "1 " << v1Idx << std::endl;
-        ofs << "1 " << v2Idx << std::endl;
-    }
+    // ofs << "VERTICES " << sVertexNum << " " << 2 * sVertexNum << endl;
+    // for(size_t i = 0; i < singularity.size(); i++){
+    //     Edge e = singularity.at(i);
+    //     int v1Idx = e.from_vertex().idx();
+    //     int v2Idx = e.to_vertex().idx();
+    //     ofs << "1 " << v1Idx << std::endl;
+    //     ofs << "1 " << v2Idx << std::endl;
+    // }
 
     ofs << "LINES " << sEdgeNum << " " << 3 * sEdgeNum << endl;
     for(size_t i = 0; i < singularity.size(); i++){
