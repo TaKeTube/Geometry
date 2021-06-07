@@ -73,8 +73,8 @@ public:
     std::vector<Vertex> V;
     std::vector<Cell> C;
     std::unordered_map<Edge, EdgeInfo> E;
-    std::vector<Vertex> selectedV;
-    std::vector<Cell> selectedC;
+    std::unordered_map<size_t, std::vector<size_t>> VI_CI;
+    std::unordered_map<size_t, CellInfo> cellInfoMap;
     CellType cellType;
 
     Mesh(const std::vector<Vertex>& v, const std::vector<Cell>& c, const CellType cellType);
@@ -83,13 +83,18 @@ public:
     ~Mesh();
 
     void getE();
+    void getVI_CI();
     Vertex getEdgeCenter(Edge e);
     size_t addVertex(Vertex v);
     int addHexCell( size_t v0, size_t v1, size_t v2, size_t v3, 
                     size_t v4, size_t v5, size_t v6, size_t v7);
     void deleteCell(size_t idx);
 
-    int Mesh::findTemplateType(size_t cellIdx, std::unordered_map<size_t, CellInfo> &cellInfoMap);
+    void selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC);
+    char findVbitmap(size_t cIdx);
+    void getLocalC(Cell &localc, Cell &c, int Vnum);
+    void replaceCellWithTemplate(size_t cIdx, char Vbitmap);
+    void refine(std::vector<size_t> &selectedV);
 };
 
 #endif

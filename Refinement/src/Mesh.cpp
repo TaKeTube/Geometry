@@ -1,12 +1,34 @@
 #include "Mesh.h"
-#include "global.h"
+#include "global.hpp"
 #include "Vector.hpp"
 
 enum TemplateCellType {T_INVALID, T_VERT, T_EDGE, T_FACE, T_CELL};
 
 static char faceMask[FACE_NUM] = {0x0F, 0x33, 0x66, 0x99, 0xCC, 0xF0};
-static char diagonalMask[FACE_NUM][2] = {{0x05, 0x0A}, {0x21, 0x12}, {0x42, 0x24}, {0x81, 0x18}, {0x84, 0x48}, {0x50, 0xA0}};
 
+static char diagonalMask[FACE_NUM][2] = {
+    {0x05, 0x0A}, {0x21, 0x12}, {0x42, 0x24}, 
+    {0x81, 0x18}, {0x84, 0x48}, {0x50, 0xA0}
+};
+
+static std::unordered_map<char, std::vector<int>> Global2Local {
+    /* vertex templates */
+    {0x01, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x02, {1, 2, 3, 0, 5, 6, 7, 4}}, 
+    {0x04, {2, 3, 0, 1, 6, 7, 4, 5}}, {0x08, {3, 0, 1, 2, 7, 4, 5, 6}},
+    {0x10, {4, 7, 6, 5, 0, 3, 2, 1}}, {0x20, {5, 4, 7, 6, 1, 0, 3, 2}},
+    {0x40, {6, 5, 4, 7, 2, 1, 0, 3}}, {0x80, {7, 6, 5, 4, 3, 2, 1, 0}},
+    /* edge templates */
+    {0x03, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x06, {1, 2, 3, 0, 5, 6, 7, 4}}, 
+    {0x0C, {2, 3, 0, 1, 6, 7, 4, 5}}, {0x09, {3, 0, 1, 2, 7, 4, 5, 6}},
+    {0x90, {4, 7, 6, 5, 0, 3, 2, 1}}, {0x30, {5, 4, 7, 6, 1, 0, 3, 2}},
+    {0x60, {6, 5, 4, 7, 2, 1, 0, 3}}, {0xC0, {7, 6, 5, 4, 3, 2, 1, 0}},
+    {0x11, {0, 4, 7, 3, 1, 5, 6, 2}}, {0x22, {1, 5, 6, 2, 0, 4, 7, 3}},
+    {0x44, {2, 6, 7, 3, 1, 5, 4, 0}}, {0x88, {3, 7, 4, 0, 2, 6, 5, 1}},
+    /* face templates */
+    {0x0F, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x33, {0, 1, 5, 4, 3, 2, 6, 7}},
+    {0x66, {1, 2, 6, 5, 0, 3, 7, 4}}, {0x99, {0, 4, 7, 3, 1, 5, 6, 2}},
+    {0xCC, {2, 3, 7, 6, 1, 0, 4, 5}}, {0xF0, {4, 5, 6, 7, 0, 1, 2, 3}}
+};
 
 /* constructior & destructior for class Vertex */
 Vertex::Vertex(float xx) : Vector3f(xx) {}
@@ -115,41 +137,128 @@ void Mesh::getE(){
     }
 }
 
-inline int getBitNum(char bitmap){
-    return bitNumLookup[bitmap];
+void Mesh::getVI_CI()
+{
+    if(!VI_CI.empty())
+        return;
+    for(size_t cIdx = 0; cIdx < C.size(); cIdx++){
+        for(size_t i = 0; i < C.at(cIdx).size(); i++){
+            size_t vIdx = C.at(cIdx).at(i);
+            if(!isInVec(cIdx, VI_CI.at(vIdx)))
+                VI_CI[vIdx].push_back(cIdx);
+        }
+    }
 }
 
-int Mesh::findTemplateType(size_t cellIdx, std::unordered_map<size_t, CellInfo> &cellInfoMap){
-    char Vbitmap = cellInfoMap.at(cellIdx).Vbitmap;
+void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC){
+    for(size_t vIdx = 0; vIdx < selectedV.size(); vIdx++){
+        std::vector<size_t> &cVec = VI_CI.at(vIdx);
+        for(size_t cIdx = 0; cIdx < cVec.size(); cIdx++){
+            /* whether the cell is already selected */
+            if(!isInVec(cIdx, selectedC))
+                selectedC.push_back(cIdx);
+            /* update selected vertex bitmap for the cell */
+            size_t i = 0;
+            for(i = 0; i < HEX_SIZE && vIdx != C.at(cIdx).at(i); i++);
+            cellInfoMap[cIdx].Vbitmap |= (1<<i);
+        }
+    }
+}
+
+char Mesh::findVbitmap(size_t cIdx){
+    char Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
     int Vnum = getBitNum(Vbitmap);
 
     switch(Vnum)
     {
+        /* no need for template */
         case 0:
             return 0x00;
+        /* vertex template */
         case 1:
             return Vbitmap;
+        /* edge or face or cell template */
         case 2:
             for(int i = 0; i < FACE_NUM; i++){
                 if(getBitNum(Vbitmap & faceMask[i]) == 2)
+                    /* face template */
                     if(getBitNum(Vbitmap & diagonalMask[i][0]) == 2 || getBitNum(Vbitmap & diagonalMask[i][1]) == 2)
                         return faceMask[i];
+                    /* edge template */
                     else
                         return Vbitmap;
             }
+            /* cell template */
             break;
+        /* face or cell template */
         case 3:
             for(int i = 0; i < FACE_NUM; i++)
+                /* face template */
                 if(getBitNum(Vbitmap & faceMask[i]) == 3)
                     return faceMask[i];
+            /* cell template */
             break;
+        /* face or cell template */
         case 4:
             for(int i = 0; i < FACE_NUM; i++)
+                /* face template */
                 if(Vbitmap == faceMask[i])
                     return Vbitmap;
+            /* cell template */
             break;
         default:
             break;
     }
+    /* cell template */
     return 0xFF;
+}
+
+void Mesh::replaceCellWithTemplate(size_t cIdx, char Vbitmap){
+    int Vnum = getBitNum(Vbitmap);
+    Cell localc;
+    Cell &c = C.at(cIdx);
+
+    switch(Vnum)
+    {
+        case 0:
+            break;
+        case 1:
+            for(size_t idx = 0; idx < HEX_SIZE; idx++){
+                localc.push_back(c.at(Global2Local.at(Vbitmap)[idx]));
+            }
+            break;
+        case 2:
+
+            break;
+
+        case 4:
+
+            break;
+
+        case 8:
+
+            break;
+
+        default:
+            break;
+    }
+}
+
+void Mesh::refine(std::vector<size_t> &selectedV){
+    std::vector<size_t> selectedC;
+    std::vector<size_t> abandonedCell;
+    char Vbitmap = 0x00;
+
+    /* select cell according to the selected vertexes */
+    selectCell(selectedV, selectedC);
+    for(auto c:selectedC){
+        Vbitmap = findVbitmap(c);
+        replaceCellWithTemplate(c, Vbitmap);
+    }
+
+    /* delete all abandoned cells */
+    /* has to be deleted from big to small */
+    sort(abandonedCell.rbegin(), abandonedCell.rend());
+    for(size_t i = 0; i < abandonedCell.size(); i++)
+        deleteCell(abandonedCell.at(i));
 }

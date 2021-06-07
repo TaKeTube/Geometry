@@ -2,6 +2,8 @@
 #define HEX_SIZE    8
 #define FACE_NUM    6
 
+#include <vector>
+
 const char bitNumLookup[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2,
     3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3,
@@ -15,3 +17,12 @@ const char bitNumLookup[256] = {
     4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6,
     6, 7, 6, 7, 7, 8
 };
+
+inline int getBitNum(char bitmap){
+    return bitNumLookup[bitmap];
+}
+
+template <class T>
+inline bool isInVec(T &e, std::vector<T> &v){
+    return (find(v.begin(), v.end(), e) == v.end()) ? false : true;
+}
