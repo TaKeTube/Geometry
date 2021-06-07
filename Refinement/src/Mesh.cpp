@@ -165,7 +165,7 @@ void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selec
     }
 }
 
-char Mesh::findVbitmap(size_t cIdx){
+char Mesh::getVbitmap(size_t cIdx){
     char Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
     int Vnum = getBitNum(Vbitmap);
 
@@ -213,32 +213,220 @@ char Mesh::findVbitmap(size_t cIdx){
     return 0xFF;
 }
 
-void Mesh::replaceCellWithTemplate(size_t cIdx, char Vbitmap){
+void Mesh::addVertTemplate(Cell c){
+    /* get original vertexes */
+    size_t v0Idx = c.at(0);
+    size_t v1Idx = c.at(1);
+    size_t v2Idx = c.at(2);
+    size_t v3Idx = c.at(3);
+    size_t v4Idx = c.at(4);
+    size_t v5Idx = c.at(5);
+    size_t v6Idx = c.at(6);
+    size_t v7Idx = c.at(7);
+    Vertex &v0 = V.at(v0Idx);
+    Vertex &v1 = V.at(v1Idx);
+    Vertex &v2 = V.at(v2Idx);
+    Vertex &v3 = V.at(v3Idx);
+    Vertex &v4 = V.at(v4Idx);
+    Vertex &v5 = V.at(v5Idx);
+    Vertex &v6 = V.at(v6Idx);
+    Vertex &v7 = V.at(v7Idx);
+    
+    /* calculate interpolated points */
+    Vector3f xOffset = (v1 - v0) / 3;
+    Vector3f yOffset = (v3 - v0) / 3;
+    Vector3f zOffset = (v4 - v0) / 3;
+    Vertex v8  = v0 + xOffset;
+    Vertex v10 = v0 + yOffset;
+    Vertex v11 = v0 + zOffset;
+    Vertex v9  = v0 + xOffset + yOffset;
+    Vertex v12 = v0 + xOffset + zOffset;
+    Vertex v14 = v0 + yOffset + zOffset;
+    Vertex v13 = v0 + xOffset + yOffset + zOffset;
+    
+    /* add vertexes */
+    size_t v8Idx  = addVertex(v8);
+    size_t v9Idx  = addVertex(v9);
+    size_t v10Idx = addVertex(v10);
+    size_t v11Idx = addVertex(v11);
+    size_t v12Idx = addVertex(v12);
+    size_t v13Idx = addVertex(v13);
+    size_t v14Idx = addVertex(v14);
+    
+    /* add cells */
+    addHexCell(v0Idx,  v8Idx,  v9Idx,  v10Idx, v11Idx, v12Idx, v13Idx, v14Idx);
+    addHexCell(v8Idx,  v1Idx,  v2Idx,  v9Idx,  v12Idx, v5Idx,  v6Idx,  v13Idx);
+    addHexCell(v9Idx,  v2Idx,  v3Idx,  v12Idx, v13Idx, v6Idx,  v7Idx,  v14Idx);
+    addHexCell(v11Idx, v12Idx, v13Idx, v14Idx, v4Idx,  v5Idx,  v6Idx,  v7Idx );
+}
+
+void Mesh::addEdgeTemplate(Cell c){
+    /* get original vertexes */
+    size_t v0Idx = c.at(0);
+    size_t v1Idx = c.at(1);
+    size_t v2Idx = c.at(2);
+    size_t v3Idx = c.at(3);
+    size_t v4Idx = c.at(4);
+    size_t v5Idx = c.at(5);
+    size_t v6Idx = c.at(6);
+    size_t v7Idx = c.at(7);
+    Vertex &v0 = V.at(v0Idx);
+    Vertex &v1 = V.at(v1Idx);
+    Vertex &v2 = V.at(v2Idx);
+    Vertex &v3 = V.at(v3Idx);
+    Vertex &v4 = V.at(v4Idx);
+    Vertex &v5 = V.at(v5Idx);
+    Vertex &v6 = V.at(v6Idx);
+    Vertex &v7 = V.at(v7Idx);
+
+    /* calculate interpolated points */
+    Vector3f yOffset1 = (v3 - v0) / 3;
+    Vector3f zOffset1 = (v4 - v0) / 3;
+    Vector3f yOffset2 = (v2 - v1) / 3;
+    Vector3f zOffset2 = (v5 - v1) / 3;
+    Vertex v8  = v1 + yOffset2;
+    Vertex v9  = v0 + yOffset1;
+    Vertex v10 = v0 + zOffset1;
+    Vertex v11 = v1 + zOffset2;
+    Vertex v12 = v1 + yOffset2 + zOffset2;
+    Vertex v13 = v0 + yOffset1 + zOffset1;
+
+    /* add vertexes */
+    size_t v8Idx  = addVertex(v8);
+    size_t v9Idx  = addVertex(v9);
+    size_t v10Idx = addVertex(v10);
+    size_t v11Idx = addVertex(v11);
+    size_t v12Idx = addVertex(v12);
+    size_t v13Idx = addVertex(v13);
+
+    /* add cells */
+    addHexCell(v0Idx,  v1Idx,  v8Idx,  v9Idx,  v10Idx, v11Idx, v12Idx, v13Idx);
+    addHexCell(v9Idx,  v8Idx,  v2Idx,  v3Idx,  v13Idx, v12Idx, v6Idx,  v7Idx);
+    addHexCell(v10Idx, v11Idx, v12Idx, v13Idx, v4Idx,  v5Idx,  v6Idx,  v7Idx);
+}
+
+void Mesh::addFaceTemplate(Cell c){
+    /* get original vertexes */
+    size_t v0Idx = c.at(0);
+    size_t v1Idx = c.at(1);
+    size_t v2Idx = c.at(2);
+    size_t v3Idx = c.at(3);
+    size_t v4Idx = c.at(4);
+    size_t v5Idx = c.at(5);
+    size_t v6Idx = c.at(6);
+    size_t v7Idx = c.at(7);
+    Vertex &v0 = V.at(v0Idx);
+    Vertex &v1 = V.at(v1Idx);
+    Vertex &v2 = V.at(v2Idx);
+    Vertex &v3 = V.at(v3Idx);
+    Vertex &v4 = V.at(v4Idx);
+    Vertex &v5 = V.at(v5Idx);
+    Vertex &v6 = V.at(v6Idx);
+    Vertex &v7 = V.at(v7Idx);
+
+    /* calculate interpolated points */
+    Vertex v8  = v0 + (v4 - v0) / 3;
+    Vertex v9  = v1 + (v5 - v1) / 3;
+    Vertex v10 = v2 + (v6 - v2) / 3;
+    Vertex v11 = v3 + (v7 - v3) / 3;
+
+    /* add vertexes */
+    size_t v8Idx  = addVertex(v8);
+    size_t v9Idx  = addVertex(v9);
+    size_t v10Idx = addVertex(v10);
+    size_t v11Idx = addVertex(v11);
+
+    /* add cells */
+    addHexCell(v0Idx, v1Idx, v2Idx,  v3Idx,  v8Idx, v9Idx, v10Idx, v11Idx);
+    addHexCell(v8Idx, v9Idx, v10Idx, v11Idx, v4Idx, v5Idx, v6Idx,  v7Idx );
+}
+
+void Mesh::addCellTemplate(Cell c){
+    /* get original vertexes */
+    size_t v0Idx = c.at(0);
+    size_t v1Idx = c.at(1);
+    size_t v2Idx = c.at(2);
+    size_t v3Idx = c.at(3);
+    size_t v4Idx = c.at(4);
+    size_t v5Idx = c.at(5);
+    size_t v6Idx = c.at(6);
+    size_t v7Idx = c.at(7);
+    Vertex &v0 = V.at(v0Idx);
+    Vertex &v1 = V.at(v1Idx);
+    Vertex &v2 = V.at(v2Idx);
+    Vertex &v3 = V.at(v3Idx);
+    Vertex &v4 = V.at(v4Idx);
+    Vertex &v5 = V.at(v5Idx);
+    Vertex &v6 = V.at(v6Idx);
+    Vertex &v7 = V.at(v7Idx);
+
+    // /* calculate interpolated points */
+    // Vertex v8  = v0 + (v4 - v0) / 3;
+    // Vertex v9  = v1 + (v5 - v1) / 3;
+    // Vertex v10 = v2 + (v6 - v2) / 3;
+    // Vertex v11 = v3 + (v7 - v3) / 3;
+    // Vertex v12  = v0 + (v4 - v0) / 3;
+    // Vertex v13  = v1 + (v5 - v1) / 3;
+    // Vertex v14 = v2 + (v6 - v2) / 3;
+    // Vertex v15 = v3 + (v7 - v3) / 3;
+    // Vertex v16  = v0 + (v4 - v0) / 3;
+    // Vertex v17  = v1 + (v5 - v1) / 3;
+    // Vertex v18 = v2 + (v6 - v2) / 3;
+    // Vertex v19 = v3 + (v7 - v3) / 3;
+    // Vertex v20  = v0 + (v4 - v0) / 3;
+    // Vertex v21  = v1 + (v5 - v1) / 3;
+    // Vertex v22 = v2 + (v6 - v2) / 3;
+    // Vertex v23 = v3 + (v7 - v3) / 3;
+
+    // /* add vertexes */
+    // size_t v8Idx  = addVertex(v8);
+    // size_t v9Idx  = addVertex(v9);
+    // size_t v10Idx = addVertex(v10);
+    // size_t v11Idx = addVertex(v11);
+
+    // /* add cells */
+    // addHexCell(v0Idx, v1Idx, v2Idx,  v3Idx,  v8Idx, v9Idx, v10Idx, v11Idx);
+    // addHexCell(v8Idx, v9Idx, v10Idx, v11Idx, v4Idx, v5Idx, v6Idx,  v7Idx );
+}
+
+void Mesh::replaceCellWithTemplate(size_t cIdx, char Vbitmap, std::vector<size_t> abandonedCell){
     int Vnum = getBitNum(Vbitmap);
     Cell localc;
     Cell &c = C.at(cIdx);
+
+    /* tranfer global vertex index to local vertex index */
+    /* index 0 is the main corner */
+    /* 
+     *   7 ------- 6    ==vertex==  ==edge==  ==face==
+     *  /|        /|    /       / /       / /        /
+     * 4 ------- 5 |   --------- ---------  ---------|
+     * | 3 ------| 2   |       | |       |  |       ||
+     * |/        |/    |===|   | |=======|  |=======||
+     * 0 ------- 1     0---|---1 0-------1  0-------1/
+     */
+    for(size_t idx = 0; idx < HEX_SIZE; idx++)
+        localc.push_back(c.at(Global2Local.at(Vbitmap)[idx]));
 
     switch(Vnum)
     {
         case 0:
             break;
         case 1:
-            for(size_t idx = 0; idx < HEX_SIZE; idx++){
-                localc.push_back(c.at(Global2Local.at(Vbitmap)[idx]));
-            }
+            addVertTemplate(localc);
+            abandonedCell.push_back(cIdx);
             break;
         case 2:
-
+            addEdgeTemplate(localc);
+            abandonedCell.push_back(cIdx);
             break;
-
         case 4:
-
+            addFaceTemplate(localc);
+            abandonedCell.push_back(cIdx);
             break;
-
         case 8:
-
+            addCellTemplate(localc);
+            abandonedCell.push_back(cIdx);
             break;
-
         default:
             break;
     }
@@ -252,8 +440,8 @@ void Mesh::refine(std::vector<size_t> &selectedV){
     /* select cell according to the selected vertexes */
     selectCell(selectedV, selectedC);
     for(auto c:selectedC){
-        Vbitmap = findVbitmap(c);
-        replaceCellWithTemplate(c, Vbitmap);
+        Vbitmap = getVbitmap(c);
+        replaceCellWithTemplate(c, Vbitmap, abandonedCell);
     }
 
     /* delete all abandoned cells */

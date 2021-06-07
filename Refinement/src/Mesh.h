@@ -90,10 +90,14 @@ public:
                     size_t v4, size_t v5, size_t v6, size_t v7);
     void deleteCell(size_t idx);
 
+    void addVertTemplate(Cell c);
+    void addEdgeTemplate(Cell c);
+    void addFaceTemplate(Cell c);
+    void addCellTemplate(Cell c);
     void selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC);
-    char findVbitmap(size_t cIdx);
+    char getVbitmap(size_t cIdx);
     void getLocalC(Cell &localc, Cell &c, int Vnum);
-    void replaceCellWithTemplate(size_t cIdx, char Vbitmap);
+    void replaceCellWithTemplate(size_t cIdx, char Vbitmap, std::vector<size_t> abandonedCell);
     void refine(std::vector<size_t> &selectedV);
 };
 
