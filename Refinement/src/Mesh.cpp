@@ -257,7 +257,7 @@ void Mesh::addVertTemplate(Cell c){
     /* add cells */
     addHexCell(v0Idx,  v8Idx,  v9Idx,  v10Idx, v11Idx, v12Idx, v13Idx, v14Idx);
     addHexCell(v8Idx,  v1Idx,  v2Idx,  v9Idx,  v12Idx, v5Idx,  v6Idx,  v13Idx);
-    addHexCell(v9Idx,  v2Idx,  v3Idx,  v12Idx, v13Idx, v6Idx,  v7Idx,  v14Idx);
+    addHexCell(v10Idx, v9Idx,  v2Idx,  v3Idx,  v14Idx, v13Idx, v6Idx,  v7Idx );
     addHexCell(v11Idx, v12Idx, v13Idx, v14Idx, v4Idx,  v5Idx,  v6Idx,  v7Idx );
 }
 
@@ -522,7 +522,7 @@ void Mesh::addCellTemplate(Cell c){
     addHexCell(v42Idx, v43Idx, v47Idx, v46Idx, v58Idx, v59Idx, v63Idx, v62Idx);
 }
 
-void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> abandonedCell){
+void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> &abandonedCell){
     int Vnum = getBitNum(Vbitmap);
     Cell localc;
     Cell &c = C.at(cIdx);

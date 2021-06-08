@@ -97,7 +97,7 @@ public:
     void selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC);
     unsigned char getVbitmap(size_t cIdx);
     void getLocalC(Cell &localc, Cell &c, int Vnum);
-    void replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> abandonedCell);
+    void replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> &abandonedCell);
     void refine(std::vector<size_t> &selectedV);
 };
 
