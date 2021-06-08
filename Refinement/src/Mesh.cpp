@@ -343,50 +343,182 @@ void Mesh::addFaceTemplate(Cell c){
 
 void Mesh::addCellTemplate(Cell c){
     /* get original vertexes */
-    size_t v0Idx = c.at(0);
-    size_t v1Idx = c.at(1);
-    size_t v2Idx = c.at(2);
-    size_t v3Idx = c.at(3);
-    size_t v4Idx = c.at(4);
-    size_t v5Idx = c.at(5);
-    size_t v6Idx = c.at(6);
-    size_t v7Idx = c.at(7);
-    Vertex &v0 = V.at(v0Idx);
-    Vertex &v1 = V.at(v1Idx);
-    Vertex &v2 = V.at(v2Idx);
-    Vertex &v3 = V.at(v3Idx);
-    Vertex &v4 = V.at(v4Idx);
-    Vertex &v5 = V.at(v5Idx);
-    Vertex &v6 = V.at(v6Idx);
-    Vertex &v7 = V.at(v7Idx);
+    size_t v0Idx  = c.at(0);
+    size_t v3Idx  = c.at(1);
+    size_t v12Idx = c.at(2);
+    size_t v15Idx = c.at(3);
+    size_t v48Idx = c.at(4);
+    size_t v51Idx = c.at(5);
+    size_t v60Idx = c.at(6);
+    size_t v63Idx = c.at(7);
+    Vertex &v0  = V.at(v0Idx);
+    Vertex &v3  = V.at(v3Idx);
+    Vertex &v12 = V.at(v12Idx);
+    Vertex &v15 = V.at(v15Idx);
+    Vertex &v48 = V.at(v48Idx);
+    Vertex &v51 = V.at(v51Idx);
+    Vertex &v60 = V.at(v60Idx);
+    Vertex &v63 = V.at(v63Idx);
 
-    // /* calculate interpolated points */
-    // Vertex v8  = v0 + (v4 - v0) / 3;
-    // Vertex v9  = v1 + (v5 - v1) / 3;
-    // Vertex v10 = v2 + (v6 - v2) / 3;
-    // Vertex v11 = v3 + (v7 - v3) / 3;
-    // Vertex v12  = v0 + (v4 - v0) / 3;
-    // Vertex v13  = v1 + (v5 - v1) / 3;
-    // Vertex v14 = v2 + (v6 - v2) / 3;
-    // Vertex v15 = v3 + (v7 - v3) / 3;
-    // Vertex v16  = v0 + (v4 - v0) / 3;
-    // Vertex v17  = v1 + (v5 - v1) / 3;
-    // Vertex v18 = v2 + (v6 - v2) / 3;
-    // Vertex v19 = v3 + (v7 - v3) / 3;
-    // Vertex v20  = v0 + (v4 - v0) / 3;
-    // Vertex v21  = v1 + (v5 - v1) / 3;
-    // Vertex v22 = v2 + (v6 - v2) / 3;
-    // Vertex v23 = v3 + (v7 - v3) / 3;
+    /* calculate interpolated points */
+    /* first layer */
+    // Vertex v0  = ;
+    // Vertex v3  = ;
+    // Vertex v12 = ;
+    // Vertex v15 = ;
+    Vertex v1  = v0  + (v3  - v0) / 3;
+    Vertex v2  = v3  - (v3  - v0) / 3;
+    Vertex v4  = v0  + (v12 - v0) / 3;
+    Vertex v7  = v3  + (v15 - v3) / 3;
+    Vertex v5  = v4  + (v7  - v4) / 3;
+    Vertex v6  = v7  - (v7  - v4) / 3;
+    Vertex v8  = v12 - (v12 - v0) / 3;
+    Vertex v11 = v15 - (v15 - v3) / 3;
+    Vertex v9  = v8  + (v11 - v8) / 3;
+    Vertex v10 = v11 - (v11 - v8) / 3;
+    Vertex v13 = v12 + (v15 - v12) / 3;
+    Vertex v14 = v15 - (v15 - v12) / 3;
+    /* second layer */
+    Vertex v16 = v0  + (v48 - v0 ) / 3; 
+    Vertex v19 = v3  + (v51 - v3 ) / 3;
+    Vertex v28 = v12 + (v60 - v12) / 3;
+    Vertex v31 = v15 + (v63 - v15) / 3;
+    Vertex v17 = v16 + (v19 - v16) / 3;
+    Vertex v18 = v19 - (v19 - v16) / 3;
+    Vertex v20 = v16 + (v28 - v16) / 3;
+    Vertex v23 = v19 + (v31 - v19) / 3;
+    Vertex v21 = v20 + (v23 - v20) / 3;
+    Vertex v22 = v23 - (v23 - v20) / 3;
+    Vertex v24 = v28 - (v28 - v16) / 3;
+    Vertex v27 = v31 - (v31 - v19) / 3;
+    Vertex v25 = v24 + (v27 - v24) / 3;
+    Vertex v26 = v27 - (v27 - v24) / 3;
+    Vertex v29 = v28 + (v31 - v28) / 3;
+    Vertex v30 = v31 - (v31 - v28) / 3;
+    /* third layer */
+    Vertex v32 = v48 - (v48 - v0 ) / 3;
+    Vertex v35 = v51 - (v51 - v3 ) / 3;
+    Vertex v44 = v60 - (v60 - v12) / 3;
+    Vertex v47 = v63 - (v63 - v15) / 3;
+    Vertex v33 = v32 + (v35 - v32) / 3;
+    Vertex v34 = v35 - (v35 - v32) / 3;
+    Vertex v36 = v32 + (v44 - v32) / 3;
+    Vertex v39 = v35 + (v47 - v35) / 3;
+    Vertex v37 = v36 + (v39 - v36) / 3;
+    Vertex v38 = v39 - (v39 - v36) / 3;
+    Vertex v40 = v44 - (v44 - v32) / 3;
+    Vertex v43 = v47 - (v47 - v35) / 3;
+    Vertex v41 = v40 + (v43 - v40) / 3;
+    Vertex v42 = v43 - (v43 - v40) / 3;
+    Vertex v45 = v44 + (v47 - v44) / 3;
+    Vertex v46 = v47 - (v47 - v44) / 3;
+    /* forth layer */
+    // Vertex v48  = ;
+    // Vertex v51  = ;
+    // Vertex v60 = ;
+    // Vertex v63 = ;
+    Vertex v49 = v48 + (v51 - v48) / 3;
+    Vertex v50 = v51 - (v51 - v48) / 3;
+    Vertex v52 = v48 + (v60 - v48) / 3;
+    Vertex v55 = v51 + (v63 - v51) / 3;
+    Vertex v53 = v52 + (v55 - v52) / 3;
+    Vertex v54 = v55 - (v55 - v52) / 3;
+    Vertex v56 = v60 - (v60 - v48) / 3;
+    Vertex v59 = v63 - (v63 - v51) / 3;
+    Vertex v57 = v56 + (v59 - v56) / 3;
+    Vertex v58 = v59 - (v59 - v56) / 3;
+    Vertex v61 = v60 + (v63 - v60) / 3;
+    Vertex v62 = v63 - (v63 - v60) / 3;
 
-    // /* add vertexes */
-    // size_t v8Idx  = addVertex(v8);
-    // size_t v9Idx  = addVertex(v9);
-    // size_t v10Idx = addVertex(v10);
-    // size_t v11Idx = addVertex(v11);
+    /* add vertexes */
+    size_t v1Idx  = addVertex(v1Idx );
+    size_t v2Idx  = addVertex(v2Idx );
+    size_t v4Idx  = addVertex(v4Idx );
+    size_t v7Idx  = addVertex(v7Idx );
+    size_t v5Idx  = addVertex(v5Idx );
+    size_t v6Idx  = addVertex(v6Idx );
+    size_t v8Idx  = addVertex(v8Idx );
+    size_t v11Idx = addVertex(v11Idx);
+    size_t v9Idx  = addVertex(v9Idx );
+    size_t v10Idx = addVertex(v10Idx);
+    size_t v13Idx = addVertex(v13Idx);
+    size_t v14Idx = addVertex(v14Idx);
 
-    // /* add cells */
-    // addHexCell(v0Idx, v1Idx, v2Idx,  v3Idx,  v8Idx, v9Idx, v10Idx, v11Idx);
-    // addHexCell(v8Idx, v9Idx, v10Idx, v11Idx, v4Idx, v5Idx, v6Idx,  v7Idx );
+    size_t v16Idx = addVertex(v16Idx);
+    size_t v19Idx = addVertex(v19Idx);
+    size_t v28Idx = addVertex(v28Idx);
+    size_t v31Idx = addVertex(v31Idx);
+    size_t v17Idx = addVertex(v17Idx);
+    size_t v18Idx = addVertex(v18Idx);
+    size_t v20Idx = addVertex(v20Idx);
+    size_t v23Idx = addVertex(v23Idx);
+    size_t v21Idx = addVertex(v21Idx);
+    size_t v22Idx = addVertex(v22Idx);
+    size_t v24Idx = addVertex(v24Idx);
+    size_t v27Idx = addVertex(v27Idx);
+    size_t v25Idx = addVertex(v25Idx);
+    size_t v26Idx = addVertex(v26Idx);
+    size_t v29Idx = addVertex(v29Idx);
+    size_t v30Idx = addVertex(v30Idx);
+
+    size_t v32Idx = addVertex(v32Idx);
+    size_t v35Idx = addVertex(v35Idx);
+    size_t v44Idx = addVertex(v44Idx);
+    size_t v47Idx = addVertex(v47Idx);
+    size_t v33Idx = addVertex(v33Idx);
+    size_t v34Idx = addVertex(v34Idx);
+    size_t v36Idx = addVertex(v36Idx);
+    size_t v39Idx = addVertex(v39Idx);
+    size_t v37Idx = addVertex(v37Idx);
+    size_t v38Idx = addVertex(v38Idx);
+    size_t v40Idx = addVertex(v40Idx);
+    size_t v43Idx = addVertex(v43Idx);
+    size_t v41Idx = addVertex(v41Idx);
+    size_t v42Idx = addVertex(v42Idx);
+    size_t v45Idx = addVertex(v45Idx);
+    size_t v46Idx = addVertex(v46Idx);
+
+    size_t v49Idx = addVertex(v49Idx);
+    size_t v50Idx = addVertex(v50Idx);
+    size_t v52Idx = addVertex(v52Idx);
+    size_t v55Idx = addVertex(v55Idx);
+    size_t v53Idx = addVertex(v53Idx);
+    size_t v54Idx = addVertex(v54Idx);
+    size_t v56Idx = addVertex(v56Idx);
+    size_t v59Idx = addVertex(v59Idx);
+    size_t v57Idx = addVertex(v57Idx);
+    size_t v58Idx = addVertex(v58Idx);
+    size_t v61Idx = addVertex(v61Idx);
+    size_t v62Idx = addVertex(v62Idx);
+
+    /* add cells */ 
+    addHexCell(v0Idx,  v1Idx,  v5Idx,  v4Idx,  v16Idx, v17Idx, v21Idx, v20Idx);
+    addHexCell(v1Idx,  v2Idx,  v6Idx,  v5Idx,  v17Idx, v18Idx, v22Idx, v21Idx);
+    addHexCell(v2Idx,  v3Idx,  v7Idx,  v6Idx,  v18Idx, v19Idx, v23Idx, v22Idx);
+    addHexCell(v4Idx,  v5Idx,  v9Idx,  v8Idx,  v20Idx, v21Idx, v25Idx, v24Idx);
+    addHexCell(v5Idx,  v6Idx,  v10Idx, v9Idx,  v21Idx, v22Idx, v26Idx, v25Idx);
+    addHexCell(v6Idx,  v7Idx,  v11Idx, v10Idx, v22Idx, v23Idx, v27Idx, v26Idx);
+    addHexCell(v8Idx,  v9Idx,  v13Idx, v12Idx, v24Idx, v25Idx, v29Idx, v28Idx);
+    addHexCell(v9Idx,  v10Idx, v14Idx, v13Idx, v25Idx, v26Idx, v30Idx, v29Idx);
+    addHexCell(v10Idx, v11Idx, v15Idx, v14Idx, v26Idx, v27Idx, v31Idx, v30Idx);
+    addHexCell(v16Idx, v17Idx, v21Idx, v20Idx, v32Idx, v33Idx, v37Idx, v36Idx);
+    addHexCell(v17Idx, v18Idx, v22Idx, v21Idx, v33Idx, v34Idx, v38Idx, v37Idx);
+    addHexCell(v18Idx, v19Idx, v23Idx, v22Idx, v34Idx, v35Idx, v39Idx, v38Idx);
+    addHexCell(v20Idx, v21Idx, v25Idx, v24Idx, v36Idx, v37Idx, v41Idx, v40Idx);
+    addHexCell(v21Idx, v22Idx, v26Idx, v25Idx, v37Idx, v38Idx, v42Idx, v41Idx);
+    addHexCell(v22Idx, v23Idx, v27Idx, v26Idx, v38Idx, v39Idx, v43Idx, v42Idx);
+    addHexCell(v24Idx, v25Idx, v29Idx, v28Idx, v40Idx, v41Idx, v45Idx, v44Idx);
+    addHexCell(v25Idx, v26Idx, v30Idx, v29Idx, v41Idx, v42Idx, v46Idx, v45Idx);
+    addHexCell(v26Idx, v27Idx, v31Idx, v30Idx, v42Idx, v43Idx, v47Idx, v46Idx);
+    addHexCell(v32Idx, v33Idx, v37Idx, v36Idx, v48Idx, v49Idx, v53Idx, v52Idx);
+    addHexCell(v33Idx, v34Idx, v38Idx, v37Idx, v49Idx, v50Idx, v54Idx, v53Idx);
+    addHexCell(v34Idx, v35Idx, v39Idx, v38Idx, v50Idx, v51Idx, v55Idx, v54Idx);
+    addHexCell(v36Idx, v37Idx, v41Idx, v40Idx, v52Idx, v53Idx, v57Idx, v56Idx);
+    addHexCell(v37Idx, v38Idx, v42Idx, v41Idx, v53Idx, v54Idx, v58Idx, v57Idx);
+    addHexCell(v38Idx, v39Idx, v43Idx, v42Idx, v54Idx, v55Idx, v59Idx, v58Idx);
+    addHexCell(v40Idx, v41Idx, v45Idx, v44Idx, v56Idx, v57Idx, v61Idx, v60Idx);
+    addHexCell(v41Idx, v42Idx, v46Idx, v45Idx, v57Idx, v58Idx, v62Idx, v61Idx);
+    addHexCell(v42Idx, v43Idx, v47Idx, v46Idx, v58Idx, v59Idx, v63Idx, v62Idx);
 }
 
 void Mesh::replaceCellWithTemplate(size_t cIdx, char Vbitmap, std::vector<size_t> abandonedCell){
