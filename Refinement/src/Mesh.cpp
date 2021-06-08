@@ -4,14 +4,14 @@
 
 enum TemplateCellType {T_INVALID, T_VERT, T_EDGE, T_FACE, T_CELL};
 
-static char faceMask[FACE_NUM] = {0x0F, 0x33, 0x66, 0x99, 0xCC, 0xF0};
+static unsigned char faceMask[FACE_NUM] = {0x0F, 0x33, 0x66, 0x99, 0xCC, 0xF0};
 
-static char diagonalMask[FACE_NUM][2] = {
+static unsigned char diagonalMask[FACE_NUM][2] = {
     {0x05, 0x0A}, {0x21, 0x12}, {0x42, 0x24}, 
     {0x81, 0x18}, {0x84, 0x48}, {0x50, 0xA0}
 };
 
-static std::unordered_map<char, std::vector<int>> Global2Local {
+static std::unordered_map<unsigned char, std::vector<int>> Global2Local {
     /* vertex templates */
     {0x01, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x02, {1, 2, 3, 0, 5, 6, 7, 4}}, 
     {0x04, {2, 3, 0, 1, 6, 7, 4, 5}}, {0x08, {3, 0, 1, 2, 7, 4, 5, 6}},
@@ -144,7 +144,7 @@ void Mesh::getVI_CI()
     for(size_t cIdx = 0; cIdx < C.size(); cIdx++){
         for(size_t i = 0; i < C.at(cIdx).size(); i++){
             size_t vIdx = C.at(cIdx).at(i);
-            if(!isInVec(cIdx, VI_CI.at(vIdx)))
+            if(!isInMap(vIdx, VI_CI) || !isInVec(cIdx, VI_CI.at(vIdx)))
                 VI_CI[vIdx].push_back(cIdx);
         }
     }
@@ -159,14 +159,14 @@ void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selec
                 selectedC.push_back(cIdx);
             /* update selected vertex bitmap for the cell */
             size_t i = 0;
-            for(i = 0; i < HEX_SIZE && vIdx != C.at(cIdx).at(i); i++);
+            for(i = 0; i < HEX_SIZE && (int)vIdx != C.at(cIdx).at(i); i++);
             cellInfoMap[cIdx].Vbitmap |= (1<<i);
         }
     }
 }
 
-char Mesh::getVbitmap(size_t cIdx){
-    char Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
+unsigned char Mesh::getVbitmap(size_t cIdx){
+    unsigned char Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
     int Vnum = getBitNum(Vbitmap);
 
     switch(Vnum)
@@ -180,13 +180,14 @@ char Mesh::getVbitmap(size_t cIdx){
         /* edge or face or cell template */
         case 2:
             for(int i = 0; i < FACE_NUM; i++){
-                if(getBitNum(Vbitmap & faceMask[i]) == 2)
+                if(getBitNum(Vbitmap & faceMask[i]) == 2){
                     /* face template */
                     if(getBitNum(Vbitmap & diagonalMask[i][0]) == 2 || getBitNum(Vbitmap & diagonalMask[i][1]) == 2)
                         return faceMask[i];
                     /* edge template */
                     else
                         return Vbitmap;
+                }
             }
             /* cell template */
             break;
@@ -225,12 +226,12 @@ void Mesh::addVertTemplate(Cell c){
     size_t v7Idx = c.at(7);
     Vertex &v0 = V.at(v0Idx);
     Vertex &v1 = V.at(v1Idx);
-    Vertex &v2 = V.at(v2Idx);
+    // Vertex &v2 = V.at(v2Idx);
     Vertex &v3 = V.at(v3Idx);
     Vertex &v4 = V.at(v4Idx);
-    Vertex &v5 = V.at(v5Idx);
-    Vertex &v6 = V.at(v6Idx);
-    Vertex &v7 = V.at(v7Idx);
+    // Vertex &v5 = V.at(v5Idx);
+    // Vertex &v6 = V.at(v6Idx);
+    // Vertex &v7 = V.at(v7Idx);
     
     /* calculate interpolated points */
     Vector3f xOffset = (v1 - v0) / 3;
@@ -276,8 +277,8 @@ void Mesh::addEdgeTemplate(Cell c){
     Vertex &v3 = V.at(v3Idx);
     Vertex &v4 = V.at(v4Idx);
     Vertex &v5 = V.at(v5Idx);
-    Vertex &v6 = V.at(v6Idx);
-    Vertex &v7 = V.at(v7Idx);
+    // Vertex &v6 = V.at(v6Idx);
+    // Vertex &v7 = V.at(v7Idx);
 
     /* calculate interpolated points */
     Vector3f yOffset1 = (v3 - v0) / 3;
@@ -431,65 +432,65 @@ void Mesh::addCellTemplate(Cell c){
     Vertex v62 = v63 - (v63 - v60) / 3;
 
     /* add vertexes */
-    size_t v1Idx  = addVertex(v1Idx );
-    size_t v2Idx  = addVertex(v2Idx );
-    size_t v4Idx  = addVertex(v4Idx );
-    size_t v7Idx  = addVertex(v7Idx );
-    size_t v5Idx  = addVertex(v5Idx );
-    size_t v6Idx  = addVertex(v6Idx );
-    size_t v8Idx  = addVertex(v8Idx );
-    size_t v11Idx = addVertex(v11Idx);
-    size_t v9Idx  = addVertex(v9Idx );
-    size_t v10Idx = addVertex(v10Idx);
-    size_t v13Idx = addVertex(v13Idx);
-    size_t v14Idx = addVertex(v14Idx);
+    size_t v1Idx  = addVertex(v1);
+    size_t v2Idx  = addVertex(v2);
+    size_t v4Idx  = addVertex(v4);
+    size_t v7Idx  = addVertex(v7);
+    size_t v5Idx  = addVertex(v5);
+    size_t v6Idx  = addVertex(v6);
+    size_t v8Idx  = addVertex(v8);
+    size_t v11Idx = addVertex(v11);
+    size_t v9Idx  = addVertex(v9);
+    size_t v10Idx = addVertex(v10);
+    size_t v13Idx = addVertex(v13);
+    size_t v14Idx = addVertex(v14);
 
-    size_t v16Idx = addVertex(v16Idx);
-    size_t v19Idx = addVertex(v19Idx);
-    size_t v28Idx = addVertex(v28Idx);
-    size_t v31Idx = addVertex(v31Idx);
-    size_t v17Idx = addVertex(v17Idx);
-    size_t v18Idx = addVertex(v18Idx);
-    size_t v20Idx = addVertex(v20Idx);
-    size_t v23Idx = addVertex(v23Idx);
-    size_t v21Idx = addVertex(v21Idx);
-    size_t v22Idx = addVertex(v22Idx);
-    size_t v24Idx = addVertex(v24Idx);
-    size_t v27Idx = addVertex(v27Idx);
-    size_t v25Idx = addVertex(v25Idx);
-    size_t v26Idx = addVertex(v26Idx);
-    size_t v29Idx = addVertex(v29Idx);
-    size_t v30Idx = addVertex(v30Idx);
+    size_t v16Idx = addVertex(v16);
+    size_t v19Idx = addVertex(v19);
+    size_t v28Idx = addVertex(v28);
+    size_t v31Idx = addVertex(v31);
+    size_t v17Idx = addVertex(v17);
+    size_t v18Idx = addVertex(v18);
+    size_t v20Idx = addVertex(v20);
+    size_t v23Idx = addVertex(v23);
+    size_t v21Idx = addVertex(v21);
+    size_t v22Idx = addVertex(v22);
+    size_t v24Idx = addVertex(v24);
+    size_t v27Idx = addVertex(v27);
+    size_t v25Idx = addVertex(v25);
+    size_t v26Idx = addVertex(v26);
+    size_t v29Idx = addVertex(v29);
+    size_t v30Idx = addVertex(v30);
 
-    size_t v32Idx = addVertex(v32Idx);
-    size_t v35Idx = addVertex(v35Idx);
-    size_t v44Idx = addVertex(v44Idx);
-    size_t v47Idx = addVertex(v47Idx);
-    size_t v33Idx = addVertex(v33Idx);
-    size_t v34Idx = addVertex(v34Idx);
-    size_t v36Idx = addVertex(v36Idx);
-    size_t v39Idx = addVertex(v39Idx);
-    size_t v37Idx = addVertex(v37Idx);
-    size_t v38Idx = addVertex(v38Idx);
-    size_t v40Idx = addVertex(v40Idx);
-    size_t v43Idx = addVertex(v43Idx);
-    size_t v41Idx = addVertex(v41Idx);
-    size_t v42Idx = addVertex(v42Idx);
-    size_t v45Idx = addVertex(v45Idx);
-    size_t v46Idx = addVertex(v46Idx);
+    size_t v32Idx = addVertex(v32);
+    size_t v35Idx = addVertex(v35);
+    size_t v44Idx = addVertex(v44);
+    size_t v47Idx = addVertex(v47);
+    size_t v33Idx = addVertex(v33);
+    size_t v34Idx = addVertex(v34);
+    size_t v36Idx = addVertex(v36);
+    size_t v39Idx = addVertex(v39);
+    size_t v37Idx = addVertex(v37);
+    size_t v38Idx = addVertex(v38);
+    size_t v40Idx = addVertex(v40);
+    size_t v43Idx = addVertex(v43);
+    size_t v41Idx = addVertex(v41);
+    size_t v42Idx = addVertex(v42);
+    size_t v45Idx = addVertex(v45);
+    size_t v46Idx = addVertex(v46);
 
-    size_t v49Idx = addVertex(v49Idx);
-    size_t v50Idx = addVertex(v50Idx);
-    size_t v52Idx = addVertex(v52Idx);
-    size_t v55Idx = addVertex(v55Idx);
-    size_t v53Idx = addVertex(v53Idx);
-    size_t v54Idx = addVertex(v54Idx);
-    size_t v56Idx = addVertex(v56Idx);
-    size_t v59Idx = addVertex(v59Idx);
-    size_t v57Idx = addVertex(v57Idx);
-    size_t v58Idx = addVertex(v58Idx);
-    size_t v61Idx = addVertex(v61Idx);
-    size_t v62Idx = addVertex(v62Idx);
+    size_t v49Idx = addVertex(v49);
+    size_t v50Idx = addVertex(v50);
+    size_t v52Idx = addVertex(v52);
+    size_t v55Idx = addVertex(v55);
+    size_t v53Idx = addVertex(v53);
+    size_t v54Idx = addVertex(v54);
+    size_t v56Idx = addVertex(v56);
+    size_t v59Idx = addVertex(v59);
+    size_t v57Idx = addVertex(v57);
+    size_t v58Idx = addVertex(v58);
+    size_t v61Idx = addVertex(v61);
+    size_t v62Idx = addVertex(v62);
 
     /* add cells */ 
     addHexCell(v0Idx,  v1Idx,  v5Idx,  v4Idx,  v16Idx, v17Idx, v21Idx, v20Idx);
@@ -521,7 +522,7 @@ void Mesh::addCellTemplate(Cell c){
     addHexCell(v42Idx, v43Idx, v47Idx, v46Idx, v58Idx, v59Idx, v63Idx, v62Idx);
 }
 
-void Mesh::replaceCellWithTemplate(size_t cIdx, char Vbitmap, std::vector<size_t> abandonedCell){
+void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> abandonedCell){
     int Vnum = getBitNum(Vbitmap);
     Cell localc;
     Cell &c = C.at(cIdx);
@@ -567,7 +568,7 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, char Vbitmap, std::vector<size_t
 void Mesh::refine(std::vector<size_t> &selectedV){
     std::vector<size_t> selectedC;
     std::vector<size_t> abandonedCell;
-    char Vbitmap = 0x00;
+    unsigned char Vbitmap = 0x00;
 
     /* select cell according to the selected vertexes */
     selectCell(selectedV, selectedC);

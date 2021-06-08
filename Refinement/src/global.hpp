@@ -3,6 +3,7 @@
 #define FACE_NUM    6
 
 #include <vector>
+#include <unordered_map>
 
 const char bitNumLookup[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2,
@@ -18,11 +19,16 @@ const char bitNumLookup[256] = {
     6, 7, 6, 7, 7, 8
 };
 
-inline int getBitNum(char bitmap){
-    return bitNumLookup[bitmap];
+inline int getBitNum(unsigned char bitmap){
+    return bitNumLookup[(int)bitmap];
 }
 
 template <class T>
 inline bool isInVec(T &e, std::vector<T> &v){
     return (find(v.begin(), v.end(), e) == v.end()) ? false : true;
+}
+
+template <class T, class S>
+inline bool isInMap(T &e, std::unordered_map<T, S> &v){
+    return (v.find(e) == v.end()) ? false : true;
 }

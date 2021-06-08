@@ -4,12 +4,12 @@
 
 #include "MeshIO.h"
 #include "Mesh.h"
-#include "global.h"
+#include "global.hpp"
 
 int main(int argc, char **argv){
     char* input_file = NULL;
     char* output_file = NULL;
-    char default_file[] = "../data/bunny.vtk";
+    char default_file[] = "../data/cube.vtk";
 
     /* 
      *  A standard command: 
@@ -29,14 +29,16 @@ int main(int argc, char **argv){
     }
 
     Mesh mesh = Mesh();
+    std::vector<size_t> selectedV;
+
+    selectedV.push_back(0);
+
     /* read mesh file */
     if(!meshReader((input_file == NULL)?default_file:input_file, mesh)){
+        /* get vertex - cell pairs */
+        mesh.getVI_CI();
         /* detect number of flat angles then print it out */
-        mesh.detectFlatAngle();
-        /* get edge information of the mesh */
-        mesh.getE();
-        /* remove flat angle by splitting the bad cell */
-        mesh.removeFlatAngle();
+        mesh.refine(selectedV);
         /* output the processed mesh */
         vtkWriter((output_file == NULL)?"output.vtk":output_file, mesh);
     }else{
