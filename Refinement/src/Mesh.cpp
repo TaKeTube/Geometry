@@ -7,18 +7,18 @@ enum TemplateCellType {T_INVALID, T_VERT, T_EDGE, T_FACE, T_CELL};
 static unsigned char faceMask[FACE_NUM] = {0x0F, 0x33, 0x66, 0x99, 0xCC, 0xF0};
 
 static unsigned char diagonalMask[FACE_NUM][2] = {
-    {0x05, 0x0A}, {0x21, 0x12}, {0x42, 0x24}, 
+    {0x05, 0x0A}, {0x21, 0x12}, {0x42, 0x24},
     {0x81, 0x18}, {0x84, 0x48}, {0x50, 0xA0}
 };
 
 static std::unordered_map<unsigned char, std::vector<int>> Global2Local {
     /* vertex templates */
-    {0x01, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x02, {1, 2, 3, 0, 5, 6, 7, 4}}, 
+    {0x01, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x02, {1, 2, 3, 0, 5, 6, 7, 4}},
     {0x04, {2, 3, 0, 1, 6, 7, 4, 5}}, {0x08, {3, 0, 1, 2, 7, 4, 5, 6}},
     {0x10, {4, 7, 6, 5, 0, 3, 2, 1}}, {0x20, {5, 4, 7, 6, 1, 0, 3, 2}},
     {0x40, {6, 5, 4, 7, 2, 1, 0, 3}}, {0x80, {7, 6, 5, 4, 3, 2, 1, 0}},
     /* edge templates */
-    {0x03, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x06, {1, 2, 3, 0, 5, 6, 7, 4}}, 
+    {0x03, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x06, {1, 2, 3, 0, 5, 6, 7, 4}},
     {0x0C, {2, 3, 0, 1, 6, 7, 4, 5}}, {0x09, {3, 0, 1, 2, 7, 4, 5, 6}},
     {0x90, {4, 7, 6, 5, 0, 3, 2, 1}}, {0x30, {5, 4, 7, 6, 1, 0, 3, 2}},
     {0x60, {6, 5, 4, 7, 2, 1, 0, 3}}, {0xC0, {7, 6, 5, 4, 3, 2, 1, 0}},
@@ -346,12 +346,12 @@ void Mesh::addCellTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx  = c.at(0);
     size_t v3Idx  = c.at(1);
-    size_t v12Idx = c.at(2);
-    size_t v15Idx = c.at(3);
+    size_t v15Idx = c.at(2);
+    size_t v12Idx = c.at(3);
     size_t v48Idx = c.at(4);
     size_t v51Idx = c.at(5);
-    size_t v60Idx = c.at(6);
-    size_t v63Idx = c.at(7);
+    size_t v63Idx = c.at(6);
+    size_t v60Idx = c.at(7);
     Vertex &v0  = V.at(v0Idx);
     Vertex &v3  = V.at(v3Idx);
     Vertex &v12 = V.at(v12Idx);
@@ -537,8 +537,10 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
      * |/        |/    |===|   | |=======|  |=======||
      * 0 ------- 1     0---|---1 0-------1  0-------1/
      */
-    for(size_t idx = 0; idx < HEX_SIZE; idx++)
-        localc.push_back(c.at(Global2Local.at(Vbitmap)[idx]));
+    if(Vnum != HEX_SIZE){
+        for(size_t idx = 0; idx < HEX_SIZE; idx++)
+            localc.push_back(c.at(Global2Local.at(Vbitmap)[idx]));
+    }
 
     switch(Vnum)
     {
@@ -557,7 +559,7 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
             abandonedCell.push_back(cIdx);
             break;
         case 8:
-            addCellTemplate(localc);
+            addCellTemplate(c);
             abandonedCell.push_back(cIdx);
             break;
         default:
