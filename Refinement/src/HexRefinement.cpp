@@ -6,11 +6,10 @@
 
 #include "MeshIO.h"
 #include "Mesh.h"
+#include "RefineTest.h"
 #include "global.hpp"
 
-#define TEST 1
-// #define TEST_1_VERT
-#define TEST_2_VERT
+#define TEST
 
 int main(int argc, char **argv){
     char* input_file = NULL;
@@ -34,7 +33,7 @@ int main(int argc, char **argv){
         }
     }
 
-#if !TEST
+#ifndef TEST
 
     Mesh mesh = Mesh();
     std::vector<size_t> selectedV;
@@ -56,61 +55,8 @@ int main(int argc, char **argv){
 
 #else
 
-    char test_file[] = "../data/cube.vtk";
-
-    #ifdef TEST_1_VERT
-    /* test 1 vertex selected */
-    for(int i = 0; i < HEX_SIZE; i++){
-        std::string idx;
-        Mesh mesh = Mesh();
-
-        /* select target vertex */
-        std::vector<size_t> selectedV;
-        selectedV.push_back(i);
-        
-        /* read mesh */
-        meshReader(test_file, mesh);
-        
-        /* get vertex - cell pairs */
-        mesh.getVI_CI();
-        
-        /* detect number of flat angles then print it out */
-        mesh.refine(selectedV);
-        
-        /* output the processed mesh */
-        idx = '0'+(char)i;
-        vtkWriter((output_file == NULL)?(std::string("v")+idx+std::string(".vtk")).c_str():output_file, mesh);
-    }
-    #endif
-
-    #ifdef TEST_2_VERT
-    /* test 2 vertex selected */
-    for(int i = 0; i < HEX_SIZE; i++){
-        for(int j = i+1; j < HEX_SIZE; j++){
-            Mesh mesh = Mesh();
-            std::string iIdx, jIdx;
-
-            /* select 2 target vertexes */
-            std::vector<size_t> selectedV;
-            selectedV.push_back(i);
-            selectedV.push_back(j);
-            
-            /* read mesh */
-            meshReader(test_file, mesh);
-            
-            /* get vertex - cell pairs */
-            mesh.getVI_CI();
-            
-            /* detect number of flat angles then print it out */
-            mesh.refine(selectedV);
-            
-            /* output the processed mesh */
-            iIdx = '0'+(char)i;
-            jIdx = '0'+(char)j;
-            vtkWriter((output_file == NULL)?(std::string("v")+iIdx+jIdx+std::string(".vtk")).c_str():output_file, mesh);
-        }
-    }
-    #endif
+    /* run tests */
+    runTest();
 
 #endif
 
