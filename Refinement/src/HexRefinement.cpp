@@ -37,7 +37,7 @@ int main(int argc, char **argv){
 
     Mesh mesh = Mesh();
     std::vector<size_t> selectedV = {
-        383, 145, 380, 348, 154, 316, 2909, 3007, 2966, 3075, 3090, 2898
+        383, 145, 380, 348, 154, 316, 2909, 2451, 2090, 2495, 2721
     };
 
     /* read mesh file */

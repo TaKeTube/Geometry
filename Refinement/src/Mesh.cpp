@@ -165,6 +165,46 @@ void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selec
     }
 }
 
+void Mesh::removeConcavity(std::vector<size_t> &selectedC){
+    unsigned char Vbitmap, newVbitmap;
+    bool hasConcavity = true;
+
+    /* update cell selected configuration until there is no concavity (no standard configration) */
+    while(hasConcavity){
+        std::vector<size_t> newC;
+        hasConcavity = false;
+
+        /* check whether there is concavity in current loop */
+        for(auto cIdx : selectedC){
+            /* get original Vertex bitmap */
+            Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
+            /* get standard Vertex bitmap */
+            newVbitmap = getVbitmap(cIdx);
+
+            /* Two bitmap dismatching means there is concavity       *
+             * (more generally, nonstandard selection configuration) */
+            if(newVbitmap != Vbitmap){
+                cellInfoMap.at(cIdx).Vbitmap = newVbitmap;
+                hasConcavity = true;
+                /*  select new vertexes */
+                std::vector<size_t> newV;
+                for(int j = 0; j < HEX_SIZE; j++){
+                    if(((char)1<<j) & newVbitmap)
+                        newV.push_back(C.at(cIdx).at(j));
+                }
+                /* select new cells according to new vertexes */
+                // selectCell(newV, newC);
+                selectCell(newV, selectedC);
+            }
+        }
+
+        /* update selected cells */
+        for(auto cIdx : newC)
+            // if(!isInVec(cIdx, selectedC))
+            selectedC.push_back(cIdx);
+    }
+}
+
 unsigned char Mesh::getVbitmap(size_t cIdx){
     unsigned char Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
     int Vnum = getBitNum(Vbitmap);
@@ -570,14 +610,14 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
 void Mesh::refine(std::vector<size_t> &selectedV){
     std::vector<size_t> selectedC;
     std::vector<size_t> abandonedCell;
-    unsigned char Vbitmap = 0x00;
 
     /* select cell according to the selected vertexes */
     selectCell(selectedV, selectedC);
-    for(auto c:selectedC){
-        Vbitmap = getVbitmap(c);
-        replaceCellWithTemplate(c, Vbitmap, abandonedCell);
-    }
+    /* remove concavity (nonstandard cell configuration) */
+    removeConcavity(selectedC);
+
+    for(auto c:selectedC)
+        replaceCellWithTemplate(c, cellInfoMap.at(c).Vbitmap, abandonedCell);
 
     /* delete all abandoned cells */
     /* has to be deleted from big to small */
