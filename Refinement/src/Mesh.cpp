@@ -153,7 +153,7 @@ void Mesh::getVI_CI()
 void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC){
     for(auto vIdx : selectedV){
         std::vector<size_t> &cVec = VI_CI.at(vIdx);
-        for(size_t cIdx = 0; cIdx < cVec.size(); cIdx++){
+        for(auto cIdx : cVec){
             /* whether the cell is already selected */
             if(!isInVec(cIdx, selectedC))
                 selectedC.push_back(cIdx);

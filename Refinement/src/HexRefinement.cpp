@@ -9,12 +9,12 @@
 #include "RefineTest.h"
 #include "global.hpp"
 
-#define TEST
+// #define TEST
 
 int main(int argc, char **argv){
     char* input_file = NULL;
     char* output_file = NULL;
-    char default_file[] = "../data/cube.vtk";
+    char default_file[] = "../data/rod.vtk";
 
     /* 
      *  A standard command: 
@@ -36,9 +36,9 @@ int main(int argc, char **argv){
 #ifndef TEST
 
     Mesh mesh = Mesh();
-    std::vector<size_t> selectedV;
-
-    selectedV.push_back(1);
+    std::vector<size_t> selectedV = {
+        383, 145, 380, 348, 154, 316, 2909, 3007, 2966, 3075, 3090, 2898
+    };
 
     /* read mesh file */
     if(!meshReader((input_file == NULL)?default_file:input_file, mesh)){
