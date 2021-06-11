@@ -2,29 +2,36 @@
 #include <cstdio>
 #include <cassert>
 #include <string>
+#include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include "MeshIO.h"
 #include "Mesh.h"
 #include "RefineTest.h"
 #include "global.hpp"
 
-#define TEST
+// #define TEST
 
 int main(int argc, char **argv){
     char* input_file = NULL;
     char* output_file = NULL;
+    char* refine_file = NULL;
     char default_file[] = "../data/rod.vtk";
+    char default_refine_file[] = "../data/refine.txt";
 
     /* 
      *  A standard command: 
-     *      ./FlatAngleTerminator.exe -input "../data/cube.obj" -output "processed_cube.vtk"
+     *      ./HexRefinement.exe -input "../data/rod.vtk" -output "refined_rod.vtk" -refine "../data/rod_refine.txt"
      */
     for (int i = 1; i < argc; i++) {
         if (!strcmp(argv[i],"-input")) {
             i++; assert (i < argc); 
             input_file = argv[i];
         } else if (!strcmp(argv[i],"-output")) {
+            i++; assert (i < argc); 
+            output_file = argv[i];
+        } else if (!strcmp(argv[i],"-refine")) {
             i++; assert (i < argc); 
             output_file = argv[i];
         } else {
@@ -36,11 +43,28 @@ int main(int argc, char **argv){
 #ifndef TEST
 
     Mesh mesh = Mesh();
-    std::vector<size_t> selectedV = {
-        383, 145, 380, 348, 154, 316, 2909, 2451, 2090, 2495, 2721
-    };
 
+    /* for test */
+    // std::vector<size_t> selectedV = {
+    //     197, 322, 69, 709, 730, 720, 25, 126
+    // };
+
+    /* read selected vertexes from file */
+    std::ifstream fin((refine_file == NULL)?default_refine_file:refine_file);
+    std::vector<size_t> selectedV;
+    int vIdx;
+
+    std::cout<<"Read selected vertexes from file...\nSelected Vertexes:"<<std::endl;
+    while(fin>>vIdx) {
+        std::cout<<vIdx<<" ";
+        selectedV.push_back(vIdx);
+    }
+    fin.close();
+    std::cout<<std::endl;
+
+    /* Refinement */
     /* read mesh file */
+    std::cout<<"Read mesh from file..."<<std::endl;
     if(!meshReader((input_file == NULL)?default_file:input_file, mesh)){
         /* get vertex - cell pairs */
         mesh.getVI_CI();
