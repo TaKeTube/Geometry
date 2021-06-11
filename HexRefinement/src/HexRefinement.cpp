@@ -17,8 +17,8 @@ int main(int argc, char **argv){
     char* input_file = NULL;
     char* output_file = NULL;
     char* refine_file = NULL;
-    char default_file[] = "../data/rod.vtk";
-    char default_refine_file[] = "../data/refine.txt";
+    char default_file[] = "../data/cad.vtk";
+    char default_refine_file[] = "../data/cad_refine.txt";
 
     /* 
      *  A standard command: 
