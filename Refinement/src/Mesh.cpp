@@ -528,12 +528,12 @@ void Mesh::addFaceTemplate(Cell c){
     Vertex v34 = v35 - (v35 - v32) / 3;
     Vertex v36 = v32 + (v44 - v32) / 3;
     Vertex v39 = v35 + (v47 - v35) / 3;
-    // Vertex v37 = v36 + (v39 - v36) / 3;
-    // Vertex v38 = v39 - (v39 - v36) / 3;
+    Vertex v37 = v36 + (v39 - v36) / 3;
+    Vertex v38 = v39 - (v39 - v36) / 3;
     Vertex v40 = v44 - (v44 - v32) / 3;
     Vertex v43 = v47 - (v47 - v35) / 3;
-    // Vertex v41 = v40 + (v43 - v40) / 3;
-    // Vertex v42 = v43 - (v43 - v40) / 3;
+    Vertex v41 = v40 + (v43 - v40) / 3;
+    Vertex v42 = v43 - (v43 - v40) / 3;
     Vertex v45 = v44 + (v47 - v44) / 3;
     Vertex v46 = v47 - (v47 - v44) / 3;
     /* forth layer */
@@ -542,10 +542,17 @@ void Mesh::addFaceTemplate(Cell c){
     // Vertex v60 = ;
     // Vertex v63 = ;
 
-    Vertex n0 = intersectRayPlane(v48, v36, v33, v5,  v21 - v5 );
-    Vertex n1 = intersectRayPlane(v51, v34, v39, v6,  v22 - v6 );
-    Vertex n2 = intersectRayPlane(v63, v43, v46, v10, v26 - v10);
-    Vertex n3 = intersectRayPlane(v60, v45, v40, v9,  v25 - v9 );
+    /* old implementation */
+    // Vertex n0 = intersectRayPlane(v48, v36, v33, v5,  v21 - v5 );
+    // Vertex n1 = intersectRayPlane(v51, v34, v39, v6,  v22 - v6 );
+    // Vertex n2 = intersectRayPlane(v63, v43, v46, v10, v26 - v10);
+    // Vertex n3 = intersectRayPlane(v60, v45, v40, v9,  v25 - v9 );
+
+    /* points interpolated after signal hex sheet refinement */
+    Vertex n0 = (v21 + v37) * 0.5;
+    Vertex n1 = (v22 + v38) * 0.5;
+    Vertex n2 = (v26 + v42) * 0.5;
+    Vertex n3 = (v25 + v41) * 0.5;
 
     /* add vertexes */
     size_t v1Idx  = addVertex(v1);
@@ -578,10 +585,10 @@ void Mesh::addFaceTemplate(Cell c){
     size_t v29Idx = addVertex(v29);
     size_t v30Idx = addVertex(v30);
 
-    size_t v32Idx = addVertex(v32);
-    size_t v35Idx = addVertex(v35);
-    size_t v44Idx = addVertex(v44);
-    size_t v47Idx = addVertex(v47);
+    // size_t v32Idx = addVertex(v32);
+    // size_t v35Idx = addVertex(v35);
+    // size_t v44Idx = addVertex(v44);
+    // size_t v47Idx = addVertex(v47);
     size_t v33Idx = addVertex(v33);
     size_t v34Idx = addVertex(v34);
     size_t v36Idx = addVertex(v36);
@@ -630,8 +637,8 @@ void Mesh::addFaceTemplate(Cell c){
     /* upper structures */
     addHexCell(v33Idx, v34Idx, n1Idx,  n0Idx,  v48Idx, v51Idx, v39Idx, v36Idx);
     addHexCell(n3Idx,  n2Idx,  v46Idx, v45Idx, v40Idx, v43Idx, v63Idx, v60Idx);
-    addHexCell(n0Idx,  n1Idx,  n2Idx,  n3Idx , v20Idx, v23Idx, v27Idx, v24Idx);
-    addHexCell(v20Idx, v23Idx, v27Idx, v24Idx, v48Idx, v51Idx, v63Idx, v60Idx);
+    addHexCell(n0Idx,  n1Idx,  n2Idx,  n3Idx , v36Idx, v39Idx, v43Idx, v40Idx);
+    addHexCell(v36Idx, v39Idx, v43Idx, v40Idx, v48Idx, v51Idx, v63Idx, v60Idx);
 }
 
 void Mesh::addCellTemplate(Cell c){

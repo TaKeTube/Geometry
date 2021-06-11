@@ -7,10 +7,10 @@
 #include "RefineTest.h"
 
 // #define TEST_1_VERT
-// #define TEST_2_VERT
+#define TEST_2_VERT
 // #define TEST_3_VERT
 // #define TEST_4_VERT
-#define TEST_5_VERT
+// #define TEST_5_VERT
 
 void refine1vertTest(int i, char* test_file){
     std::string idx;

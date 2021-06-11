@@ -9,7 +9,7 @@
 #include "RefineTest.h"
 #include "global.hpp"
 
-// #define TEST
+#define TEST
 
 int main(int argc, char **argv){
     char* input_file = NULL;
