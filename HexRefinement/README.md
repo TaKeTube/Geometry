@@ -1,6 +1,6 @@
 # Hex Refinement
 
-Implement local Hex mesh refinement algorithm described in
+Implement **local Hex mesh refinement** algorithm described in
 
 *[CONFORMAL REFINEMENT OF ALL-HEXAHEDRAL ELEMENT  MESHES BASED ON MULTIPLE TWIST PLANE INSERTION](https://imr.sandia.gov/papers/imr13/harris.pdf)*  by Harris et al.
 
@@ -27,22 +27,31 @@ using command line to choose input and output files, a example command is like f
 Here is one method to get indexes of selected vertexes
 
 1. Open the target mesh using **ParaView**
-2. Click the button <kbd>interactive Select Points On</kbd> on the top of the display window ![button](.\img\button.png)
+2. Click the button <kbd>interactive Select Points On</kbd> on the top of the display window ![button](https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/img/button.png?raw=true)
 3. You will see Selection Display Inspector on the right of the display window. Click <kbd>Point Labels</kbd> and tick the ID option :white_check_mark:
 
-![ID](.\img\ID.png)
+![ID](https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/img/ID.png?raw=true)
 
 4. Then you will see the index when your cursor is on the vertex. Write indexes into a txt file then run the program.
 
-<img src=".\img\points.png" alt="points" style="zoom: 67%;" />
+<img src="https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/img/points.png?raw=true" alt="points" style="zoom: 67%;" />
 
 #### Results
 
 **Vertex Refinement**
 
+![](https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/results/vertex.png?raw=true)
+
 **Edge Refinement**
+
+![](https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/results/edge.png?raw=true)
 
 **Face Refinement**
 
+![](https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/results/face.png?raw=true)
+
 **Remove Concavity**
 
+Notice that even the selected vertexes set is concave, the algorithm would automatically remove the concavity and choose a standard configuration.
+
+![](https://github.com/TaKeTube/Geometry/blob/main/HexRefinement/results/concavity.png?raw=true)
