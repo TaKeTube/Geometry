@@ -90,6 +90,8 @@ public:
                     size_t v4, size_t v5, size_t v6, size_t v7);
     void deleteCell(size_t idx);
 
+    void addModifiedEdgeTemplate(Cell c);
+    void addModifiedFaceTemplate(Cell c);
     void addVertTemplate(Cell c);
     void addEdgeTemplate(Cell c);
     void addFaceTemplate(Cell c);
