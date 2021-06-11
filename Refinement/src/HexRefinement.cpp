@@ -33,7 +33,7 @@ int main(int argc, char **argv){
             output_file = argv[i];
         } else if (!strcmp(argv[i],"-refine")) {
             i++; assert (i < argc); 
-            output_file = argv[i];
+            refine_file = argv[i];
         } else {
             printf ("Error with command line argument %d: '%s'\n",i,argv[i]);
             assert(0);
