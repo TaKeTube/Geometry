@@ -14,7 +14,7 @@ Implement **local Hex mesh refinement** algorithm described in
 
 - **OUTPUT**: <kbd>.vtk</kbd> refined unstructured hex mesh file
 
-the default input file is <kbd>./data/rod.vtk</kbd>, default outputs is <kbd>output.vtk</kbd> 
+the default input file is <kbd>./data/cad.vtk</kbd>, default outputs is <kbd>output.vtk</kbd>, default selected vertexes are described in  <kbd>./data/cad_refine.vtk</kbd>
 
 using command line to choose input and output files, a example command is like follow:
 
