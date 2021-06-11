@@ -2,15 +2,16 @@
 #include "global.hpp"
 #include "Vector.hpp"
 
-enum TemplateCellType {T_INVALID, T_VERT, T_EDGE, T_FACE, T_CELL};
-
+/* face bitmap mask */
 static unsigned char faceMask[FACE_NUM] = {0x0F, 0x33, 0x66, 0x99, 0xCC, 0xF0};
 
+/* diagonal vertexes bitmap mask */
 static unsigned char diagonalMask[FACE_NUM][2] = {
     {0x05, 0x0A}, {0x21, 0x12}, {0x42, 0x24},
     {0x81, 0x18}, {0x84, 0x48}, {0x50, 0xA0}
 };
 
+/* dict for transfering global index to local index */
 static std::unordered_map<unsigned char, std::vector<int>> Global2Local {
     /* vertex templates */
     {0x01, {0, 1, 2, 3, 4, 5, 6, 7}}, {0x02, {1, 2, 3, 0, 5, 6, 7, 4}},
@@ -137,6 +138,14 @@ void Mesh::getE(){
     }
 }
 
+/*
+ * getVI_CI()
+ * DESCRIPTION: get [vertex idx] - [cell idx vector] pair
+ *              stored into a hash map
+ * INPUT: hex mesh
+ * OUTPUT: a hash map with vertexIdx-cellIdx vector pairs of the hex mesh
+ * RETURN: none
+ */
 void Mesh::getVI_CI()
 {
     if(!VI_CI.empty())
@@ -150,8 +159,17 @@ void Mesh::getVI_CI()
     }
 }
 
+/*
+ * selectCell()
+ * DESCRIPTION: select cells according to selected vertex
+ * INPUT: selectedV - vector of selected vertex
+ * OUTPUT: selectedC - vector of selected cells
+ * RETURN: none
+ */
 void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC){
+    /* traverse vertexes in selected v */
     for(auto vIdx : selectedV){
+        /* get cells contain this vertex */
         std::vector<size_t> &cVec = VI_CI.at(vIdx);
         for(auto cIdx : cVec){
             /* whether the cell is already selected */
@@ -165,6 +183,13 @@ void Mesh::selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selec
     }
 }
 
+/*
+ * removeConcavity()
+ * DESCRIPTION: remove concavity (nonstandard selection configuration) of the selected configuration
+ * INPUT: selectedC - vector of selected cells
+ * OUTPUT: standard selected cells
+ * RETURN: none
+ */
 void Mesh::removeConcavity(std::vector<size_t> &selectedC){
     unsigned char Vbitmap, newVbitmap;
     bool hasConcavity = true;
@@ -205,6 +230,13 @@ void Mesh::removeConcavity(std::vector<size_t> &selectedC){
     }
 }
 
+/*
+ * getVbitmap()
+ * DESCRIPTION: get standard selected vertex bitmap of the cell (not necessary cell's original bitmap)
+ * INPUT: cIdx - cell index
+ * OUTPUT: standard selected vertex bitmap of the cell
+ * RETURN: standard selected vertex bitmap of the cell
+ */
 unsigned char Mesh::getVbitmap(size_t cIdx){
     unsigned char Vbitmap = cellInfoMap.at(cIdx).Vbitmap;
     int Vnum = getBitNum(Vbitmap);
@@ -254,6 +286,13 @@ unsigned char Mesh::getVbitmap(size_t cIdx){
     return 0xFF;
 }
 
+/*
+ * addModifiedEdgeTemplate()
+ * DESCRIPTION: add template of selected edge after modified parallel hex sheet refinement
+ * INPUT: c - cell to be replaced
+ * OUTPUT: a template of selected edge after modified parallel hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::addModifiedEdgeTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx = c.at(0);
@@ -299,6 +338,13 @@ void Mesh::addModifiedEdgeTemplate(Cell c){
     addHexCell(v10Idx, v11Idx, v12Idx, v13Idx, v4Idx,  v5Idx,  v6Idx,  v7Idx);
 }
 
+/*
+ * addModifiedFaceTemplate()
+ * DESCRIPTION: add template of selected face after modified parallel hex sheet refinement
+ * INPUT: c - cell to be replaced
+ * OUTPUT: a template of selected face after modified parallel hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::addModifiedFaceTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx = c.at(0);
@@ -335,6 +381,13 @@ void Mesh::addModifiedFaceTemplate(Cell c){
     addHexCell(v8Idx, v9Idx, v10Idx, v11Idx, v4Idx, v5Idx, v6Idx,  v7Idx );
 }
 
+/*
+ * addVertTemplate()
+ * DESCRIPTION: add template of selected vertex after modified parallel & single hex sheet refinement
+ * INPUT: c - cell to be replaced
+ * OUTPUT: a template of selected face after modified parallel & single hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::addVertTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx = c.at(0);
@@ -382,6 +435,13 @@ void Mesh::addVertTemplate(Cell c){
     addHexCell(v11Idx, v12Idx, v13Idx, v14Idx, v4Idx,  v5Idx,  v6Idx,  v7Idx );
 }
 
+/*
+ * addEdgeTemplate()
+ * DESCRIPTION: add template of selected edge after modified parallel & single hex sheet refinement
+ * INPUT: c - cell to be replaced
+ * OUTPUT: a template of selected edge after modified parallel & single hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::addEdgeTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx = c.at(0);
@@ -465,6 +525,13 @@ void Mesh::addEdgeTemplate(Cell c){
     addHexCell(n10Idx, n11Idx, v2Idx,  v3Idx,  n12Idx, n13Idx, v6Idx,  v7Idx );
 }
 
+/*
+ * addFaceTemplate()
+ * DESCRIPTION: add template of selected face after modified parallel & single hex sheet refinement
+ * INPUT: c - cell to be replaced
+ * OUTPUT: a template of selected face after modified parallel & single hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::addFaceTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx  = c.at(0);
@@ -641,6 +708,13 @@ void Mesh::addFaceTemplate(Cell c){
     addHexCell(v36Idx, v39Idx, v43Idx, v40Idx, v48Idx, v51Idx, v63Idx, v60Idx);
 }
 
+/*
+ * addCellTemplate()
+ * DESCRIPTION: add template of selected cell after modified parallel & single hex sheet refinement
+ * INPUT: c - cell to be replaced
+ * OUTPUT: a template of selected cell after modified parallel & single hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::addCellTemplate(Cell c){
     /* get original vertexes */
     size_t v0Idx  = c.at(0);
@@ -821,6 +895,15 @@ void Mesh::addCellTemplate(Cell c){
     addHexCell(v42Idx, v43Idx, v47Idx, v46Idx, v58Idx, v59Idx, v63Idx, v62Idx);
 }
 
+/*
+ * replaceCellWithTemplate()
+ * DESCRIPTION: replace a selected cell with template coorsponding to its selected vertexes
+ * INPUT: cIdx - index of the cell to be replaced
+ *        Vbitmap - selected vertexes bitmap of the cell
+ *        abandonedCell - vector of abandoned cells
+ * OUTPUT: a template after modified parallel & single hex sheet refinement in mesh
+ * RETURN: none
+ */
 void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> &abandonedCell){
     int Vnum = getBitNum(Vbitmap);
     Cell localc;
@@ -843,20 +926,25 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
 
     switch(Vnum)
     {
+        /* no need for refinement */
         case 0:
             break;
+        /* vertex refinement */
         case 1:
             addVertTemplate(localc);
             abandonedCell.push_back(cIdx);
             break;
+        /* edge refinement */
         case 2:
             addEdgeTemplate(localc);
             abandonedCell.push_back(cIdx);
             break;
+        /* face refinement */
         case 4:
             addFaceTemplate(localc);
             abandonedCell.push_back(cIdx);
             break;
+        /* cell refinement */
         case 8:
             addCellTemplate(c);
             abandonedCell.push_back(cIdx);
@@ -866,6 +954,13 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
     }
 }
 
+/*
+ * refine()
+ * DESCRIPTION: refinethe mesh coorsponding to the selected vertexes
+ * INPUT: selectedV - vector of selected vertexes
+ * OUTPUT: refined mesh
+ * RETURN: none
+ */
 void Mesh::refine(std::vector<size_t> &selectedV){
     std::vector<size_t> selectedC;
     std::vector<size_t> abandonedCell;
@@ -875,6 +970,7 @@ void Mesh::refine(std::vector<size_t> &selectedV){
     /* remove concavity (nonstandard cell configuration) */
     removeConcavity(selectedC);
 
+    /* replace selected cells with templates */
     for(auto c:selectedC)
         replaceCellWithTemplate(c, cellInfoMap.at(c).Vbitmap, abandonedCell);
 

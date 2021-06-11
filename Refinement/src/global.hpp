@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "Mesh.h"
 
+/* lookup table of number of 1s in a bit string */
 const char bitNumLookup[256] = {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2,
     3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3,
@@ -23,6 +24,7 @@ const char bitNumLookup[256] = {
     6, 7, 6, 7, 7, 8
 };
 
+/* get number of 1s in a bitstring */
 inline int getBitNum(unsigned char bitmap){
     return bitNumLookup[(int)bitmap];
 }
@@ -37,7 +39,7 @@ inline bool isInMap(T &e, std::unordered_map<T, S> &v){
     return (v.find(e) == v.end()) ? false : true;
 }
 
-/* using Möller Trumbore Algorithm */
+/* using Möller Trumbore Algorithm to find the intersect point of a plane and a ray */
 Vertex intersectRayPlane(const Vertex &v0, const Vertex &v1, const Vertex &v2, 
                          const Vertex &o, const Vector3f &d);
 

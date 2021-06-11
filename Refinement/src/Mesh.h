@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <unordered_map>
-#include <queue>
 #include <algorithm>
 #include "Vector.hpp"
 
@@ -73,7 +72,7 @@ public:
     std::vector<Vertex> V;
     std::vector<Cell> C;
     std::unordered_map<Edge, EdgeInfo> E;
-    std::unordered_map<size_t, std::vector<size_t>> VI_CI;
+    std::unordered_map<size_t, std::vector<size_t>> VI_CI;  /* vertex id - cell id pair */
     std::unordered_map<size_t, CellInfo> cellInfoMap;
     CellType cellType;
 
