@@ -384,6 +384,7 @@ void Mesh::addModifiedFaceTemplate(Cell c){
 /*
  * addVertTemplate()
  * DESCRIPTION: add template of selected vertex after modified parallel & single hex sheet refinement
+ *              see template.md for corresponding vertex indexes.
  * INPUT: c - cell to be replaced
  * OUTPUT: a template of selected face after modified parallel & single hex sheet refinement in mesh
  * RETURN: none
@@ -438,6 +439,7 @@ void Mesh::addVertTemplate(Cell c){
 /*
  * addEdgeTemplate()
  * DESCRIPTION: add template of selected edge after modified parallel & single hex sheet refinement
+ *              see template.md for corresponding vertex indexes.
  * INPUT: c - cell to be replaced
  * OUTPUT: a template of selected edge after modified parallel & single hex sheet refinement in mesh
  * RETURN: none
@@ -528,6 +530,7 @@ void Mesh::addEdgeTemplate(Cell c){
 /*
  * addFaceTemplate()
  * DESCRIPTION: add template of selected face after modified parallel & single hex sheet refinement
+ *              see template.md for corresponding vertex indexes.
  * INPUT: c - cell to be replaced
  * OUTPUT: a template of selected face after modified parallel & single hex sheet refinement in mesh
  * RETURN: none
@@ -711,6 +714,7 @@ void Mesh::addFaceTemplate(Cell c){
 /*
  * addCellTemplate()
  * DESCRIPTION: add template of selected cell after modified parallel & single hex sheet refinement
+ *              see template.md for corresponding vertex indexes.
  * INPUT: c - cell to be replaced
  * OUTPUT: a template of selected cell after modified parallel & single hex sheet refinement in mesh
  * RETURN: none
@@ -898,6 +902,7 @@ void Mesh::addCellTemplate(Cell c){
 /*
  * replaceCellWithTemplate()
  * DESCRIPTION: replace a selected cell with template coorsponding to its selected vertexes
+ *              see template.md for corresponding vertex indexes.
  * INPUT: cIdx - index of the cell to be replaced
  *        Vbitmap - selected vertexes bitmap of the cell
  *        abandonedCell - vector of abandoned cells
