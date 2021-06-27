@@ -1,7 +1,7 @@
 #include <eigen3/Eigen/Eigen>
 #include "subdiv.h"
 
-#define SUBDIV_EPSILON 0.001
+#define SUBDIV_EPSILON 1e-5
 
 const int HexDivTable[8][8] =
 {

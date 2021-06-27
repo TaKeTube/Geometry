@@ -7,7 +7,7 @@ SET(ENV{VTK_DIR} "D:/Program Files (x86)/VTK")
 find_package(VTK REQUIRED)
 include(${VTK_USE_FILE})
 
-include_directories(SYSTEM "../Library")
+include_directories(SYSTEM "../../Library")
 
 # gdb debug
 SET(CMAKE_BUILD_TYPE "Debug")
