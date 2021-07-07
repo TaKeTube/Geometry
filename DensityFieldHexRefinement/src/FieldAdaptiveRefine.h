@@ -2,16 +2,21 @@
 #define FIELD_ADAPTIVE_REFINE_H
 
 #include <queue>
+#include <vector>
 #include <eigen3/Eigen/Eigen>
 
 using namespace Eigen;
 
-int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, std::function<Vector3d> DensityField);
+double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField);
 
-int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, std::function<Vector3d> DensityField);
+double EvalDensity(const std::vector<Vector3d> V, const std::function<double(Vector3d)> &DensityField);
 
-int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, Matrix3Xd &RefinedV, MatrixXi &RefinedC);
+int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField);
 
-int EvalFieldAdaptiveMesh(Matrix3Xd &V, MatrixXi &C, std::function<Vector3d> DensityField);
+int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Vector3d)> &DensityField);
+
+int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC);
+
+int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::function<double(Vector3d)> &DensityField);
 
 #endif
