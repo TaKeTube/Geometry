@@ -7,9 +7,9 @@
 
 using namespace Eigen;
 
-double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField);
+inline double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField);
 
-double EvalDensity(const std::vector<Vector3d> V, const std::function<double(Vector3d)> &DensityField);
+inline double EvalDensity(const std::vector<Vector3d> V, const std::function<double(Vector3d)> &DensityField);
 
 int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField);
 
