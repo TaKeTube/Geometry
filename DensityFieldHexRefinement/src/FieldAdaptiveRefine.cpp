@@ -2,7 +2,7 @@
 #include "Utility.hpp"
 #include "TrivialRefine.h"
 
-#define MAX_ITER_NUM 20
+#define MAX_ITER_NUM 2
 
 inline double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField){
     Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),
@@ -19,10 +19,10 @@ inline double EvalDensity(const std::vector<Vector3d> &V, const std::function<do
 int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField){
     int IterCount = 0;
     std::queue<int> TargetC;
-    if(MarkTargetHex(V, C, TargetC, DensityField) == -1) 
+    if(MarkTargetHex(V, C, TargetC, DensityField) == -1)
         return -1;
 
-    while(!TargetC.empty() || IterCount < MAX_ITER_NUM){
+    while(!TargetC.empty() && IterCount++ < MAX_ITER_NUM){
         if(RefineTargetHex(V, C, TargetC) == -1)
             return -1;
         if(MarkTargetHex(V, C, TargetC, DensityField) == -1)
@@ -34,7 +34,7 @@ int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Ve
 }
 
 int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Vector3d)> &DensityField){
-    for(size_t i = 0; i < C.cols(); i++){
+    for(int i = 0; i < C.cols(); i++){
         MatrixXi c = C.col(i);
         if(EvalDensity(V, c, DensityField) > 1/HexVolume(V, c)){
             TargetC.push(i);
@@ -45,17 +45,17 @@ int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &Target
 
 int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC){
     Mesh mesh = Mesh();
-    Matrix3Xd RefinedV;
-    MatrixXi RefinedC;
+    // Matrix3Xd RefinedV;
+    // MatrixXi RefinedC;
     std::vector<size_t> TargetV;
 
 
-    for(size_t i = 0; i < V.cols(); i++)
-        mesh.V.push_back(Vertex(V.col(i)));
+    for(int i = 0; i < V.cols(); i++)
+        mesh.V.push_back(V.col(i));
 
-    for(size_t i = 0; i < C.cols(); i++){
+    for(int i = 0; i < C.cols(); i++){
         Cell c;
-        for(size_t j = 0; j < HEX_SIZE; j++){
+        for(int j = 0; j < HEX_SIZE; j++){
             c.push_back(C(j,i));
         }
         mesh.C.push_back(c);
@@ -70,20 +70,20 @@ int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC){
     mesh.getVI_CI();
     mesh.refine(TargetV);
 
-    RefinedC.resize(HEX_SIZE, mesh.C.size());
-    RefinedV.resize(3, mesh.V.size());
+    C.resize(HEX_SIZE, mesh.C.size());
+    V.resize(3, mesh.V.size());
 
     for(size_t i = 0; i < mesh.V.size(); i++)
-        RefinedV.col(i) = mesh.V.at(i);
+        V.col(i) = mesh.V.at(i);
 
     for(size_t i = 0; i < mesh.C.size(); i++){
         for(size_t j = 0; j < HEX_SIZE; j++){
-            RefinedC(j,i) = mesh.C.at(i).at(j);
+            C(j,i) = mesh.C.at(i).at(j);
         }
     }
 
-    V = RefinedV;
-    C = RefinedC;
+    // V = RefinedV;
+    // C = RefinedC;
 
     return 0;
 }

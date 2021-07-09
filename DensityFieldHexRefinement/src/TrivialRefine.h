@@ -14,24 +14,11 @@ using namespace Eigen;
 enum CellType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
 typedef std::vector<int> Cell;
+typedef std::vector<Vector3d, aligned_allocator<Vector3d> > Vertexes;
 
 struct CellInfo
 {
     unsigned char    Vbitmap;
-};
-
-/* Vertex related */
-class Vertex : public Vector3d
-{
-public:
-    std::vector<int> Nbr;
-
-    Vertex();
-    Vertex(float xx);
-    Vertex(float xx, float yy, float zz);
-    Vertex(float xx, float yy, float zz, std::vector<int>& neighbor);
-    Vertex(Vector3d v);
-    ~Vertex();
 };
 
 /* Edge related */
@@ -73,22 +60,22 @@ namespace std
 class Mesh
 {
 public:
-    std::vector<Vertex> V;
+    Vertexes V;
     std::vector<Cell> C;
     std::unordered_map<Edge, EdgeInfo> E;
     std::unordered_map<size_t, std::vector<size_t>> VI_CI;  /* vertex id - cell id pair */
     std::unordered_map<size_t, CellInfo> cellInfoMap;
     CellType cellType;
 
-    Mesh(const std::vector<Vertex>& v, const std::vector<Cell>& c, const CellType cellType);
+    Mesh(const Vertexes& v, const std::vector<Cell>& c, const CellType cellType);
     Mesh(const Mesh& mesh);
     Mesh();
     ~Mesh();
 
     void getE();
     void getVI_CI();
-    Vertex getEdgeCenter(Edge e);
-    size_t addVertex(Vertex v);
+    Vector3d getEdgeCenter(Edge e);
+    size_t addVertex(Vector3d v);
     int addHexCell( size_t v0, size_t v1, size_t v2, size_t v3, 
                     size_t v4, size_t v5, size_t v6, size_t v7);
     void deleteCell(size_t idx);

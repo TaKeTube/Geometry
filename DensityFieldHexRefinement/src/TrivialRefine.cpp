@@ -32,23 +32,12 @@ static std::unordered_map<unsigned char, std::vector<int>> Global2Local {
     {0xCC, {2, 3, 7, 6, 1, 0, 4, 5}}, {0xF0, {4, 5, 6, 7, 0, 1, 2, 3}}
 };
 
-/* constructior & destructior for class Vertex */
-Vertex::Vertex(float xx) : Vector3d(xx) {}
-Vertex::Vertex(float xx, float yy, float zz) : Vector3d(xx, yy, zz) {}
-Vertex::Vertex(float xx, float yy, float zz, std::vector<int>& neighbor)
-: Vector3d(xx, yy, zz)
-, Nbr(neighbor)
-{}
-Vertex::Vertex(Vector3d v) : Vector3d(v) {}
-Vertex::Vertex(){}
-Vertex::~Vertex(){}
-
 /* constructior & destructior for class Edge */
 Edge::Edge() {}
 Edge::Edge(size_t v1, size_t v2) : v1Idx(v1), v2Idx(v2) {}
 
 /* constructior & destructior for class Mesh */
-Mesh::Mesh(const std::vector<Vertex>& v, const std::vector<Cell>& c, const CellType cellType)
+Mesh::Mesh(const Vertexes& v, const std::vector<Cell>& c, const CellType cellType)
 : V(v)
 , C(c)
 , cellType(cellType)
@@ -68,7 +57,7 @@ Mesh::~Mesh(){}
  * OUTPUT: center of the edge
  * RETURN: center Vertex of the edge
  */
-inline Vertex Mesh::getEdgeCenter(Edge e){
+inline Vector3d Mesh::getEdgeCenter(Edge e){
     return (V.at(e.v1Idx)+V.at(e.v2Idx))/2;
 }
 
@@ -79,7 +68,7 @@ inline Vertex Mesh::getEdgeCenter(Edge e){
  * OUTPUT: the index of the added vertex
  * RETURN: the index of the added vertex
  */
-inline size_t Mesh::addVertex(Vertex v){
+inline size_t Mesh::addVertex(Vector3d v){
     V.push_back(v);
     return V.size()-1;
 }
@@ -304,12 +293,12 @@ void Mesh::addModifiedEdgeTemplate(Cell c){
     size_t v5Idx = c.at(5);
     size_t v6Idx = c.at(6);
     size_t v7Idx = c.at(7);
-    Vertex &v0 = V.at(v0Idx);
-    Vertex &v1 = V.at(v1Idx);
-    Vertex &v2 = V.at(v2Idx);
-    Vertex &v3 = V.at(v3Idx);
-    Vertex &v4 = V.at(v4Idx);
-    Vertex &v5 = V.at(v5Idx);
+    Vector3d &v0 = V.at(v0Idx);
+    Vector3d &v1 = V.at(v1Idx);
+    Vector3d &v2 = V.at(v2Idx);
+    Vector3d &v3 = V.at(v3Idx);
+    Vector3d &v4 = V.at(v4Idx);
+    Vector3d &v5 = V.at(v5Idx);
     // Vertex &v6 = V.at(v6Idx);
     // Vertex &v7 = V.at(v7Idx);
 
@@ -318,12 +307,12 @@ void Mesh::addModifiedEdgeTemplate(Cell c){
     Vector3d zOffset1 = (v4 - v0) / 3;
     Vector3d yOffset2 = (v2 - v1) / 3;
     Vector3d zOffset2 = (v5 - v1) / 3;
-    Vertex v8  = v1 + yOffset2;
-    Vertex v9  = v0 + yOffset1;
-    Vertex v10 = v0 + zOffset1;
-    Vertex v11 = v1 + zOffset2;
-    Vertex v12 = v1 + yOffset2 + zOffset2;
-    Vertex v13 = v0 + yOffset1 + zOffset1;
+    Vector3d v8  = v1 + yOffset2;
+    Vector3d v9  = v0 + yOffset1;
+    Vector3d v10 = v0 + zOffset1;
+    Vector3d v11 = v1 + zOffset2;
+    Vector3d v12 = v1 + yOffset2 + zOffset2;
+    Vector3d v13 = v0 + yOffset1 + zOffset1;
 
     /* add vertexes */
     size_t v8Idx  = addVertex(v8);
@@ -356,20 +345,20 @@ void Mesh::addModifiedFaceTemplate(Cell c){
     size_t v5Idx = c.at(5);
     size_t v6Idx = c.at(6);
     size_t v7Idx = c.at(7);
-    Vertex &v0 = V.at(v0Idx);
-    Vertex &v1 = V.at(v1Idx);
-    Vertex &v2 = V.at(v2Idx);
-    Vertex &v3 = V.at(v3Idx);
-    Vertex &v4 = V.at(v4Idx);
-    Vertex &v5 = V.at(v5Idx);
-    Vertex &v6 = V.at(v6Idx);
-    Vertex &v7 = V.at(v7Idx);
+    Vector3d &v0 = V.at(v0Idx);
+    Vector3d &v1 = V.at(v1Idx);
+    Vector3d &v2 = V.at(v2Idx);
+    Vector3d &v3 = V.at(v3Idx);
+    Vector3d &v4 = V.at(v4Idx);
+    Vector3d &v5 = V.at(v5Idx);
+    Vector3d &v6 = V.at(v6Idx);
+    Vector3d &v7 = V.at(v7Idx);
 
     /* calculate interpolated points */
-    Vertex v8  = v0 + (v4 - v0) / 3;
-    Vertex v9  = v1 + (v5 - v1) / 3;
-    Vertex v10 = v2 + (v6 - v2) / 3;
-    Vertex v11 = v3 + (v7 - v3) / 3;
+    Vector3d v8  = v0 + (v4 - v0) / 3;
+    Vector3d v9  = v1 + (v5 - v1) / 3;
+    Vector3d v10 = v2 + (v6 - v2) / 3;
+    Vector3d v11 = v3 + (v7 - v3) / 3;
 
     /* add vertexes */
     size_t v8Idx  = addVertex(v8);
@@ -400,11 +389,11 @@ void Mesh::addVertTemplate(Cell c){
     size_t v5Idx = c.at(5);
     size_t v6Idx = c.at(6);
     size_t v7Idx = c.at(7);
-    Vertex &v0 = V.at(v0Idx);
-    Vertex &v1 = V.at(v1Idx);
+    Vector3d &v0 = V.at(v0Idx);
+    Vector3d &v1 = V.at(v1Idx);
     // Vertex &v2 = V.at(v2Idx);
-    Vertex &v3 = V.at(v3Idx);
-    Vertex &v4 = V.at(v4Idx);
+    Vector3d &v3 = V.at(v3Idx);
+    Vector3d &v4 = V.at(v4Idx);
     // Vertex &v5 = V.at(v5Idx);
     // Vertex &v6 = V.at(v6Idx);
     // Vertex &v7 = V.at(v7Idx);
@@ -413,13 +402,13 @@ void Mesh::addVertTemplate(Cell c){
     Vector3d xOffset = (v1 - v0) / 3;
     Vector3d yOffset = (v3 - v0) / 3;
     Vector3d zOffset = (v4 - v0) / 3;
-    Vertex v8  = v0 + xOffset;
-    Vertex v10 = v0 + yOffset;
-    Vertex v11 = v0 + zOffset;
-    Vertex v9  = v0 + xOffset + yOffset;
-    Vertex v12 = v0 + xOffset + zOffset;
-    Vertex v14 = v0 + yOffset + zOffset;
-    Vertex v13 = v0 + xOffset + yOffset + zOffset;
+    Vector3d v8  = v0 + xOffset;
+    Vector3d v10 = v0 + yOffset;
+    Vector3d v11 = v0 + zOffset;
+    Vector3d v9  = v0 + xOffset + yOffset;
+    Vector3d v12 = v0 + xOffset + zOffset;
+    Vector3d v14 = v0 + yOffset + zOffset;
+    Vector3d v13 = v0 + xOffset + yOffset + zOffset;
     
     /* add vertexes */
     size_t v8Idx  = addVertex(v8);
@@ -455,42 +444,42 @@ void Mesh::addEdgeTemplate(Cell c){
     size_t v5Idx = c.at(5);
     size_t v6Idx = c.at(6);
     size_t v7Idx = c.at(7);
-    Vertex &v0 = V.at(v0Idx);
-    Vertex &v1 = V.at(v1Idx);
-    Vertex &v2 = V.at(v2Idx);
-    Vertex &v3 = V.at(v3Idx);
-    Vertex &v4 = V.at(v4Idx);
-    Vertex &v5 = V.at(v5Idx);
-    Vertex &v6 = V.at(v6Idx);
-    Vertex &v7 = V.at(v7Idx);
+    Vector3d &v0 = V.at(v0Idx);
+    Vector3d &v1 = V.at(v1Idx);
+    Vector3d &v2 = V.at(v2Idx);
+    Vector3d &v3 = V.at(v3Idx);
+    Vector3d &v4 = V.at(v4Idx);
+    Vector3d &v5 = V.at(v5Idx);
+    Vector3d &v6 = V.at(v6Idx);
+    Vector3d &v7 = V.at(v7Idx);
 
     /* calculate interpolated points after modified parallel refinement */
     Vector3d yOffset1 = (v3 - v0) / 3;
     Vector3d zOffset1 = (v4 - v0) / 3;
     Vector3d yOffset2 = (v2 - v1) / 3;
     Vector3d zOffset2 = (v5 - v1) / 3;
-    Vertex v8  = v1 + yOffset2;
-    Vertex v9  = v0 + yOffset1;
-    Vertex v10 = v0 + zOffset1;
-    Vertex v11 = v1 + zOffset2;
-    Vertex v12 = v1 + yOffset2 + zOffset2;
-    Vertex v13 = v0 + yOffset1 + zOffset1;
+    Vector3d v8  = v1 + yOffset2;
+    Vector3d v9  = v0 + yOffset1;
+    Vector3d v10 = v0 + zOffset1;
+    Vector3d v11 = v1 + zOffset2;
+    Vector3d v12 = v1 + yOffset2 + zOffset2;
+    Vector3d v13 = v0 + yOffset1 + zOffset1;
 
     /* calculate interpolated points after single sheet refinement */
-    Vertex n0  = v0  + (v1  - v0 ) / 3;
-    Vertex n1  = v1  - (v1  - v0 ) / 3;
-    Vertex n2  = v8  + (v9  - v8 ) / 3;
-    Vertex n3  = v9  - (v9  - v8 ) / 3;
-    Vertex n4  = v10 + (v11 - v10) / 3;
-    Vertex n5  = v11 - (v11 - v10) / 3;
-    Vertex n6  = v12 + (v13 - v12) / 3;
-    Vertex n7  = v13 - (v13 - v12) / 3;
-    Vertex n8  = ((v4 + (v5 - v4) / 3) + n4) * 0.5;
-    Vertex n9  = ((v5 - (v5 - v4) / 3) + n5) * 0.5;
-    Vertex n10 = ((v3 - (v3 - v2) / 3) + n3) * 0.5;
-    Vertex n11 = ((v2 + (v3 - v2) / 3) + n2) * 0.5;
-    Vertex n12 = ((v7 - (v7 - v6) / 3) + n7) * 0.5;
-    Vertex n13 = ((v6 + (v7 - v6) / 3) + n6) * 0.5;
+    Vector3d n0  = v0  + (v1  - v0 ) / 3;
+    Vector3d n1  = v1  - (v1  - v0 ) / 3;
+    Vector3d n2  = v8  + (v9  - v8 ) / 3;
+    Vector3d n3  = v9  - (v9  - v8 ) / 3;
+    Vector3d n4  = v10 + (v11 - v10) / 3;
+    Vector3d n5  = v11 - (v11 - v10) / 3;
+    Vector3d n6  = v12 + (v13 - v12) / 3;
+    Vector3d n7  = v13 - (v13 - v12) / 3;
+    Vector3d n8  = ((v4 + (v5 - v4) / 3) + n4) * 0.5;
+    Vector3d n9  = ((v5 - (v5 - v4) / 3) + n5) * 0.5;
+    Vector3d n10 = ((v3 - (v3 - v2) / 3) + n3) * 0.5;
+    Vector3d n11 = ((v2 + (v3 - v2) / 3) + n2) * 0.5;
+    Vector3d n12 = ((v7 - (v7 - v6) / 3) + n7) * 0.5;
+    Vector3d n13 = ((v6 + (v7 - v6) / 3) + n6) * 0.5;
 
     /* add vertexes */
     size_t v8Idx  = addVertex(v8);
@@ -546,14 +535,14 @@ void Mesh::addFaceTemplate(Cell c){
     size_t v51Idx = c.at(5);
     size_t v63Idx = c.at(6);
     size_t v60Idx = c.at(7);
-    Vertex &v0  = V.at(v0Idx);
-    Vertex &v3  = V.at(v3Idx);
-    Vertex &v12 = V.at(v12Idx);
-    Vertex &v15 = V.at(v15Idx);
-    Vertex &v48 = V.at(v48Idx);
-    Vertex &v51 = V.at(v51Idx);
-    Vertex &v60 = V.at(v60Idx);
-    Vertex &v63 = V.at(v63Idx);
+    Vector3d &v0  = V.at(v0Idx);
+    Vector3d &v3  = V.at(v3Idx);
+    Vector3d &v12 = V.at(v12Idx);
+    Vector3d &v15 = V.at(v15Idx);
+    Vector3d &v48 = V.at(v48Idx);
+    Vector3d &v51 = V.at(v51Idx);
+    Vector3d &v60 = V.at(v60Idx);
+    Vector3d &v63 = V.at(v63Idx);
 
     /* calculate 27 subdivisions points */
     /* first layer */
@@ -561,52 +550,52 @@ void Mesh::addFaceTemplate(Cell c){
     // Vertex v3  = ;
     // Vertex v12 = ;
     // Vertex v15 = ;
-    Vertex v1  = v0  + (v3  - v0) / 3;
-    Vertex v2  = v3  - (v3  - v0) / 3;
-    Vertex v4  = v0  + (v12 - v0) / 3;
-    Vertex v7  = v3  + (v15 - v3) / 3;
-    Vertex v5  = v4  + (v7  - v4) / 3;
-    Vertex v6  = v7  - (v7  - v4) / 3;
-    Vertex v8  = v12 - (v12 - v0) / 3;
-    Vertex v11 = v15 - (v15 - v3) / 3;
-    Vertex v9  = v8  + (v11 - v8) / 3;
-    Vertex v10 = v11 - (v11 - v8) / 3;
-    Vertex v13 = v12 + (v15 - v12) / 3;
-    Vertex v14 = v15 - (v15 - v12) / 3;
+    Vector3d v1  = v0  + (v3  - v0) / 3;
+    Vector3d v2  = v3  - (v3  - v0) / 3;
+    Vector3d v4  = v0  + (v12 - v0) / 3;
+    Vector3d v7  = v3  + (v15 - v3) / 3;
+    Vector3d v5  = v4  + (v7  - v4) / 3;
+    Vector3d v6  = v7  - (v7  - v4) / 3;
+    Vector3d v8  = v12 - (v12 - v0) / 3;
+    Vector3d v11 = v15 - (v15 - v3) / 3;
+    Vector3d v9  = v8  + (v11 - v8) / 3;
+    Vector3d v10 = v11 - (v11 - v8) / 3;
+    Vector3d v13 = v12 + (v15 - v12) / 3;
+    Vector3d v14 = v15 - (v15 - v12) / 3;
     /* second layer */
-    Vertex v16 = v0  + (v48 - v0 ) / 3; 
-    Vertex v19 = v3  + (v51 - v3 ) / 3;
-    Vertex v28 = v12 + (v60 - v12) / 3;
-    Vertex v31 = v15 + (v63 - v15) / 3;
-    Vertex v17 = v16 + (v19 - v16) / 3;
-    Vertex v18 = v19 - (v19 - v16) / 3;
-    Vertex v20 = v16 + (v28 - v16) / 3;
-    Vertex v23 = v19 + (v31 - v19) / 3;
-    Vertex v21 = v20 + (v23 - v20) / 3;
-    Vertex v22 = v23 - (v23 - v20) / 3;
-    Vertex v24 = v28 - (v28 - v16) / 3;
-    Vertex v27 = v31 - (v31 - v19) / 3;
-    Vertex v25 = v24 + (v27 - v24) / 3;
-    Vertex v26 = v27 - (v27 - v24) / 3;
-    Vertex v29 = v28 + (v31 - v28) / 3;
-    Vertex v30 = v31 - (v31 - v28) / 3;
+    Vector3d v16 = v0  + (v48 - v0 ) / 3; 
+    Vector3d v19 = v3  + (v51 - v3 ) / 3;
+    Vector3d v28 = v12 + (v60 - v12) / 3;
+    Vector3d v31 = v15 + (v63 - v15) / 3;
+    Vector3d v17 = v16 + (v19 - v16) / 3;
+    Vector3d v18 = v19 - (v19 - v16) / 3;
+    Vector3d v20 = v16 + (v28 - v16) / 3;
+    Vector3d v23 = v19 + (v31 - v19) / 3;
+    Vector3d v21 = v20 + (v23 - v20) / 3;
+    Vector3d v22 = v23 - (v23 - v20) / 3;
+    Vector3d v24 = v28 - (v28 - v16) / 3;
+    Vector3d v27 = v31 - (v31 - v19) / 3;
+    Vector3d v25 = v24 + (v27 - v24) / 3;
+    Vector3d v26 = v27 - (v27 - v24) / 3;
+    Vector3d v29 = v28 + (v31 - v28) / 3;
+    Vector3d v30 = v31 - (v31 - v28) / 3;
     /* third layer */
-    Vertex v32 = v48 - (v48 - v0 ) / 3;
-    Vertex v35 = v51 - (v51 - v3 ) / 3;
-    Vertex v44 = v60 - (v60 - v12) / 3;
-    Vertex v47 = v63 - (v63 - v15) / 3;
-    Vertex v33 = v32 + (v35 - v32) / 3;
-    Vertex v34 = v35 - (v35 - v32) / 3;
-    Vertex v36 = v32 + (v44 - v32) / 3;
-    Vertex v39 = v35 + (v47 - v35) / 3;
-    Vertex v37 = v36 + (v39 - v36) / 3;
-    Vertex v38 = v39 - (v39 - v36) / 3;
-    Vertex v40 = v44 - (v44 - v32) / 3;
-    Vertex v43 = v47 - (v47 - v35) / 3;
-    Vertex v41 = v40 + (v43 - v40) / 3;
-    Vertex v42 = v43 - (v43 - v40) / 3;
-    Vertex v45 = v44 + (v47 - v44) / 3;
-    Vertex v46 = v47 - (v47 - v44) / 3;
+    Vector3d v32 = v48 - (v48 - v0 ) / 3;
+    Vector3d v35 = v51 - (v51 - v3 ) / 3;
+    Vector3d v44 = v60 - (v60 - v12) / 3;
+    Vector3d v47 = v63 - (v63 - v15) / 3;
+    Vector3d v33 = v32 + (v35 - v32) / 3;
+    Vector3d v34 = v35 - (v35 - v32) / 3;
+    Vector3d v36 = v32 + (v44 - v32) / 3;
+    Vector3d v39 = v35 + (v47 - v35) / 3;
+    Vector3d v37 = v36 + (v39 - v36) / 3;
+    Vector3d v38 = v39 - (v39 - v36) / 3;
+    Vector3d v40 = v44 - (v44 - v32) / 3;
+    Vector3d v43 = v47 - (v47 - v35) / 3;
+    Vector3d v41 = v40 + (v43 - v40) / 3;
+    Vector3d v42 = v43 - (v43 - v40) / 3;
+    Vector3d v45 = v44 + (v47 - v44) / 3;
+    Vector3d v46 = v47 - (v47 - v44) / 3;
     /* forth layer */
     // Vertex v48  = ;
     // Vertex v51  = ;
@@ -614,10 +603,10 @@ void Mesh::addFaceTemplate(Cell c){
     // Vertex v63 = ;
 
     /* points interpolated after signal hex sheet refinement */
-    Vertex n0 = (v21 + v37) * 0.5;
-    Vertex n1 = (v22 + v38) * 0.5;
-    Vertex n2 = (v26 + v42) * 0.5;
-    Vertex n3 = (v25 + v41) * 0.5;
+    Vector3d n0 = (v21 + v37) * 0.5;
+    Vector3d n1 = (v22 + v38) * 0.5;
+    Vector3d n2 = (v26 + v42) * 0.5;
+    Vector3d n3 = (v25 + v41) * 0.5;
 
     /* add vertexes */
     size_t v1Idx  = addVertex(v1);
@@ -724,14 +713,14 @@ void Mesh::addCellTemplate(Cell c){
     size_t v51Idx = c.at(5);
     size_t v63Idx = c.at(6);
     size_t v60Idx = c.at(7);
-    Vertex &v0  = V.at(v0Idx);
-    Vertex &v3  = V.at(v3Idx);
-    Vertex &v12 = V.at(v12Idx);
-    Vertex &v15 = V.at(v15Idx);
-    Vertex &v48 = V.at(v48Idx);
-    Vertex &v51 = V.at(v51Idx);
-    Vertex &v60 = V.at(v60Idx);
-    Vertex &v63 = V.at(v63Idx);
+    Vector3d &v0  = V.at(v0Idx);
+    Vector3d &v3  = V.at(v3Idx);
+    Vector3d &v12 = V.at(v12Idx);
+    Vector3d &v15 = V.at(v15Idx);
+    Vector3d &v48 = V.at(v48Idx);
+    Vector3d &v51 = V.at(v51Idx);
+    Vector3d &v60 = V.at(v60Idx);
+    Vector3d &v63 = V.at(v63Idx);
 
     /* calculate interpolated points */
     /* first layer */
@@ -739,69 +728,69 @@ void Mesh::addCellTemplate(Cell c){
     // Vertex v3  = ;
     // Vertex v12 = ;
     // Vertex v15 = ;
-    Vertex v1  = v0  + (v3  - v0) / 3;
-    Vertex v2  = v3  - (v3  - v0) / 3;
-    Vertex v4  = v0  + (v12 - v0) / 3;
-    Vertex v7  = v3  + (v15 - v3) / 3;
-    Vertex v5  = v4  + (v7  - v4) / 3;
-    Vertex v6  = v7  - (v7  - v4) / 3;
-    Vertex v8  = v12 - (v12 - v0) / 3;
-    Vertex v11 = v15 - (v15 - v3) / 3;
-    Vertex v9  = v8  + (v11 - v8) / 3;
-    Vertex v10 = v11 - (v11 - v8) / 3;
-    Vertex v13 = v12 + (v15 - v12) / 3;
-    Vertex v14 = v15 - (v15 - v12) / 3;
+    Vector3d v1  = v0  + (v3  - v0) / 3;
+    Vector3d v2  = v3  - (v3  - v0) / 3;
+    Vector3d v4  = v0  + (v12 - v0) / 3;
+    Vector3d v7  = v3  + (v15 - v3) / 3;
+    Vector3d v5  = v4  + (v7  - v4) / 3;
+    Vector3d v6  = v7  - (v7  - v4) / 3;
+    Vector3d v8  = v12 - (v12 - v0) / 3;
+    Vector3d v11 = v15 - (v15 - v3) / 3;
+    Vector3d v9  = v8  + (v11 - v8) / 3;
+    Vector3d v10 = v11 - (v11 - v8) / 3;
+    Vector3d v13 = v12 + (v15 - v12) / 3;
+    Vector3d v14 = v15 - (v15 - v12) / 3;
     /* second layer */
-    Vertex v16 = v0  + (v48 - v0 ) / 3; 
-    Vertex v19 = v3  + (v51 - v3 ) / 3;
-    Vertex v28 = v12 + (v60 - v12) / 3;
-    Vertex v31 = v15 + (v63 - v15) / 3;
-    Vertex v17 = v16 + (v19 - v16) / 3;
-    Vertex v18 = v19 - (v19 - v16) / 3;
-    Vertex v20 = v16 + (v28 - v16) / 3;
-    Vertex v23 = v19 + (v31 - v19) / 3;
-    Vertex v21 = v20 + (v23 - v20) / 3;
-    Vertex v22 = v23 - (v23 - v20) / 3;
-    Vertex v24 = v28 - (v28 - v16) / 3;
-    Vertex v27 = v31 - (v31 - v19) / 3;
-    Vertex v25 = v24 + (v27 - v24) / 3;
-    Vertex v26 = v27 - (v27 - v24) / 3;
-    Vertex v29 = v28 + (v31 - v28) / 3;
-    Vertex v30 = v31 - (v31 - v28) / 3;
+    Vector3d v16 = v0  + (v48 - v0 ) / 3; 
+    Vector3d v19 = v3  + (v51 - v3 ) / 3;
+    Vector3d v28 = v12 + (v60 - v12) / 3;
+    Vector3d v31 = v15 + (v63 - v15) / 3;
+    Vector3d v17 = v16 + (v19 - v16) / 3;
+    Vector3d v18 = v19 - (v19 - v16) / 3;
+    Vector3d v20 = v16 + (v28 - v16) / 3;
+    Vector3d v23 = v19 + (v31 - v19) / 3;
+    Vector3d v21 = v20 + (v23 - v20) / 3;
+    Vector3d v22 = v23 - (v23 - v20) / 3;
+    Vector3d v24 = v28 - (v28 - v16) / 3;
+    Vector3d v27 = v31 - (v31 - v19) / 3;
+    Vector3d v25 = v24 + (v27 - v24) / 3;
+    Vector3d v26 = v27 - (v27 - v24) / 3;
+    Vector3d v29 = v28 + (v31 - v28) / 3;
+    Vector3d v30 = v31 - (v31 - v28) / 3;
     /* third layer */
-    Vertex v32 = v48 - (v48 - v0 ) / 3;
-    Vertex v35 = v51 - (v51 - v3 ) / 3;
-    Vertex v44 = v60 - (v60 - v12) / 3;
-    Vertex v47 = v63 - (v63 - v15) / 3;
-    Vertex v33 = v32 + (v35 - v32) / 3;
-    Vertex v34 = v35 - (v35 - v32) / 3;
-    Vertex v36 = v32 + (v44 - v32) / 3;
-    Vertex v39 = v35 + (v47 - v35) / 3;
-    Vertex v37 = v36 + (v39 - v36) / 3;
-    Vertex v38 = v39 - (v39 - v36) / 3;
-    Vertex v40 = v44 - (v44 - v32) / 3;
-    Vertex v43 = v47 - (v47 - v35) / 3;
-    Vertex v41 = v40 + (v43 - v40) / 3;
-    Vertex v42 = v43 - (v43 - v40) / 3;
-    Vertex v45 = v44 + (v47 - v44) / 3;
-    Vertex v46 = v47 - (v47 - v44) / 3;
+    Vector3d v32 = v48 - (v48 - v0 ) / 3;
+    Vector3d v35 = v51 - (v51 - v3 ) / 3;
+    Vector3d v44 = v60 - (v60 - v12) / 3;
+    Vector3d v47 = v63 - (v63 - v15) / 3;
+    Vector3d v33 = v32 + (v35 - v32) / 3;
+    Vector3d v34 = v35 - (v35 - v32) / 3;
+    Vector3d v36 = v32 + (v44 - v32) / 3;
+    Vector3d v39 = v35 + (v47 - v35) / 3;
+    Vector3d v37 = v36 + (v39 - v36) / 3;
+    Vector3d v38 = v39 - (v39 - v36) / 3;
+    Vector3d v40 = v44 - (v44 - v32) / 3;
+    Vector3d v43 = v47 - (v47 - v35) / 3;
+    Vector3d v41 = v40 + (v43 - v40) / 3;
+    Vector3d v42 = v43 - (v43 - v40) / 3;
+    Vector3d v45 = v44 + (v47 - v44) / 3;
+    Vector3d v46 = v47 - (v47 - v44) / 3;
     /* forth layer */
     // Vertex v48  = ;
     // Vertex v51  = ;
     // Vertex v60 = ;
     // Vertex v63 = ;
-    Vertex v49 = v48 + (v51 - v48) / 3;
-    Vertex v50 = v51 - (v51 - v48) / 3;
-    Vertex v52 = v48 + (v60 - v48) / 3;
-    Vertex v55 = v51 + (v63 - v51) / 3;
-    Vertex v53 = v52 + (v55 - v52) / 3;
-    Vertex v54 = v55 - (v55 - v52) / 3;
-    Vertex v56 = v60 - (v60 - v48) / 3;
-    Vertex v59 = v63 - (v63 - v51) / 3;
-    Vertex v57 = v56 + (v59 - v56) / 3;
-    Vertex v58 = v59 - (v59 - v56) / 3;
-    Vertex v61 = v60 + (v63 - v60) / 3;
-    Vertex v62 = v63 - (v63 - v60) / 3;
+    Vector3d v49 = v48 + (v51 - v48) / 3;
+    Vector3d v50 = v51 - (v51 - v48) / 3;
+    Vector3d v52 = v48 + (v60 - v48) / 3;
+    Vector3d v55 = v51 + (v63 - v51) / 3;
+    Vector3d v53 = v52 + (v55 - v52) / 3;
+    Vector3d v54 = v55 - (v55 - v52) / 3;
+    Vector3d v56 = v60 - (v60 - v48) / 3;
+    Vector3d v59 = v63 - (v63 - v51) / 3;
+    Vector3d v57 = v56 + (v59 - v56) / 3;
+    Vector3d v58 = v59 - (v59 - v56) / 3;
+    Vector3d v61 = v60 + (v63 - v60) / 3;
+    Vector3d v62 = v63 - (v63 - v60) / 3;
 
     /* add vertexes */
     size_t v1Idx  = addVertex(v1);
