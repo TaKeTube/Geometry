@@ -71,6 +71,24 @@ inline Vertex Mesh::getEdgeCenter(Edge e){
     return (V.at(e.v1Idx)+V.at(e.v2Idx))/2;
 }
 
+int Mesh::getVertexIdx(Vertex v){
+    for(size_t i = 0; i < V.size(); i++){
+        Vertex &curV = V.at(i);
+        if((v - curV).norm2() < REFINE_EPSILON)
+            return i;
+    }
+    return -1;
+}
+
+int Mesh::getAddedVertexIdx(Vertex v){
+    for(size_t i = 0; i < addedV.size(); i++){
+        Vertex &curV = addedV.at(i);
+        if((v - curV).norm2() < REFINE_EPSILON)
+            return V.size() + i;
+    }
+    return -1;
+}
+
 /*
  * addVertex()
  * DESCRIPTION: add Vertex into the mesh
@@ -79,8 +97,12 @@ inline Vertex Mesh::getEdgeCenter(Edge e){
  * RETURN: the index of the added vertex
  */
 inline size_t Mesh::addVertex(Vertex v){
-    V.push_back(v);
-    return V.size()-1;
+    int NewVIdx;
+    if((NewVIdx = getAddedVertexIdx(v)) == -1){
+        addedV.push_back(v);
+        NewVIdx = V.size() + addedV.size() - 1;
+    }
+    return NewVIdx;
 }
 
 /*
@@ -101,8 +123,8 @@ inline int Mesh::addHexCell(size_t v0, size_t v1, size_t v2, size_t v3,
     c.push_back(v5);
     c.push_back(v6);
     c.push_back(v7);
-    C.push_back(c);
-    return C.size()-1;
+    addedC.push_back(c);
+    return C.size() + addedC.size() - 1;
 }
 
 /*
@@ -113,8 +135,44 @@ inline int Mesh::addHexCell(size_t v0, size_t v1, size_t v2, size_t v3,
  * RETURN: none
  */
 inline void Mesh::deleteCell(size_t idx){
-    auto iter = C.begin()+idx;
-    C.erase(iter);
+    abandonedC.push_back(idx);
+}
+
+/*
+ * update()
+ * DESCRIPTION: update the mesh status (for lazy evaluation)
+ *              added cells & vertexes are truly added into mesh's C & V
+ *              removed cells & vertexes are truly removed mesh's C & V
+ * INPUT: none
+ * OUTPUT: none
+ * RETURN: none
+ */
+void Mesh::update(){
+    /* added vertexes */
+    for(size_t i = 0; i < addedV.size(); i++)
+        V.push_back(addedV.at(i));
+
+    /* added cells */
+    for(size_t i = 0; i < addedC.size(); i++)
+        C.push_back(addedC.at(i));
+
+    /* delete all abandoned cells */
+    /* has to be deleted from big to small */
+    sort(abandonedC.rbegin(), abandonedC.rend());
+    for(size_t i = 0; i < abandonedC.size(); i++)
+        C.erase(C.begin()+abandonedC.at(i));
+
+    /* delete all abandoned vertexes */
+    /* has to be deleted from big to small */
+    sort(abandonedV.rbegin(), abandonedV.rend());
+    for(size_t i = 0; i < abandonedV.size(); i++)
+        V.erase(V.begin()+abandonedV.at(i));
+
+    /* clear lazy evaluation related container */
+    std::vector<Vertex>().swap(addedV);
+    std::vector<Cell>().swap(addedC);
+    std::vector<size_t>().swap(abandonedV);
+    std::vector<size_t>().swap(abandonedC);
 }
 
 /*
@@ -905,11 +963,10 @@ void Mesh::addCellTemplate(Cell c){
  *              see template.md for corresponding vertex indexes.
  * INPUT: cIdx - index of the cell to be replaced
  *        Vbitmap - selected vertexes bitmap of the cell
- *        abandonedCell - vector of abandoned cells
  * OUTPUT: a template after modified parallel & single hex sheet refinement in mesh
  * RETURN: none
  */
-void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> &abandonedCell){
+void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap){
     int Vnum = getBitNum(Vbitmap);
     Cell localc;
     Cell &c = C.at(cIdx);
@@ -937,22 +994,22 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
         /* vertex refinement */
         case 1:
             addVertTemplate(localc);
-            abandonedCell.push_back(cIdx);
+            deleteCell(cIdx);
             break;
         /* edge refinement */
         case 2:
             addEdgeTemplate(localc);
-            abandonedCell.push_back(cIdx);
+            deleteCell(cIdx);
             break;
         /* face refinement */
         case 4:
             addFaceTemplate(localc);
-            abandonedCell.push_back(cIdx);
+            deleteCell(cIdx);
             break;
         /* cell refinement */
         case 8:
             addCellTemplate(c);
-            abandonedCell.push_back(cIdx);
+            deleteCell(cIdx);
             break;
         default:
             break;
@@ -968,7 +1025,6 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vect
  */
 void Mesh::refine(std::vector<size_t> &selectedV){
     std::vector<size_t> selectedC;
-    std::vector<size_t> abandonedCell;
 
     /* select cell according to the selected vertexes */
     selectCell(selectedV, selectedC);
@@ -977,11 +1033,8 @@ void Mesh::refine(std::vector<size_t> &selectedV){
 
     /* replace selected cells with templates */
     for(auto c:selectedC)
-        replaceCellWithTemplate(c, cellInfoMap.at(c).Vbitmap, abandonedCell);
+        replaceCellWithTemplate(c, cellInfoMap.at(c).Vbitmap);
 
-    /* delete all abandoned cells */
-    /* has to be deleted from big to small */
-    sort(abandonedCell.rbegin(), abandonedCell.rend());
-    for(size_t i = 0; i < abandonedCell.size(); i++)
-        deleteCell(abandonedCell.at(i));
+    /* update mesh status for lazy evaluation */
+    update();
 }

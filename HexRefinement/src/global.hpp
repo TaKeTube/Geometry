@@ -4,6 +4,7 @@
 #define MOD(x, n)   (((x%n)+n)%n)
 #define HEX_SIZE    8
 #define FACE_NUM    6
+#define REFINE_EPSILON  1e-5
 
 #include <vector>
 #include <unordered_map>
