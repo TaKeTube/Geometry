@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Mesh.h"
 #include "global.hpp"
 #include "Vector.hpp"
@@ -290,15 +291,15 @@ void Mesh::removeConcavity(std::vector<size_t> &selectedC){
                         newV.push_back(C.at(cIdx).at(j));
                 }
                 /* select new cells according to new vertexes */
-                // selectCell(newV, newC);
-                selectCell(newV, selectedC);
+                selectCell(newV, newC);
             }
         }
 
         /* update selected cells */
-        for(auto cIdx : newC)
-            // if(!isInVec(cIdx, selectedC))
-            selectedC.push_back(cIdx);
+        for(auto cIdx : newC){
+            if(!isInVec(cIdx, selectedC))
+                selectedC.push_back(cIdx);
+        }
     }
 }
 
@@ -1040,15 +1041,25 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap){
 void Mesh::refine(std::vector<size_t> &selectedV){
     std::vector<size_t> selectedC;
 
+    std::cout<<"Start refinement..."<<std::endl;
+
     /* select cell according to the selected vertexes */
     selectCell(selectedV, selectedC);
     /* remove concavity (nonstandard cell configuration) */
     removeConcavity(selectedC);
 
     /* replace selected cells with templates */
-    for(auto c:selectedC)
-        replaceCellWithTemplate(c, cellInfoMap.at(c).Vbitmap);
+    // for(auto c:selectedC)
+    //     replaceCellWithTemplate(c, cellInfoMap.at(c).Vbitmap);
+
+    for(size_t i = 0; i < selectedC.size(); i++){
+        replaceCellWithTemplate(selectedC.at(i), cellInfoMap.at(selectedC.at(i)).Vbitmap);
+        if(i%10 == 0)
+            std::cout<< (float)i*100/selectedC.size() << "% "<<std::endl;
+    }
 
     /* update mesh status for lazy evaluation */
     update();
+
+    std::cout<<"Finish refinement!"<<std::endl;
 }

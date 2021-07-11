@@ -1030,6 +1030,8 @@ void Mesh::replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap){
 void Mesh::refine(std::vector<size_t> &selectedV){
     std::vector<size_t> selectedC;
 
+    std::cout<<"Start refinement..."<<std::endl;
+
     /* select cell according to the selected vertexes */
     selectCell(selectedV, selectedC);
     /* remove concavity (nonstandard cell configuration) */
@@ -1042,9 +1044,11 @@ void Mesh::refine(std::vector<size_t> &selectedV){
     for(size_t i = 0; i < selectedC.size(); i++){
         replaceCellWithTemplate(selectedC.at(i), cellInfoMap.at(selectedC.at(i)).Vbitmap);
         if(i%100 == 0)
-            std::cout<< (float)i*100/selectedC.size() << "% ";
+            std::cout<< (float)i*100/selectedC.size() << "% "<<std::endl;
     }
 
     /* update mesh status for lazy evaluation */
     update();
+
+    std::cout<<"Finish refinement!"<<std::endl;
 }

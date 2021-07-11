@@ -36,7 +36,7 @@ int main(int argc, char **argv){
     MatrixXi C;
 
     if(!meshReader((input_file == NULL)?default_file:input_file, V, C)){
-        FieldAdaptiveRefine(V, C, [](Vector3d v){return 500*exp(-v.squaredNorm()/2)/sqrt(2*M_PI);});
+        FieldAdaptiveRefine(V, C, [](Vector3d v){return 258*exp(-v.squaredNorm()/2)/sqrt(2*M_PI);});
         vtkWriter((output_file == NULL)?"output.vtk":output_file, V, C);
     }
 }
