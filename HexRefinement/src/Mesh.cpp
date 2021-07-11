@@ -71,6 +71,13 @@ inline Vertex Mesh::getEdgeCenter(Edge e){
     return (V.at(e.v1Idx)+V.at(e.v2Idx))/2;
 }
 
+/*
+ * getVertexIdx()
+ * DESCRIPTION: get the index of given vertex through geometry method (distance)
+ * INPUT: Vertex
+ * OUTPUT: index of the vertex in mesh
+ * RETURN: index of the vertex in mesh, -1 if not in mesh
+ */
 int Mesh::getVertexIdx(Vertex v){
     for(size_t i = 0; i < V.size(); i++){
         Vertex &curV = V.at(i);
@@ -80,6 +87,13 @@ int Mesh::getVertexIdx(Vertex v){
     return -1;
 }
 
+/*
+ * getAddedVertexIdx()
+ * DESCRIPTION: get the index of given vertex in added vertexes vector through geometry method (distance)
+ * INPUT: Vertex
+ * OUTPUT: index of the vertex in added vertexes vector
+ * RETURN: index of the vertex in added vertexes vector, -1 if not in it
+ */
 int Mesh::getAddedVertexIdx(Vertex v){
     for(size_t i = 0; i < addedV.size(); i++){
         Vertex &curV = addedV.at(i);
@@ -91,7 +105,7 @@ int Mesh::getAddedVertexIdx(Vertex v){
 
 /*
  * addVertex()
- * DESCRIPTION: add Vertex into the mesh
+ * DESCRIPTION: add Vertex into the mesh (for Lazy Evaluation)
  * INPUT: vertex to be added
  * OUTPUT: the index of the added vertex
  * RETURN: the index of the added vertex
@@ -107,7 +121,7 @@ inline size_t Mesh::addVertex(Vertex v){
 
 /*
  * addHexCell()
- * DESCRIPTION: add hex cell into the mesh according to indexes of eight vertexes
+ * DESCRIPTION: add hex cell into the mesh according to indexes of eight vertexes (for Lazy Evaluation)
  * INPUT: indexes of eight vertexes
  * OUTPUT: the index of the added cell
  * RETURN: the index of the added cell
@@ -129,7 +143,7 @@ inline int Mesh::addHexCell(size_t v0, size_t v1, size_t v2, size_t v3,
 
 /*
  * deleteCell()
- * DESCRIPTION: delete the cell in Cell vectors according to corresponding index
+ * DESCRIPTION: delete the cell in Cell vectors according to corresponding index (for Lazy Evaluation)
  * INPUT: index of the cell to be deleted
  * OUTPUT: none
  * RETURN: none
