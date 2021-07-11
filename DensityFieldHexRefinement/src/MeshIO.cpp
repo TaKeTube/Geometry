@@ -117,7 +117,7 @@ void vtkWriter(const char* fname, Matrix3Xd &V, MatrixXi &C)
 
     /* write cellType */
     ofs << "CELLS " << cnum << " ";
-    vtkIdType idType = idType = VTK_HEXAHEDRON;
+    vtkIdType idType = VTK_HEXAHEDRON;
     ofs << 9*cnum << endl;
 
     /* write cells */

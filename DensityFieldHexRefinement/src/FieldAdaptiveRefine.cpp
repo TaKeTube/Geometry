@@ -2,7 +2,7 @@
 #include "Utility.hpp"
 #include "TrivialRefine.h"
 
-#define MAX_ITER_NUM 2
+#define MAX_ITER_NUM 1
 
 inline double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField){
     Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),

@@ -10,6 +10,7 @@ using namespace Eigen;
 #define MOD(x, n)   (((x%n)+n)%n)
 #define HEX_SIZE    8
 #define FACE_NUM    6
+#define REFINE_EPSILON  1e-8
 
 /* lookup table of number of 1s in a bit string */
 const char bitNumLookup[256] = {

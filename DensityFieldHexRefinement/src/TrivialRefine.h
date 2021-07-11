@@ -8,12 +8,11 @@
 
 using namespace Eigen;
 
-// #include "Vector.hpp"
-
 /* Cell related */
 enum CellType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
 typedef std::vector<int> Cell;
+typedef Vector3d Vertex;
 typedef std::vector<Vector3d, aligned_allocator<Vector3d> > Vertexes;
 
 struct CellInfo
@@ -74,11 +73,21 @@ public:
 
     void getE();
     void getVI_CI();
-    Vector3d getEdgeCenter(Edge e);
-    size_t addVertex(Vector3d v);
+    Vertex getEdgeCenter(Edge e);
+    int getVertexIdx(Vertex v);
+    size_t addVertex(Vertex v);
     int addHexCell( size_t v0, size_t v1, size_t v2, size_t v3, 
                     size_t v4, size_t v5, size_t v6, size_t v7);
     void deleteCell(size_t idx);
+
+    void selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC);
+    void refine(std::vector<size_t> &selectedV);
+
+private:
+    Vertexes addedV;
+    std::vector<size_t> abandonedV;
+    std::vector<Cell> addedC;
+    std::vector<size_t> abandonedC;
 
     void addModifiedEdgeTemplate(Cell c);
     void addModifiedFaceTemplate(Cell c);
@@ -86,11 +95,12 @@ public:
     void addEdgeTemplate(Cell c);
     void addFaceTemplate(Cell c);
     void addCellTemplate(Cell c);
-    void selectCell(std::vector<size_t> &selectedV, std::vector<size_t> &selectedC);
     void removeConcavity(std::vector<size_t> &selectedC);
     unsigned char getVbitmap(size_t cIdx);
-    void replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap, std::vector<size_t> &abandonedCell);
-    void refine(std::vector<size_t> &selectedV);
+    void replaceCellWithTemplate(size_t cIdx, unsigned char Vbitmap);
+
+    int getAddedVertexIdx(Vertex v);
+    void update();  /* for lazy evaluation */
 };
 
 #endif
