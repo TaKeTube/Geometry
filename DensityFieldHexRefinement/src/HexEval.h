@@ -10,7 +10,7 @@ namespace HexEval
     {
         VOLUME_METRIC,
         EDGE_LENGTH_METRIC,
-        RIEMANNIAN_METRIC
+        ANISOTROPIC_METRIC
     };
 
     const unsigned int HexEdge[12][2] =
@@ -44,25 +44,26 @@ namespace HexEval
         }
     };
 
-    struct EdgeInfo
-    {
-        std::vector<size_t> cellIdxVec;
-        double len;
-    };
-
     class HexEvaluator
     {
     public:
         int EvalDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, DensityMetric metric);
         std::vector<double> HexEvaluator::GetDensityField();
 
+        void setRefDensityField(const std::function<double(Eigen::Vector3d)> &DensityField);
+        void setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField);
+
     private:
         std::vector<double> DensityField;
-        std::unordered_map<Edge, EdgeInfo> EdgeInfoMap;
+        std::unordered_map<Edge, double> EdgeLenMap;
+        std::unordered_map<Edge, double> EdgeAnisotropicMetricMap;
+
+        std::function<double(Eigen::Vector3d)> RefDensityField;
+        std::function<Eigen::Matrix3d(Eigen::Vector3d)> AnisotropicDensityField;
 
         void EvalVolDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
         void EvalLenDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
-        void EvalRiemannianDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
+        void EvalAnisotropicDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
     };
 }
 
