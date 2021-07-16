@@ -5,8 +5,6 @@
 #include <vector>
 #include <unordered_map>
 
-using namespace Eigen;
-
 #define MOD(x, n)   (((x%n)+n)%n)
 #define HEX_SIZE    8
 #define FACE_NUM    6
@@ -51,10 +49,10 @@ inline bool isInMap(T &e, std::unordered_map<T, S> &v){
  * OUTPUT: none
  * RETURN: volume of hex cell
  */
-inline double HexVolume(const Matrix3Xd &V, const VectorXi &c){
-    Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),
+inline double HexVolume(const Eigen::Matrix3Xd &V, const Eigen::VectorXi &c){
+    Eigen::Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),
              v4 = V.col(c(4)), v5 = V.col(c(5)), v6 = V.col(c(6)), v7 = V.col(c(7));
-    Matrix3d M1, M2, M3;
+    Eigen::Matrix3d M1, M2, M3;
     M1 << v6-v0, v1-v0, v2-v5;
     M2 << v6-v0, v4-v0, v5-v7;
     M3 << v6-v0, v3-v0, v7-v2;

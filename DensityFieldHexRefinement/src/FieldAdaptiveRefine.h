@@ -5,18 +5,24 @@
 #include <vector>
 #include <eigen3/Eigen/Eigen>
 
-using namespace Eigen;
+enum RefineMethod {TRIVIAL_REFINE};
 
-inline double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField);
+inline double EvalDensity(const Eigen::Matrix3Xd &V, const Eigen::VectorXi &c, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-inline double EvalDensity(const std::vector<Vector3d> V, const std::function<double(Vector3d)> &DensityField);
+inline double EvalDensity(const std::vector<Eigen::Vector3d> V, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField);
+int FieldAdaptiveRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Vector3d)> &DensityField);
+int MarkTargetHex(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField, MarkType type);
 
-int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC);
+int TrivialMark(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::function<double(Vector3d)> &DensityField);
+int RefineTargetHex(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, RefineType type);
+
+int TrivialRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, RefineType type);
+
+int PaddingRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, RefineType type);
+
+int EvalFieldAdaptiveMesh(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField);
 
 #endif

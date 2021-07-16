@@ -6,14 +6,12 @@
 #include <algorithm>
 #include <eigen3/Eigen/Eigen>
 
-using namespace Eigen;
-
 /* Cell related */
 enum CellType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
 typedef std::vector<int> Cell;
-typedef Vector3d Vertex;
-typedef std::vector<Vector3d, aligned_allocator<Vector3d> > Vertexes;
+typedef Eigen::Vector3d Vertex;
+typedef std::vector<Eigen::Vector3d, aligned_allocator<Eigen::Vector3d> > Vertexes;
 
 struct CellInfo
 {
@@ -36,7 +34,6 @@ public:
 
 struct EdgeInfo
 {
-    bool isSplit;
     size_t centerIdx;
     std::vector<size_t> cellIdxVec;
 };
