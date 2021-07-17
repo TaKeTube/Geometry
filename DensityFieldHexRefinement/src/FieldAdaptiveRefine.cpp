@@ -1,7 +1,6 @@
 #include "FieldAdaptiveRefine.h"
 #include "Utility.hpp"
 
-#include "RiemannianMark.h"
 #include "TrivialRefine.h"
 
 #define MAX_ITER_NUM 3
@@ -23,13 +22,13 @@ inline double EvalDensity(const std::vector<Vector3d> &V, const std::function<do
 int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField){
     int IterCount = 0;
     std::queue<int> TargetC;
-    if(MarkTargetHex(V, C, TargetC, DensityField, TRIVIAL_MARK) == -1)
+    if(MarkTargetHex(V, C, TargetC, DensityField, HexEval::VOLUME_METRIC) == -1)
         return -1;
 
     while(!TargetC.empty() && IterCount++ < MAX_ITER_NUM){
         if(RefineTargetHex(V, C, TargetC, TRIVIAL_REFINE) == -1)
             return -1;
-        if(MarkTargetHex(V, C, TargetC, DensityField, TRIVIAL_MARK) == -1)
+        if(MarkTargetHex(V, C, TargetC, DensityField, HexEval::VOLUME_METRIC) == -1)
             return -1;
     }
 
@@ -37,7 +36,7 @@ int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Ve
     return 0;
 }
 
-int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Vector3d)> &DensityField, DensityMetric metric){
+int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Vector3d)> &DensityField, HexEval::DensityMetric metric){
 
     return 0;
 }
@@ -54,7 +53,7 @@ int TrivialMark(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC,
     return 0;
 }
 
-int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineType type){
+int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineMethod type){
     switch (type)
     {
     case TRIVIAL_REFINE:

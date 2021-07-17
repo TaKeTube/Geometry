@@ -4,6 +4,7 @@
 #include <queue>
 #include <vector>
 #include <eigen3/Eigen/Eigen>
+#include "HexEval.h"
 
 enum RefineMethod {TRIVIAL_REFINE};
 
@@ -13,7 +14,7 @@ inline double EvalDensity(const std::vector<Eigen::Vector3d> V, const std::funct
 
 int FieldAdaptiveRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-int MarkTargetHex(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField, MarkType type);
+int MarkTargetHex(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField, HexEval::DensityMetric type);
 
 int TrivialMark(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField);
 
