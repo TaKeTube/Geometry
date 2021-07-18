@@ -11,7 +11,7 @@ enum CellType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
 typedef std::vector<int> Cell;
 typedef Eigen::Vector3d Vertex;
-typedef std::vector<Eigen::Vector3d, aligned_allocator<Eigen::Vector3d> > Vertexes;
+typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > Vertexes;
 
 struct CellInfo
 {

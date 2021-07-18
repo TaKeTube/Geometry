@@ -8,5 +8,6 @@ int meshReader(const char* fname, Matrix3Xd &V, MatrixXi &C);
 void vtkReader(const char* fname, Matrix3Xd &V, MatrixXi &C);
 void objReader(const char* fname, Matrix3Xd &V, MatrixXi &C);
 void vtkWriter(const char* fname, Matrix3Xd &V, MatrixXi &C);
+void vtkWriter(const char* fname, Matrix3Xd &V, MatrixXi &C, std::vector<double> densityField);
 
 #endif

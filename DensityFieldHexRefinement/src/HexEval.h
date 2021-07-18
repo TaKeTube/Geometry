@@ -2,7 +2,41 @@
 #define HEX_EVAL_H
 
 #include <vector>
+#include <unordered_map>
+#include <algorithm>
 #include <eigen3/Eigen/Eigen>
+
+namespace HexEval
+{
+    /* Edge related */
+    class Edge
+    {
+    public:
+        size_t v1Idx, v2Idx;
+
+        Edge();
+        Edge(size_t v1, size_t v2);
+
+        bool operator==(const Edge &e) const
+        {
+            return ((v1Idx == e.v1Idx) && (v2Idx == e.v2Idx)) || ((v1Idx == e.v2Idx) && (v2Idx == e.v1Idx));
+        }
+    };
+}
+
+/* hash function for edge unordered_map */
+namespace std
+{
+    template <>
+    struct hash<HexEval::Edge>
+    {
+        size_t operator()(const HexEval::Edge &e) const noexcept
+        {
+            return hash<decltype(e.v1Idx)>()(e.v1Idx) +
+                   hash<decltype(e.v2Idx)>()(e.v2Idx);
+        }
+    };
+}
 
 namespace HexEval
 {
@@ -29,28 +63,17 @@ namespace HexEval
             {3, 7},
     };
 
-    /* Edge related */
-    class Edge
-    {
-    public:
-        size_t v1Idx, v2Idx;
-
-        Edge();
-        Edge(size_t v1, size_t v2);
-
-        bool operator==(const Edge &e) const
-        {
-            return ((v1Idx == e.v1Idx) && (v2Idx == e.v2Idx)) || ((v1Idx == e.v2Idx) && (v2Idx == e.v1Idx));
-        }
-    };
-
     class HexEvaluator
     {
     public:
+        HexEvaluator();
+
+        int EvalDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
         int EvalDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, DensityMetric metric);
-        std::vector<double> HexEvaluator::GetDensityField();
+        std::vector<double> GetDensityField();
 
         void setRefDensityField(const std::function<double(Eigen::Vector3d)> &DensityField);
+        void setDensityFieldMetric(DensityMetric metric);
         void setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField);
 
     private:
@@ -58,26 +81,13 @@ namespace HexEval
         std::unordered_map<Edge, double> EdgeLenMap;
         std::unordered_map<Edge, double> EdgeAnisotropicMetricMap;
 
+        DensityMetric densityMetric;
         std::function<double(Eigen::Vector3d)> RefDensityField;
         std::function<Eigen::Matrix3d(Eigen::Vector3d)> AnisotropicDensityField;
 
         void EvalVolDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
         void EvalLenDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
         void EvalAnisotropicDensity(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
-    };
-}
-
-/* hash function for edge unordered_map */
-namespace std
-{
-    template <>
-    struct hash<HexEval::Edge>
-    {
-        size_t operator()(const HexEval::Edge &e) const noexcept
-        {
-            return hash<decltype(e.v1Idx)>()(e.v1Idx) +
-                   hash<decltype(e.v2Idx)>()(e.v2Idx);
-        }
     };
 }
 
