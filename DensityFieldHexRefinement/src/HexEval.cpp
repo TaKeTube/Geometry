@@ -159,7 +159,8 @@ void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
     }
 }
 
-void HexEvaluator::setDensityFieldMetric(DensityMetric metric){
+void HexEvaluator::setDensityFieldMetric(DensityMetric metric)
+{
     densityMetric = metric;
 }
 
@@ -168,7 +169,8 @@ void HexEvaluator::setRefDensityField(const std::function<double(Vector3d)> &Den
     RefDensityField = DensityField;
 }
 
-void HexEvaluator::setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField){
+void HexEvaluator::setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField)
+{
     AnisotropicDensityField = DensityField;
 }
 
