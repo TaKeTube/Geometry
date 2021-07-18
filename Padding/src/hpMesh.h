@@ -9,33 +9,39 @@
 /* Cell related */
 enum MeshType {TRIANGLE, QUAD, TETRAHEDRA, HEXAHEDRA, POLYGON};
 
-struct Cell
+typedef std::vector<size_t>         Cell;
+typedef std::vector<size_t>         Face;
+typedef std::pair<size_t, size_t>   Edge;
+typedef Eigen::Vector3d             Vert;
+typedef std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > Vertexes;
+
+struct CellInfo
 {
-    std::vector<size_t> V; // vertexes
+    // std::vector<size_t> V; // vertexes
     std::vector<size_t> E; // edges
     std::vector<size_t> F; // faces
     bool isBoundary;
 };
 
-struct Face
+struct FaceInfo
 {
-    std::vector<size_t> V; // vertexes
+    // std::vector<size_t> V; // vertexes
     std::vector<size_t> E; // edges
     std::vector<size_t> neighborC;    // neighbor cells
     bool isBoundary;
 };
 
-struct Edge
+struct EdgeInfo
 {
-    std::vector<size_t> V; // vertexes
+    // std::vector<size_t> V; // vertexes
     std::vector<size_t> neighborF;    // neighbor faces
     std::vector<size_t> neighborC;    // neighbor cells
     bool isBoundary;
 };
 
-struct Vert
+struct VertInfo
 {
-    Eigen::Vector3d v; // vertexes
+    // Eigen::Vector3d v; // vertexes
     std::vector<size_t> neighborV;   // neighbor vertexes
     std::vector<size_t> neighborE;   // neighbor edges
     std::vector<size_t> neighborF;   // neighbor faces
@@ -49,10 +55,14 @@ struct Vert
 class Mesh
 {
 public:
-    std::vector<Vert> V;
+    Vertexes V;
     std::vector<Cell> C;
     std::vector<Edge> E;
     std::vector<Face> F;
+    std::unordered_map<size_t, CellInfo> CinfoMap;
+    std::unordered_map<size_t, FaceInfo> FinfoMap;
+    std::unordered_map<size_t, EdgeInfo> EinfoMap;
+    std::unordered_map<size_t, VertInfo> VinfoMap;
     MeshType cellType;
 
     Mesh();
