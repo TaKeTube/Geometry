@@ -49,6 +49,8 @@ struct VertInfo
     bool isBoundary;
 
     Eigen::Vector3d normal; // normal vector
+    int surfDegree;         // surface degree
+    double surfAvgLen;      // surface average length of neighbor edges
 };
 
 /* Mesh related */
@@ -63,6 +65,8 @@ public:
     std::unordered_map<size_t, FaceInfo> FinfoMap;
     std::unordered_map<size_t, EdgeInfo> EinfoMap;
     std::unordered_map<size_t, VertInfo> VinfoMap;
+    std::vector<size_t> SurfaceF;
+    std::vector<size_t> SurfaceV;
     MeshType cellType;
 
     Mesh();
@@ -79,7 +83,11 @@ public:
     void deleteCell(size_t idx);
 
     void getGeometryInfo();
+    void getSurface();
     void getSurfaceNormal();
+    void getSurfaceNormal(Mesh &superMesh);
+    void getSurfaceAvgLen();
+    void getSurfaceAvgLen(Mesh &superMesh);
 };
 
 #endif

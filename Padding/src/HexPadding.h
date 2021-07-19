@@ -5,7 +5,7 @@
 
 void padding(Mesh& mesh, std::vector<size_t> &markedC);
 
-void getMarkedMesh(std::vector<size_t> &markedC, Mesh &markedMesh);
+void getMarkedSubMesh(std::vector<size_t> &markedC, Mesh &markedSubMesh);
 
 
 #endif

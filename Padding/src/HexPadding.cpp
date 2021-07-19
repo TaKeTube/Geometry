@@ -3,12 +3,14 @@
 using namespace std;
 
 void padding(Mesh &m, vector<size_t> &markedC){
-    Mesh markedMesh;
+    Mesh markedSubMesh;
 
     /* generate mesh from marked cells */
-    getMarkedMesh(markedC, markedMesh);
+    getMarkedSubMesh(markedC, markedSubMesh);
 
     /* get normals of vertexes of markedMesh */
-    markedMesh.getGeometryInfo();
-    markedMesh.getSurfaceNormal();
+    markedSubMesh.getSurface();
+    markedSubMesh.getGeometryInfo();
+    markedSubMesh.getSurfaceNormal(m);
+    markedSubMesh.getSurfaceAvgLen(m);
 }
