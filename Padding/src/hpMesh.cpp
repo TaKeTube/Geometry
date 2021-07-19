@@ -7,6 +7,19 @@
 using namespace std;
 using namespace Eigen;
 
+// Mesh::Mesh(const Vertexes& v, const std::vector<Cell>& c, const CellType cellType)
+// : V(v)
+// , C(c)
+// , cellType(cellType)
+// {}
+Mesh::Mesh(const Mesh& mesh)
+: V(mesh.V)
+, C(mesh.C)
+, cellType(mesh.cellType)
+{}
+Mesh::Mesh(){}
+Mesh::~Mesh(){}
+
 /*
  * addVert()
  * DESCRIPTION: add Vertex into the mesh
@@ -14,7 +27,7 @@ using namespace Eigen;
  * OUTPUT: the index of the added vertex
  * RETURN: the index of the added vertex
  */
-inline size_t Mesh::addVert(Vert &v)
+size_t Mesh::addVert(Vert &v)
 {
     V.push_back(v);
     return V.size() - 1;
@@ -27,7 +40,7 @@ inline size_t Mesh::addVert(Vert &v)
  * OUTPUT: the index of the added cell
  * RETURN: the index of the added cell
  */
-inline size_t Mesh::addCell(Cell &c)
+size_t Mesh::addCell(Cell &c)
 {
     C.push_back(c);
     return C.size() - 1;
@@ -46,19 +59,17 @@ void Mesh::getGeometryInfo()
         /* for each faces of the cell... */
         for (size_t i = 0; i < 6; i++)
         {
+            Face f(4);
             /* for each vertexes of the face... */
             for (size_t j = 0; j < 4; j++)
-            {
-                Face f(4);
-                size_t fIdx = 6 * cIdx + i;
-
                 f.at(j) = C.at(cIdx).at(HexFace[i][j]);
-                totalF.at(fIdx) = f;
 
-                /* sort face */
-                sort(f.begin(), f.end());
-                sortedF.at(fIdx) = make_tuple(f, fIdx, i, j);
-            }
+            size_t fIdx = 6 * cIdx + i;
+            totalF.at(fIdx) = f;
+
+            /* sort face */
+            sort(f.begin(), f.end());
+            sortedF.at(fIdx) = make_tuple(f, fIdx, cIdx, i);
             CinfoMap[cIdx].F.resize(6);
         }
 
@@ -67,7 +78,7 @@ void Mesh::getGeometryInfo()
 
         /* get F & boundary check */
         F.push_back(totalF.at(get<1>(sortedF.at(0))));
-        CinfoMap[get<1>(sortedF.at(0))].F[get<2>(sortedF.at(0))] = 0;
+        CinfoMap[get<2>(sortedF.at(0))].F[get<3>(sortedF.at(0))] = 0;
         FinfoMap[F.size() - 1].isBoundary = true;
 
         for (size_t i = 1; i < sortedF.size(); i++)
@@ -84,7 +95,7 @@ void Mesh::getGeometryInfo()
                 FinfoMap[F.size() - 1].isBoundary = false;
             }
 
-            CinfoMap[get<1>(sortedF.at(i))].F[get<2>(sortedF.at(i))] = F.size() - 1;
+            CinfoMap[get<2>(sortedF.at(i))].F[get<3>(sortedF.at(i))] = F.size() - 1;
         }
     }
 }
@@ -118,35 +129,57 @@ void Mesh::getSurfaceNormal()
         Vector3d n0 = getNormal(V.at(v0Idx), V.at(v1Idx), V.at(v2Idx));
         Vector3d n1 = getNormal(V.at(v2Idx), V.at(v3Idx), V.at(v0Idx));
 
-        if (VinfoMap.find(v1Idx) == VinfoMap.end())
-            VinfoMap[v1Idx].normal = n0;
-        else
-            VinfoMap[v1Idx].normal += n0;
+        // if (VinfoMap.find(v1Idx) == VinfoMap.end())
+        //     VinfoMap[v1Idx].normal = n0;
+        // else
+        //     VinfoMap[v1Idx].normal += n0;
 
-        if (VinfoMap.find(v2Idx) == VinfoMap.end())
-            VinfoMap[v2Idx].normal = n0;
-        else
-            VinfoMap[v2Idx].normal += n0;
+        // if (VinfoMap.find(v2Idx) == VinfoMap.end())
+        //     VinfoMap[v2Idx].normal = n0;
+        // else
+        //     VinfoMap[v2Idx].normal += n0;
 
-        if (VinfoMap.find(v3Idx) == VinfoMap.end())
-            VinfoMap[v3Idx].normal = n0;
-        else
-            VinfoMap[v3Idx].normal += n0;
+        // if (VinfoMap.find(v3Idx) == VinfoMap.end())
+        //     VinfoMap[v3Idx].normal = n0;
+        // else
+        //     VinfoMap[v3Idx].normal += n0;
 
-        if (VinfoMap.find(v2Idx) == VinfoMap.end())
-            VinfoMap[v2Idx].normal = n1;
-        else
-            VinfoMap[v2Idx].normal += n1;
+        // if (VinfoMap.find(v2Idx) == VinfoMap.end())
+        //     VinfoMap[v2Idx].normal = n1;
+        // else
+        //     VinfoMap[v2Idx].normal += n1;
 
-        if (VinfoMap.find(v3Idx) == VinfoMap.end())
-            VinfoMap[v3Idx].normal = n1;
-        else
-            VinfoMap[v3Idx].normal += n1;
+        // if (VinfoMap.find(v3Idx) == VinfoMap.end())
+        //     VinfoMap[v3Idx].normal = n1;
+        // else
+        //     VinfoMap[v3Idx].normal += n1;
+
+        // if (VinfoMap.find(v0Idx) == VinfoMap.end())
+        //     VinfoMap[v0Idx].normal = n1;
+        // else
+        //     VinfoMap[v0Idx].normal += n1;
+
+        Vector3d n = (n0 + n1).normalized();
 
         if (VinfoMap.find(v0Idx) == VinfoMap.end())
-            VinfoMap[v0Idx].normal = n1;
+            VinfoMap[v0Idx].normal = n;
         else
-            VinfoMap[v0Idx].normal += n1;
+            VinfoMap[v0Idx].normal += n;
+
+        if (VinfoMap.find(v1Idx) == VinfoMap.end())
+            VinfoMap[v1Idx].normal = n;
+        else
+            VinfoMap[v1Idx].normal += n;
+
+        if (VinfoMap.find(v2Idx) == VinfoMap.end())
+            VinfoMap[v2Idx].normal = n;
+        else
+            VinfoMap[v2Idx].normal += n;
+
+        if (VinfoMap.find(v3Idx) == VinfoMap.end())
+            VinfoMap[v3Idx].normal = n;
+        else
+            VinfoMap[v3Idx].normal += n;
     }
 
     for (size_t vIdx : SurfaceV)
@@ -163,35 +196,57 @@ void Mesh::getSurfaceNormal(Mesh &superMesh)
         Vector3d n0 = getNormal(superMesh.V.at(v0Idx), superMesh.V.at(v1Idx), superMesh.V.at(v2Idx));
         Vector3d n1 = getNormal(superMesh.V.at(v2Idx), superMesh.V.at(v3Idx), superMesh.V.at(v0Idx));
 
-        if (VinfoMap.find(v1Idx) == VinfoMap.end())
-            VinfoMap[v1Idx].normal = n0;
-        else
-            VinfoMap[v1Idx].normal += n0;
+        // if (VinfoMap.find(v1Idx) == VinfoMap.end())
+        //     VinfoMap[v1Idx].normal = n0;
+        // else
+        //     VinfoMap[v1Idx].normal += n0;
 
-        if (VinfoMap.find(v2Idx) == VinfoMap.end())
-            VinfoMap[v2Idx].normal = n0;
-        else
-            VinfoMap[v2Idx].normal += n0;
+        // if (VinfoMap.find(v2Idx) == VinfoMap.end())
+        //     VinfoMap[v2Idx].normal = n0;
+        // else
+        //     VinfoMap[v2Idx].normal += n0;
 
-        if (VinfoMap.find(v3Idx) == VinfoMap.end())
-            VinfoMap[v3Idx].normal = n0;
-        else
-            VinfoMap[v3Idx].normal += n0;
+        // if (VinfoMap.find(v3Idx) == VinfoMap.end())
+        //     VinfoMap[v3Idx].normal = n0;
+        // else
+        //     VinfoMap[v3Idx].normal += n0;
 
-        if (VinfoMap.find(v2Idx) == VinfoMap.end())
-            VinfoMap[v2Idx].normal = n1;
-        else
-            VinfoMap[v2Idx].normal += n1;
+        // if (VinfoMap.find(v2Idx) == VinfoMap.end())
+        //     VinfoMap[v2Idx].normal = n1;
+        // else
+        //     VinfoMap[v2Idx].normal += n1;
 
-        if (VinfoMap.find(v3Idx) == VinfoMap.end())
-            VinfoMap[v3Idx].normal = n1;
-        else
-            VinfoMap[v3Idx].normal += n1;
+        // if (VinfoMap.find(v3Idx) == VinfoMap.end())
+        //     VinfoMap[v3Idx].normal = n1;
+        // else
+        //     VinfoMap[v3Idx].normal += n1;
+
+        // if (VinfoMap.find(v0Idx) == VinfoMap.end())
+        //     VinfoMap[v0Idx].normal = n1;
+        // else
+        //     VinfoMap[v0Idx].normal += n1;
+
+        Vector3d n = (n0 + n1).normalized();
 
         if (VinfoMap.find(v0Idx) == VinfoMap.end())
-            VinfoMap[v0Idx].normal = n1;
+            VinfoMap[v0Idx].normal = n;
         else
-            VinfoMap[v0Idx].normal += n1;
+            VinfoMap[v0Idx].normal += n;
+
+        if (VinfoMap.find(v1Idx) == VinfoMap.end())
+            VinfoMap[v1Idx].normal = n;
+        else
+            VinfoMap[v1Idx].normal += n;
+
+        if (VinfoMap.find(v2Idx) == VinfoMap.end())
+            VinfoMap[v2Idx].normal = n;
+        else
+            VinfoMap[v2Idx].normal += n;
+
+        if (VinfoMap.find(v3Idx) == VinfoMap.end())
+            VinfoMap[v3Idx].normal = n;
+        else
+            VinfoMap[v3Idx].normal += n;
     }
 
     for (size_t vIdx : SurfaceV)

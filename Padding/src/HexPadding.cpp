@@ -18,8 +18,8 @@ void padding(Mesh &m, vector<size_t> &markedC)
     getMarkedSubMesh(m, markedSubMesh, markedC);
 
     /* get normals of vertexes of markedMesh */
-    markedSubMesh.getSurface();
     markedSubMesh.getGeometryInfo();
+    markedSubMesh.getSurface();
     markedSubMesh.getSurfaceNormal(m);
     markedSubMesh.getSurfaceAvgLen(m);
 
@@ -30,7 +30,7 @@ void padding(Mesh &m, vector<size_t> &markedC)
         size_t vIdx = SurfV.at(i);
         VertInfo &vinfo = markedSubMesh.VinfoMap.at(vIdx);
         Vector3d newv = m.V.at(vIdx) - vinfo.surfAvgLen * PADDING_RATIO * vinfo.normal;
-        size_t newvIdx = m.addVertex(newv);
+        size_t newvIdx = m.addVert(newv);
         vMap[vIdx] = newvIdx;
     }
 

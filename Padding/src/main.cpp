@@ -8,6 +8,7 @@
 
 #include "MeshIO.h"
 #include "hpMesh.h"
+#include "HexPadding.h"
 
 // #define TEST
 
@@ -39,11 +40,13 @@ int main(int argc, char **argv){
     }
 
     Mesh mesh = Mesh();
+    std::vector<size_t> MarkedC = {0};
 
     /* Padding */
     /* read mesh file */
     std::cout<<"Read mesh from file..."<<std::endl;
     if(!meshReader((input_file == NULL)?default_file:input_file, mesh)){
+        padding(mesh, MarkedC);
         /* output the processed mesh */
         vtkWriter((output_file == NULL)?"output.vtk":output_file, mesh);
     }else{
