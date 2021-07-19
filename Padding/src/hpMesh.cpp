@@ -7,6 +7,32 @@
 using namespace std;
 using namespace Eigen;
 
+/*
+ * addVert()
+ * DESCRIPTION: add Vertex into the mesh
+ * INPUT: vertex to be added
+ * OUTPUT: the index of the added vertex
+ * RETURN: the index of the added vertex
+ */
+inline size_t Mesh::addVert(Vert &v)
+{
+    V.push_back(v);
+    return V.size() - 1;
+}
+
+/*
+ * addCell()
+ * DESCRIPTION: add Cell into the mesh
+ * INPUT: cell to be added
+ * OUTPUT: the index of the added cell
+ * RETURN: the index of the added cell
+ */
+inline size_t Mesh::addCell(Cell &c)
+{
+    C.push_back(c);
+    return C.size() - 1;
+}
+
 void Mesh::getGeometryInfo()
 {
     F.clear();
@@ -68,8 +94,10 @@ void Mesh::getSurface()
     SurfaceF.clear();
     SurfaceV.clear();
 
-    for (size_t fIdx = 0; fIdx < F.size(); fIdx++){
-        if (FinfoMap.at(fIdx).isBoundary){
+    for (size_t fIdx = 0; fIdx < F.size(); fIdx++)
+    {
+        if (FinfoMap.at(fIdx).isBoundary)
+        {
             SurfaceF.push_back(fIdx);
             for (size_t i = 0; i < 4; i++)
                 SurfaceV.push_back(F.at(fIdx).at(i));
@@ -181,10 +209,10 @@ void Mesh::getSurfaceAvgLen()
         Vector3d &v1 = V.at(v1Idx);
         Vector3d &v2 = V.at(v2Idx);
         Vector3d &v3 = V.at(v3Idx);
-        double v01len = (v1 - v0).squaredNorm()*0.5;
-        double v12len = (v2 - v1).squaredNorm()*0.5;
-        double v23len = (v3 - v2).squaredNorm()*0.5;
-        double v30len = (v0 - v3).squaredNorm()*0.5;
+        double v01len = (v1 - v0).squaredNorm() * 0.5;
+        double v12len = (v2 - v1).squaredNorm() * 0.5;
+        double v23len = (v3 - v2).squaredNorm() * 0.5;
+        double v30len = (v0 - v3).squaredNorm() * 0.5;
 
         if (VinfoMap.find(v0Idx) == VinfoMap.end())
         {
@@ -246,10 +274,10 @@ void Mesh::getSurfaceAvgLen(Mesh &superMesh)
         Vector3d &v1 = superMesh.V.at(v1Idx);
         Vector3d &v2 = superMesh.V.at(v2Idx);
         Vector3d &v3 = superMesh.V.at(v3Idx);
-        double v01len = (v1 - v0).squaredNorm()*0.5;
-        double v12len = (v2 - v1).squaredNorm()*0.5;
-        double v23len = (v3 - v2).squaredNorm()*0.5;
-        double v30len = (v0 - v3).squaredNorm()*0.5;
+        double v01len = (v1 - v0).squaredNorm() * 0.5;
+        double v12len = (v2 - v1).squaredNorm() * 0.5;
+        double v23len = (v3 - v2).squaredNorm() * 0.5;
+        double v30len = (v0 - v3).squaredNorm() * 0.5;
 
         if (VinfoMap.find(v0Idx) == VinfoMap.end())
         {

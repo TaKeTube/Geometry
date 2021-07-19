@@ -64,7 +64,7 @@ void vtkReader(const char* fname , Mesh& mesh)
         const vtkIdType vnum = output->GetNumberOfPoints();
         const vtkIdType cnum = output->GetNumberOfCells();
         cout << "UnstructuredGrid: " << vnum << " points " << cnum << " cells" << endl;
-        vector<Vertex>& V = mesh.V;
+        Vertexes& V = mesh.V;
         V.resize(vnum);
 
         /* read vertexes */
@@ -72,9 +72,9 @@ void vtkReader(const char* fname , Mesh& mesh)
         for (vtkIdType i = 0; i < vnum; i++)
         {
             output->GetPoint(i, p);
-            V.at(i).x = p[0];
-            V.at(i).y = p[1];
-            V.at(i).z = p[2];
+            V.at(i).x() = p[0];
+            V.at(i).y() = p[1];
+            V.at(i).z() = p[2];
         }
 
         /* read cell type */
@@ -110,7 +110,7 @@ void vtkReader(const char* fname , Mesh& mesh)
  */
 void vtkWriter(const char* fname , Mesh& mesh)
 {
-    const vector<Vertex>& V = mesh.V;
+    const Vertexes V = mesh.V;
     const vector<Cell>& C = mesh.C;
     const size_t vnum = V.size();
     const size_t cnum = C.size();
@@ -125,7 +125,7 @@ void vtkWriter(const char* fname , Mesh& mesh)
     /* write vertexes */
     ofs << "POINTS " << vnum << " float" << endl;
     for (size_t i = 0; i < vnum; i++)
-        ofs << fixed << setprecision(7) << V.at(i).x << " " << V.at(i).y << " " << V.at(i).z << endl;
+        ofs << fixed << setprecision(7) << V.at(i).x() << " " << V.at(i).y() << " " << V.at(i).z() << endl;
 
     /* write cellType */
     ofs << "CELLS " << cnum << " ";

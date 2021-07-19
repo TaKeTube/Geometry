@@ -65,6 +65,7 @@ public:
     std::unordered_map<size_t, FaceInfo> FinfoMap;
     std::unordered_map<size_t, EdgeInfo> EinfoMap;
     std::unordered_map<size_t, VertInfo> VinfoMap;
+    std::vector<size_t> SubV;       // valid vertexes index for submesh
     std::vector<size_t> SurfaceF;
     std::vector<size_t> SurfaceV;
     MeshType cellType;
@@ -74,13 +75,11 @@ public:
     // Mesh(const std::vector<Vertex>& v, const std::vector<Cell>& c, const MeshType meshType);
     ~Mesh();
 
-    void getE();
-    void getVI_CI();
-    // int getVertexIdx(Vertex v);
-    // size_t addVertex(Vertex v);
-    int addHexCell( size_t v0, size_t v1, size_t v2, size_t v3, 
+    size_t addVert(Vert &v);
+    size_t addCell(Cell &c);
+    size_t addCell( size_t v0, size_t v1, size_t v2, size_t v3, 
                     size_t v4, size_t v5, size_t v6, size_t v7);
-    void deleteCell(size_t idx);
+    // void deleteCell(size_t idx);
 
     void getGeometryInfo();
     void getSurface();
