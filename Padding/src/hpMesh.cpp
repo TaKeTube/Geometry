@@ -72,31 +72,31 @@ void Mesh::getGeometryInfo()
             sortedF.at(fIdx) = make_tuple(f, fIdx, cIdx, i);
             CinfoMap[cIdx].F.resize(6);
         }
+    }
 
-        /* sort F for the sake of boundary check */
-        sort(sortedF.begin(), sortedF.end());
+    /* sort F for the sake of boundary check */
+    sort(sortedF.begin(), sortedF.end());
 
-        /* get F & boundary check */
-        F.push_back(totalF.at(get<1>(sortedF.at(0))));
-        CinfoMap[get<2>(sortedF.at(0))].F[get<3>(sortedF.at(0))] = 0;
-        FinfoMap[F.size() - 1].isBoundary = true;
+    /* get F & boundary check */
+    F.push_back(totalF.at(get<1>(sortedF.at(0))));
+    CinfoMap[get<2>(sortedF.at(0))].F[get<3>(sortedF.at(0))] = 0;
+    FinfoMap[F.size() - 1].isBoundary = true;
 
-        for (size_t i = 1; i < sortedF.size(); i++)
+    for (size_t i = 1; i < sortedF.size(); i++)
+    {
+        if (get<0>(sortedF.at(i)) != get<0>(sortedF.at(i - 1)))
         {
-            if (get<0>(sortedF.at(i)) != get<0>(sortedF.at(i - 1)))
-            {
-                /* a new different face, add it into F */
-                F.push_back(totalF.at(get<1>(sortedF.at(i))));
-                FinfoMap[F.size() - 1].isBoundary = true;
-            }
-            else
-            {
-                /* repeated faces, which means it is not a boundary face */
-                FinfoMap[F.size() - 1].isBoundary = false;
-            }
-
-            CinfoMap[get<2>(sortedF.at(i))].F[get<3>(sortedF.at(i))] = F.size() - 1;
+            /* a new different face, add it into F */
+            F.push_back(totalF.at(get<1>(sortedF.at(i))));
+            FinfoMap[F.size() - 1].isBoundary = true;
         }
+        else
+        {
+            /* repeated faces, which means it is not a boundary face */
+            FinfoMap[F.size() - 1].isBoundary = false;
+        }
+
+        CinfoMap[get<2>(sortedF.at(i))].F[get<3>(sortedF.at(i))] = F.size() - 1;
     }
 }
 

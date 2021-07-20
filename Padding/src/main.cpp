@@ -12,10 +12,11 @@
 
 // #define TEST
 
-int main(int argc, char **argv){
-    char* input_file = NULL;
-    char* output_file = NULL;
-    char* refine_file = NULL;
+int main(int argc, char **argv)
+{
+    char *input_file = NULL;
+    char *output_file = NULL;
+    char *refine_file = NULL;
     char default_file[] = "../data/cad.vtk";
     char default_refine_file[] = "../data/cad_refine.txt";
 
@@ -23,33 +24,49 @@ int main(int argc, char **argv){
      *  A standard command: 
      *      ./HexRefinement.exe -input "../data/rod.vtk" -output "refined_rod.vtk" -refine "../data/rod_refine.txt"
      */
-    for (int i = 1; i < argc; i++) {
-        if (!strcmp(argv[i],"-input")) {
-            i++; assert (i < argc); 
+    for (int i = 1; i < argc; i++)
+    {
+        if (!strcmp(argv[i], "-input"))
+        {
+            i++;
+            assert(i < argc);
             input_file = argv[i];
-        } else if (!strcmp(argv[i],"-output")) {
-            i++; assert (i < argc); 
+        }
+        else if (!strcmp(argv[i], "-output"))
+        {
+            i++;
+            assert(i < argc);
             output_file = argv[i];
-        } else if (!strcmp(argv[i],"-refine")) {
-            i++; assert (i < argc); 
+        }
+        else if (!strcmp(argv[i], "-refine"))
+        {
+            i++;
+            assert(i < argc);
             refine_file = argv[i];
-        } else {
-            printf ("Error with command line argument %d: '%s'\n",i,argv[i]);
+        }
+        else
+        {
+            printf("Error with command line argument %d: '%s'\n", i, argv[i]);
             assert(0);
         }
     }
 
     Mesh mesh = Mesh();
-    std::vector<size_t> MarkedC = {0};
+    std::vector<size_t> MarkedC = {
+        2, 6, 7
+    };
 
     /* Padding */
     /* read mesh file */
-    std::cout<<"Read mesh from file..."<<std::endl;
-    if(!meshReader((input_file == NULL)?default_file:input_file, mesh)){
+    std::cout << "Read mesh from file..." << std::endl;
+    if (!meshReader((input_file == NULL) ? default_file : input_file, mesh))
+    {
         padding(mesh, MarkedC);
         /* output the processed mesh */
-        vtkWriter((output_file == NULL)?"output.vtk":output_file, mesh);
-    }else{
+        vtkWriter((output_file == NULL) ? "output.vtk" : output_file, mesh);
+    }
+    else
+    {
         /* fail to read file */
         std::cout << "Fail to read file" << std::endl;
     }

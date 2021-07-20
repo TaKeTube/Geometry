@@ -1,7 +1,7 @@
 #include <set>
 #include "HexPadding.h"
 
-#define PADDING_RATIO   0.5
+#define PADDING_RATIO 0.3
 
 using namespace std;
 using namespace Eigen;
@@ -34,22 +34,30 @@ void padding(Mesh &m, vector<size_t> &markedC)
         vMap[vIdx] = newvIdx;
     }
 
-    for (auto &c : m.C){
-        for (auto &vIdx : c){
-            if(vMap.find(vIdx) != vMap.end())
-                vIdx = vMap.at(vIdx);
+    for (size_t cIdx = 0; cIdx < m.C.size(); cIdx++)
+    {
+        if (CFlag.at(cIdx))
+        {
+            Cell &c = m.C.at(cIdx);
+            for (auto &vIdx : c)
+            {
+                if (vMap.find(vIdx) != vMap.end())
+                    vIdx = vMap.at(vIdx);
+            }
         }
     }
 
-    for (auto &fIdx: markedSubMesh.SurfaceF) {
+    for (auto &fIdx : markedSubMesh.SurfaceF)
+    {
         Cell c(8);
         Face &f = markedSubMesh.F.at(fIdx);
 
-        for (size_t i = 0; i < 4; i++) {
+        for (size_t i = 0; i < 4; i++)
+        {
             c.at(i) = f.at(i);
             c.at(i + 4) = vMap.at(f.at(i));
         }
-        
+
         m.addCell(c);
     }
 }
