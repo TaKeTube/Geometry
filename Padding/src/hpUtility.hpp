@@ -14,7 +14,13 @@ const unsigned int HexFace[6][4] =
     { 1,5,6,2 },
 };
 
-/* return (v1-v0) x (v2-v0) */
+/*
+ * getNormal()
+ * DESCRIPTION: get normal vector of a triangle, return (v1-v0) x (v2-v0)
+ * INPUT: vertexes of a triangle
+ * OUTPUT: (v1-v0) x (v2-v0)
+ * RETURN: (v1-v0) x (v2-v0)
+ */
 inline Eigen::Vector3d getNormal(const Eigen::Vector3d &v0, const Eigen::Vector3d &v1, const Eigen::Vector3d &v2){
     Eigen::Vector3d dv0 = v1 - v0;
     Eigen::Vector3d dv1 = v2 - v0;

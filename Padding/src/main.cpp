@@ -10,15 +10,13 @@
 #include "hpMesh.h"
 #include "HexPadding.h"
 
-// #define TEST
-
 int main(int argc, char **argv)
 {
     char *input_file = NULL;
     char *output_file = NULL;
     char *target_file = NULL;
-    char default_file[] = "../data/cad.vtk";
-    char default_target_file[] = "../data/cad_target.txt";
+    char default_file[] = "../data/8cube.vtk";
+    char default_target_file[] = "../data/8cube_target.txt";
 
     /* 
      *  A standard command: 
@@ -75,6 +73,7 @@ int main(int argc, char **argv)
     std::cout << "Read mesh from file..." << std::endl;
     if (!meshReader((input_file == NULL) ? default_file : input_file, mesh))
     {
+        /* padding */
         padding(mesh, MarkedC);
         /* output the processed mesh */
         vtkWriter((output_file == NULL) ? "output.vtk" : output_file, mesh);

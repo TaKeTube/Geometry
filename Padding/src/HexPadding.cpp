@@ -6,10 +6,18 @@
 using namespace std;
 using namespace Eigen;
 
+/*
+ * padding()
+ * DESCRIPTION: pad the target cells of a given mesh, i.e. add a layer of hex mesh
+ * INPUT: hex mesh, indexes of target cells
+ * OUTPUT: padded hex mesh
+ * RETURN: none
+ */
 void padding(Mesh &m, vector<size_t> &markedC)
 {
     Mesh markedSubMesh;
 
+    /* mark marked cells */
     vector<bool> CFlag(m.C.size(), false);
     for (size_t cIdx : markedC)
         CFlag.at(cIdx) = true;
@@ -17,7 +25,7 @@ void padding(Mesh &m, vector<size_t> &markedC)
     /* generate mesh from marked cells */
     getMarkedSubMesh(m, markedSubMesh, markedC);
 
-    /* get normals of vertexes of markedMesh */
+    /* get normals and average surface length of the markedMesh */
     markedSubMesh.getGeometryInfo();
     markedSubMesh.getSurface();
     markedSubMesh.getSurfaceNormal(m);
@@ -30,19 +38,24 @@ void padding(Mesh &m, vector<size_t> &markedC)
     {
         size_t vIdx = SurfV.at(i);
         VertInfo &vinfo = markedSubMesh.VinfoMap.at(vIdx);
+        /* shrink surface vertexes */
         Vector3d newv = m.V.at(vIdx) - vinfo.surfAvgLen * PADDING_RATIO * vinfo.normal;
         size_t newvIdx = m.addVert(newv);
+        /* recording the mapped relation of surface vertexes and its shrinked vertexes */
         vMap[vIdx] = newvIdx;
     }
 
     /* modify surface cells of the target submesh */
     for (size_t cIdx = 0; cIdx < m.C.size(); cIdx++)
     {
+        /* if it is a marked cell */
         if (CFlag.at(cIdx))
         {
             Cell &c = m.C.at(cIdx);
             for (auto &vIdx : c)
             {
+                /* if the vertexes has shrinked, i.e. a surface vertexes of submesh  *
+                 * change it to its shrinked point                                   */
                 if (vMap.find(vIdx) != vMap.end())
                     vIdx = vMap.at(vIdx);
             }
@@ -65,6 +78,13 @@ void padding(Mesh &m, vector<size_t> &markedC)
     }
 }
 
+/*
+ * getMarkedSubMesh()
+ * DESCRIPTION: get submesh of the mesh according to the marked cells
+ * INPUT: hex mesh, indexes of target cells
+ * OUTPUT: submesh consisting of the marked cells
+ * RETURN: none
+ */
 void getMarkedSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
 {
     subMesh.SubV.clear();
@@ -79,6 +99,7 @@ void getMarkedSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
             subMesh.SubV.push_back(c.at(i));
     }
 
+    /* remove repeated sub vertexes of the submesh */
     set<size_t> Vset(subMesh.SubV.begin(), subMesh.SubV.end());
     subMesh.SubV.assign(Vset.begin(), Vset.end());
 }

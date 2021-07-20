@@ -7,11 +7,6 @@
 using namespace std;
 using namespace Eigen;
 
-// Mesh::Mesh(const Vertexes& v, const std::vector<Cell>& c, const CellType cellType)
-// : V(v)
-// , C(c)
-// , cellType(cellType)
-// {}
 Mesh::Mesh(const Mesh& mesh)
 : V(mesh.V)
 , C(mesh.C)
@@ -46,12 +41,19 @@ size_t Mesh::addCell(Cell &c)
     return C.size() - 1;
 }
 
+/*
+ * getGeometryInfo()
+ * DESCRIPTION: get geometry info of the hex (here it is just face info)
+ * INPUT: hex mesh
+ * OUTPUT: face info of the mesh
+ * RETURN: none
+ */
 void Mesh::getGeometryInfo()
 {
     F.clear();
 
     vector<Face> totalF(C.size() * 6);
-    vector<tuple<Face, size_t, size_t, size_t>> sortedF(C.size() * 6);
+    vector<tuple<Face, size_t>> sortedF(C.size() * 6);
 
     /* traverse cells */
     for (size_t cIdx = 0; cIdx < C.size(); cIdx++)
@@ -67,19 +69,17 @@ void Mesh::getGeometryInfo()
             size_t fIdx = 6 * cIdx + i;
             totalF.at(fIdx) = f;
 
-            /* sort face */
+            /* sort face fo the sake of removing repeated hex and boundary checking */
             sort(f.begin(), f.end());
-            sortedF.at(fIdx) = make_tuple(f, fIdx, cIdx, i);
-            CinfoMap[cIdx].F.resize(6);
+            sortedF.at(fIdx) = make_tuple(f, fIdx);
         }
     }
 
-    /* sort F for the sake of boundary check */
+    /* sort F for the sake of removing repeated hex and boundary check */
     sort(sortedF.begin(), sortedF.end());
 
     /* get F & boundary check */
     F.push_back(totalF.at(get<1>(sortedF.at(0))));
-    CinfoMap[get<2>(sortedF.at(0))].F[get<3>(sortedF.at(0))] = 0;
     FinfoMap[F.size() - 1].isBoundary = true;
 
     for (size_t i = 1; i < sortedF.size(); i++)
@@ -95,16 +95,22 @@ void Mesh::getGeometryInfo()
             /* repeated faces, which means it is not a boundary face */
             FinfoMap[F.size() - 1].isBoundary = false;
         }
-
-        CinfoMap[get<2>(sortedF.at(i))].F[get<3>(sortedF.at(i))] = F.size() - 1;
     }
 }
 
+/*
+ * getSurface()
+ * DESCRIPTION: get surface of the hex, i.e. surface faces and surface vertexes
+ * INPUT: hex mesh
+ * OUTPUT: SurfaceF & SurfaceV
+ * RETURN: none
+ */
 void Mesh::getSurface()
 {
     SurfaceF.clear();
     SurfaceV.clear();
 
+    /* get surface Vs and Fs */
     for (size_t fIdx = 0; fIdx < F.size(); fIdx++)
     {
         if (FinfoMap.at(fIdx).isBoundary)
@@ -115,10 +121,18 @@ void Mesh::getSurface()
         }
     }
 
+    /* remove repeated surface vertexes */
     set<size_t> Vset(SurfaceV.begin(), SurfaceV.end());
     SurfaceV.assign(Vset.begin(), Vset.end());
 }
 
+/*
+ * getSurfaceNormal()
+ * DESCRIPTION: get surface normal vector for each surface vertexes
+ * INPUT: hex mesh
+ * OUTPUT: surface normal vector
+ * RETURN: none
+ */
 void Mesh::getSurfaceNormal()
 {
     for (size_t fIdx : SurfaceF)
@@ -126,9 +140,11 @@ void Mesh::getSurfaceNormal()
         Face &f = F.at(fIdx);
         size_t v0Idx = f.at(0), v1Idx = f.at(1), v2Idx = f.at(2), v3Idx = f.at(3);
 
+        /* get normal of two triangle of a face */
         Vector3d n0 = -getNormal(V.at(v0Idx), V.at(v1Idx), V.at(v2Idx));
         Vector3d n1 = -getNormal(V.at(v2Idx), V.at(v3Idx), V.at(v0Idx));
 
+        /* old method, accumulate normals of neighbor triangular faces of a vertex then take average */
         // if (VinfoMap.find(v1Idx) == VinfoMap.end())
         //     VinfoMap[v1Idx].normal = n0;
         // else
@@ -159,6 +175,7 @@ void Mesh::getSurfaceNormal()
         // else
         //     VinfoMap[v0Idx].normal += n1;
 
+        /* new method, accumulate normals of neighbor quad faces of a vertex then take average */
         Vector3d n = (n0 + n1).normalized();
 
         if (VinfoMap.find(v0Idx) == VinfoMap.end())
@@ -182,10 +199,18 @@ void Mesh::getSurfaceNormal()
             VinfoMap[v3Idx].normal += n;
     }
 
+    /* normalize the accuamlated normals */
     for (size_t vIdx : SurfaceV)
         VinfoMap[vIdx].normal.normalize();
 }
 
+/*
+ * getSurfaceNormal()
+ * DESCRIPTION: get surface normal vector for each surface vertexes of a submesh (use vertexes of its father mesh)
+ * INPUT: hex mesh & its father mesh
+ * OUTPUT: surface normal vector
+ * RETURN: none
+ */
 void Mesh::getSurfaceNormal(Mesh &superMesh)
 {
     for (size_t fIdx : SurfaceF)
@@ -193,9 +218,11 @@ void Mesh::getSurfaceNormal(Mesh &superMesh)
         Face &f = F.at(fIdx);
         size_t v0Idx = f.at(0), v1Idx = f.at(1), v2Idx = f.at(2), v3Idx = f.at(3);
 
+        /* get normal of two triangle of a face */
         Vector3d n0 = -getNormal(superMesh.V.at(v0Idx), superMesh.V.at(v1Idx), superMesh.V.at(v2Idx));
         Vector3d n1 = -getNormal(superMesh.V.at(v2Idx), superMesh.V.at(v3Idx), superMesh.V.at(v0Idx));
 
+        /* old method, accumulate normals of neighbor triangular faces of a vertex then take average */
         // if (VinfoMap.find(v1Idx) == VinfoMap.end())
         //     VinfoMap[v1Idx].normal = n0;
         // else
@@ -226,6 +253,7 @@ void Mesh::getSurfaceNormal(Mesh &superMesh)
         // else
         //     VinfoMap[v0Idx].normal += n1;
 
+        /* new method, accumulate normals of neighbor quad faces of a vertex then take average */
         Vector3d n = (n0 + n1).normalized();
 
         if (VinfoMap.find(v0Idx) == VinfoMap.end())
@@ -249,10 +277,18 @@ void Mesh::getSurfaceNormal(Mesh &superMesh)
             VinfoMap[v3Idx].normal += n;
     }
 
+    /* normalize the accuamlated normals */
     for (size_t vIdx : SurfaceV)
         VinfoMap[vIdx].normal.normalize();
 }
 
+/*
+ * getSurfaceAvgLen()
+ * DESCRIPTION: get average length of neighbor faces' edges for each surface vertexes
+ * INPUT: hex mesh & its father mesh
+ * OUTPUT: surface average length and valence of each surface vertexes
+ * RETURN: none
+ */
 void Mesh::getSurfaceAvgLen()
 {
     for (size_t fIdx : SurfaceF)
@@ -314,10 +350,18 @@ void Mesh::getSurfaceAvgLen()
         }
     }
 
+    /* take average */
     for (size_t vIdx : SurfaceV)
         VinfoMap[vIdx].surfAvgLen /= VinfoMap[vIdx].surfDegree;
 }
 
+/*
+ * getSurfaceAvgLen()
+ * DESCRIPTION: get average length of neighbor faces' edges for each surface vertexes of a submesh (use vertexes of its father mesh)
+ * INPUT: hex mesh & its father mesh
+ * OUTPUT: surface average length and valence of each surface vertexes
+ * RETURN: none
+ */
 void Mesh::getSurfaceAvgLen(Mesh &superMesh)
 {
     for (size_t fIdx : SurfaceF)
@@ -379,6 +423,7 @@ void Mesh::getSurfaceAvgLen(Mesh &superMesh)
         }
     }
 
+    /* take average */
     for (size_t vIdx : SurfaceV)
         VinfoMap[vIdx].surfAvgLen /= VinfoMap[vIdx].surfDegree;
 }
