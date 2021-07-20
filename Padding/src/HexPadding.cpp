@@ -23,6 +23,7 @@ void padding(Mesh &m, vector<size_t> &markedC)
     markedSubMesh.getSurfaceNormal(m);
     markedSubMesh.getSurfaceAvgLen(m);
 
+    /* get shrinked vertexes of the target submesh */
     unordered_map<size_t, size_t> vMap;
     vector<size_t> &SurfV = markedSubMesh.SurfaceV;
     for (size_t i = 0; i < SurfV.size(); i++)
@@ -34,6 +35,7 @@ void padding(Mesh &m, vector<size_t> &markedC)
         vMap[vIdx] = newvIdx;
     }
 
+    /* modify surface cells of the target submesh */
     for (size_t cIdx = 0; cIdx < m.C.size(); cIdx++)
     {
         if (CFlag.at(cIdx))
@@ -47,6 +49,7 @@ void padding(Mesh &m, vector<size_t> &markedC)
         }
     }
 
+    /* add new layers of cells into the target submesh */
     for (auto &fIdx : markedSubMesh.SurfaceF)
     {
         Cell c(8);
