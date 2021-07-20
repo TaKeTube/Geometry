@@ -126,8 +126,8 @@ void Mesh::getSurfaceNormal()
         Face &f = F.at(fIdx);
         size_t v0Idx = f.at(0), v1Idx = f.at(1), v2Idx = f.at(2), v3Idx = f.at(3);
 
-        Vector3d n0 = getNormal(V.at(v0Idx), V.at(v1Idx), V.at(v2Idx));
-        Vector3d n1 = getNormal(V.at(v2Idx), V.at(v3Idx), V.at(v0Idx));
+        Vector3d n0 = -getNormal(V.at(v0Idx), V.at(v1Idx), V.at(v2Idx));
+        Vector3d n1 = -getNormal(V.at(v2Idx), V.at(v3Idx), V.at(v0Idx));
 
         // if (VinfoMap.find(v1Idx) == VinfoMap.end())
         //     VinfoMap[v1Idx].normal = n0;
@@ -193,8 +193,8 @@ void Mesh::getSurfaceNormal(Mesh &superMesh)
         Face &f = F.at(fIdx);
         size_t v0Idx = f.at(0), v1Idx = f.at(1), v2Idx = f.at(2), v3Idx = f.at(3);
 
-        Vector3d n0 = getNormal(superMesh.V.at(v0Idx), superMesh.V.at(v1Idx), superMesh.V.at(v2Idx));
-        Vector3d n1 = getNormal(superMesh.V.at(v2Idx), superMesh.V.at(v3Idx), superMesh.V.at(v0Idx));
+        Vector3d n0 = -getNormal(superMesh.V.at(v0Idx), superMesh.V.at(v1Idx), superMesh.V.at(v2Idx));
+        Vector3d n1 = -getNormal(superMesh.V.at(v2Idx), superMesh.V.at(v3Idx), superMesh.V.at(v0Idx));
 
         // if (VinfoMap.find(v1Idx) == VinfoMap.end())
         //     VinfoMap[v1Idx].normal = n0;

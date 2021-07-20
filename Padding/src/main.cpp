@@ -16,13 +16,13 @@ int main(int argc, char **argv)
 {
     char *input_file = NULL;
     char *output_file = NULL;
-    char *refine_file = NULL;
+    char *target_file = NULL;
     char default_file[] = "../data/cad.vtk";
-    char default_refine_file[] = "../data/cad_refine.txt";
+    char default_target_file[] = "../data/cad_target.txt";
 
     /* 
      *  A standard command: 
-     *      ./HexRefinement.exe -input "../data/rod.vtk" -output "refined_rod.vtk" -refine "../data/rod_refine.txt"
+     *      ./Padding.exe -input "../data/rod.vtk" -output "padded_rod.vtk" -target "../data/rod_target.txt"
      */
     for (int i = 1; i < argc; i++)
     {
@@ -38,11 +38,11 @@ int main(int argc, char **argv)
             assert(i < argc);
             output_file = argv[i];
         }
-        else if (!strcmp(argv[i], "-refine"))
+        else if (!strcmp(argv[i], "-target"))
         {
             i++;
             assert(i < argc);
-            refine_file = argv[i];
+            target_file = argv[i];
         }
         else
         {
@@ -52,9 +52,23 @@ int main(int argc, char **argv)
     }
 
     Mesh mesh = Mesh();
-    std::vector<size_t> MarkedC = {
-        2, 6, 7
-    };
+
+    // std::vector<size_t> MarkedC = {
+    //     2, 6, 7
+    // };
+
+    /* read marked cells from file */
+    std::ifstream fin((target_file == NULL)?default_target_file:target_file);
+    std::vector<size_t> MarkedC;
+    int cIdx;
+
+    std::cout<<"Read target cells from file...\nMarked Cells:"<<std::endl;
+    while(fin>>cIdx) {
+        std::cout<<cIdx<<" ";
+        MarkedC.push_back(cIdx);
+    }
+    fin.close();
+    std::cout<<std::endl;
 
     /* Padding */
     /* read mesh file */
