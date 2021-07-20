@@ -9,9 +9,9 @@ int main(){
     Eigen::Matrix<int, 8, 8> C1To8;
     Eigen::Matrix<int, 8, 64> C1To64;
 
-    P << 0, 0, 0, 0, 2, 2, 2, 1,
-         0, 0, 2, 2, 0, 0, 2, 2,
-         0, 2, 2, 0, 0, 2, 2, 0;
+    P << 0, 0, 0, 0, 2, 1, 2, 2,
+         0, 2, 2, 0, 0, 2, 2, 0,
+         0, 0, 2, 2, 0, 0, 2, 2;
 
     HexDiv1To8(P, NewP1To8, C1To8);
     HexDiv1To64(P, NewP1To64, C1To64);

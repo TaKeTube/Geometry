@@ -1,7 +1,7 @@
 #include <set>
 #include "HexPadding.h"
 
-#define PADDING_RATIO 0.9
+#define PADDING_RATIO 0.3
 
 using namespace std;
 using namespace Eigen;
