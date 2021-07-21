@@ -2,6 +2,7 @@
 #include "HexPadding.h"
 
 #define PADDING_RATIO 0.3
+#define SMOOTH_ITERNUM  1
 
 using namespace std;
 using namespace Eigen;
@@ -13,7 +14,7 @@ using namespace Eigen;
  * OUTPUT: padded hex mesh
  * RETURN: none
  */
-void padding(Mesh &m, vector<size_t> &markedC)
+void padding(Mesh &m, vector<size_t> markedC)
 {
     Mesh markedSubMesh;
 
@@ -23,10 +24,10 @@ void padding(Mesh &m, vector<size_t> &markedC)
         CFlag.at(cIdx) = true;
 
     /* generate mesh from marked cells */
-    getMarkedSubMesh(m, markedSubMesh, markedC);
+    getSubMesh(m, markedSubMesh, markedC);
 
     /* get normals and average surface length of the markedMesh */
-    markedSubMesh.getGeometryInfo();
+    markedSubMesh.getFaceInfo();
     markedSubMesh.getSurface();
     markedSubMesh.getSurfaceNormal(m);
     markedSubMesh.getSurfaceAvgLen(m);
@@ -74,22 +75,29 @@ void padding(Mesh &m, vector<size_t> &markedC)
             c.at(i + 4) = vMap.at(f.at(i));
         }
 
-        m.addCell(c);
+        markedC.push_back(m.addCell(c));
     }
+
+    /* smoothing */
+    Mesh smoothSubMesh;
+    getSubMesh(m, smoothSubMesh, markedC);
+
+    for (int i = 0; i < SMOOTH_ITERNUM; i++)
+        volSmoothingSubmesh(m, smoothSubMesh);
 }
 
 /*
- * getMarkedSubMesh()
+ * getSubMesh()
  * DESCRIPTION: get submesh of the mesh according to the marked cells
  * INPUT: hex mesh, indexes of target cells
  * OUTPUT: submesh consisting of the marked cells
  * RETURN: none
  */
-void getMarkedSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
+void getSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
 {
     subMesh.SubV.clear();
 
-    subMesh.V = mesh.V;
+    // subMesh.V = mesh.V;
 
     for (size_t cIdx : markedC)
     {
@@ -102,4 +110,52 @@ void getMarkedSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
     /* remove repeated sub vertexes of the submesh */
     set<size_t> Vset(subMesh.SubV.begin(), subMesh.SubV.end());
     subMesh.SubV.assign(Vset.begin(), Vset.end());
+}
+
+void volSmoothing(Mesh &mesh)
+{
+    mesh.getFaceInfo();
+    mesh.getSurface();
+    mesh.getVertInfo();
+
+    vector<pair<size_t, Vert>> volSmoothMap;
+    for (size_t vIdx = 0; vIdx < mesh.V.size(); vIdx++)
+    {
+        auto& vinfo = mesh.VinfoMap.at(vIdx);
+        if(!vinfo.isBoundary)
+        {
+            Vert newv = Vector3d::Zero();
+            for(size_t cIdx = 0; cIdx < vinfo.neighborC.size(); cIdx++)
+                newv += mesh.getCellCenter(mesh.C.at(cIdx));
+            newv /= vinfo.neighborC.size();
+            volSmoothMap.push_back(make_pair(vIdx, newv));
+        }
+    }
+
+    for (auto &mapPair : volSmoothMap)
+        mesh.V.at(mapPair.first) = mapPair.second;
+}
+
+void volSmoothingSubmesh(Mesh &mesh, Mesh &subMesh)
+{
+    subMesh.getFaceInfo();
+    subMesh.getSurface();
+    subMesh.getVertInfo();
+
+    vector<pair<size_t, Vert>> volSmoothMap;
+    for (size_t vIdx = 0; vIdx < subMesh.SubV.size(); vIdx++)
+    {
+        auto& vinfo = subMesh.VinfoMap.at(vIdx);
+        if(!vinfo.isBoundary)
+        {
+            Vert newv = Vector3d::Zero();
+            for(size_t cIdx = 0; cIdx < vinfo.neighborC.size(); cIdx++)
+                newv += mesh.getCellCenter(subMesh.C.at(cIdx));
+            newv /= vinfo.neighborC.size();
+            volSmoothMap.push_back(make_pair(vIdx, newv));
+        }
+    }
+
+    for (auto &mapPair : volSmoothMap)
+        mesh.V.at(mapPair.first) = mapPair.second;
 }

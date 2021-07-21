@@ -14,6 +14,18 @@ const unsigned int HexFace[6][4] =
     { 1,5,6,2 },
 };
 
+const unsigned int HexVertNeighbor[8][3] = 
+{
+    { 1,3,4 },
+    { 0,2,5 },
+    { 1,3,6 },
+    { 0,2,7 },
+    { 0,5,7 },
+    { 1,4,6 },
+    { 2,5,7 },
+    { 3,4,6 }
+};
+
 /*
  * getNormal()
  * DESCRIPTION: get normal vector of a triangle, return (v1-v0) x (v2-v0)

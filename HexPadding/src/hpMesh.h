@@ -40,11 +40,11 @@ struct FaceInfo
 
 struct VertInfo
 {
-    // std::vector<size_t> neighborV;   // neighbor vertexes
+    std::vector<size_t> neighborV;   // neighbor vertexes
     // std::vector<size_t> neighborE;   // neighbor edges
     // std::vector<size_t> neighborF;   // neighbor faces
-    // std::vector<size_t> neighborC;   // neighbor cells
-    // bool isBoundary;
+    std::vector<size_t> neighborC;   // neighbor cells
+    bool isBoundary;
 
     Eigen::Vector3d normal; // normal vector
     int surfDegree;         // surface degree
@@ -76,11 +76,21 @@ public:
     size_t addCell(Cell &c);
 
     void getGeometryInfo();
+    void getFaceInfo();
+    void getVertInfo();
     void getSurface();
     void getSurfaceNormal();
     void getSurfaceNormal(Mesh &superMesh);
     void getSurfaceAvgLen();
     void getSurfaceAvgLen(Mesh &superMesh);
+    Vert getCellCenter(Cell &c);
+};
+
+class SubMesh : public Mesh
+{
+public:
+    Vertexes& V;
+
 };
 
 #endif

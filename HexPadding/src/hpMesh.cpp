@@ -45,10 +45,21 @@ size_t Mesh::addCell(Cell &c)
  * getGeometryInfo()
  * DESCRIPTION: get geometry info of the hex (here it is just face info)
  * INPUT: hex mesh
+ * OUTPUT: geometry info of the mesh
+ * RETURN: none
+ */
+void Mesh::getGeometryInfo(){
+    getFaceInfo();
+}
+
+/*
+ * getFaceInfo()
+ * DESCRIPTION: get face info of the hex
+ * INPUT: hex mesh
  * OUTPUT: face info of the mesh
  * RETURN: none
  */
-void Mesh::getGeometryInfo()
+void Mesh::getFaceInfo()
 {
     F.clear();
 
@@ -98,6 +109,33 @@ void Mesh::getGeometryInfo()
     }
 }
 
+void Mesh::getVertInfo()
+{
+    for (size_t cIdx = 0; cIdx < C.size(); cIdx++)
+    {
+        Cell& c = C.at(cIdx);
+        for (size_t i = 0; i < 8; i++)
+        {
+            size_t vIdx = c.at(i);
+            VinfoMap[vIdx].neighborC.push_back(cIdx);
+            VinfoMap[vIdx].neighborV.push_back(c.at(HexVertNeighbor[i][0]));
+            VinfoMap[vIdx].neighborV.push_back(c.at(HexVertNeighbor[i][1]));
+            VinfoMap[vIdx].neighborV.push_back(c.at(HexVertNeighbor[i][2]));
+        }
+    }
+
+    /* remove repeated neighbor vertexes for each vertex */
+    for (size_t vIdx = 0; vIdx < V.size(); vIdx++)
+    {   
+        if (VinfoMap.find(vIdx) != VinfoMap.end())
+        {
+            auto& neighborV = VinfoMap[vIdx].neighborV;
+            set<size_t> Vset(neighborV.begin(), neighborV.end());
+            neighborV.assign(Vset.begin(), Vset.end());
+        }
+    }
+}
+
 /*
  * getSurface()
  * DESCRIPTION: get surface of the hex, i.e. surface faces and surface vertexes
@@ -124,6 +162,10 @@ void Mesh::getSurface()
     /* remove repeated surface vertexes */
     set<size_t> Vset(SurfaceV.begin(), SurfaceV.end());
     SurfaceV.assign(Vset.begin(), Vset.end());
+
+    /* update boundary info */
+    for (auto& vIdx : SurfaceV)
+        VinfoMap[vIdx].isBoundary = true;
 }
 
 /*
@@ -426,4 +468,12 @@ void Mesh::getSurfaceAvgLen(Mesh &superMesh)
     /* take average */
     for (size_t vIdx : SurfaceV)
         VinfoMap[vIdx].surfAvgLen /= VinfoMap[vIdx].surfDegree;
+}
+
+Vert Mesh::getCellCenter(Cell &c)
+{
+    Vert v = Vector3d::Zero();
+    for (size_t vIdx = 0; vIdx < c.size(); vIdx++)
+        v += V.at(vIdx);
+    return v/c.size();
 }
