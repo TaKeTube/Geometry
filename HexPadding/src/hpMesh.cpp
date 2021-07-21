@@ -109,15 +109,25 @@ void Mesh::getFaceInfo()
     }
 }
 
+/*
+ * getVertInfo()
+ * DESCRIPTION: get vertex info of the hex
+ * INPUT: hex mesh
+ * OUTPUT: vertex info of the mesh
+ * RETURN: none
+ */
 void Mesh::getVertInfo()
 {
+    /* traverse all the cells */
     for (size_t cIdx = 0; cIdx < C.size(); cIdx++)
     {
         Cell& c = C.at(cIdx);
         for (size_t i = 0; i < 8; i++)
         {
             size_t vIdx = c.at(i);
+            /* add neighbor cells */
             VinfoMap[vIdx].neighborC.push_back(cIdx);
+            /* add neighbor edges */
             VinfoMap[vIdx].neighborV.push_back(c.at(HexVertNeighbor[i][0]));
             VinfoMap[vIdx].neighborV.push_back(c.at(HexVertNeighbor[i][1]));
             VinfoMap[vIdx].neighborV.push_back(c.at(HexVertNeighbor[i][2]));
@@ -470,6 +480,13 @@ void Mesh::getSurfaceAvgLen(Mesh &superMesh)
         VinfoMap[vIdx].surfAvgLen /= VinfoMap[vIdx].surfDegree;
 }
 
+/*
+ * getCellCenter()
+ * DESCRIPTION: get center of the cell
+ * INPUT: cell
+ * OUTPUT: center of the given cell
+ * RETURN: none
+ */
 Vert Mesh::getCellCenter(Cell &c)
 {
     Vert v = Vector3d::Zero();

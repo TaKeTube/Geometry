@@ -115,6 +115,13 @@ void getSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
     subMesh.SubV.assign(Vset.begin(), Vset.end());
 }
 
+/*
+ * volSmoothingUsingCells()
+ * DESCRIPTION: smooth internal points according to the center of neighboring cells
+ * INPUT: hex mesh
+ * OUTPUT: smoothed mesh
+ * RETURN: none
+ */
 void volSmoothingUsingCells(Mesh &mesh)
 {
     mesh.getFaceInfo();
@@ -127,6 +134,7 @@ void volSmoothingUsingCells(Mesh &mesh)
         auto &vinfo = mesh.VinfoMap.at(vIdx);
         if (!vinfo.isBoundary)
         {
+            /* if it is a internal point, take the average of the centers of its neighbor cells */
             Vert newv = Vector3d::Zero();
             for (size_t cIdx : vinfo.neighborC)
                 newv += mesh.getCellCenter(mesh.C.at(cIdx));
@@ -135,10 +143,18 @@ void volSmoothingUsingCells(Mesh &mesh)
         }
     }
 
+    /* modify the geometry of the mesh */
     for (auto &mapPair : volSmoothMap)
         mesh.V.at(mapPair.first) = mapPair.second;
 }
 
+/*
+ * volSmoothingSubmeshUsingCells()
+ * DESCRIPTION: smooth internal points of the submesh according to the center of neighboring cells
+ * INPUT: hex mesh, target sub mesh
+ * OUTPUT: mesh with submesh region smoothed
+ * RETURN: none
+ */
 void volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
 {
     subMesh.getFaceInfo();
@@ -151,6 +167,7 @@ void volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
         auto &vinfo = subMesh.VinfoMap.at(vIdx);
         if (!vinfo.isBoundary)
         {
+            /* if it is a internal point, take the average of the centers of its neighbor cells */
             Vert newv = Vector3d::Zero();
             for (size_t cIdx : vinfo.neighborC)
                 newv += mesh.getCellCenter(subMesh.C.at(cIdx));
@@ -159,11 +176,19 @@ void volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
         }
     }
 
+    /* modify the geometry of the mesh */
     for (auto &mapPair : volSmoothMap)
         mesh.V.at(mapPair.first) = mapPair.second;
 }
 
-void volSmoothingUsingEdges(Mesh &mesh)
+/*
+ * volSmoothingUsingVerts()
+ * DESCRIPTION: smooth internal points according to neighboring vertexes
+ * INPUT: hex mesh
+ * OUTPUT: smoothed mesh
+ * RETURN: none
+ */
+void volSmoothingUsingVerts(Mesh &mesh)
 {
     mesh.getFaceInfo();
     mesh.getSurface();
@@ -175,6 +200,7 @@ void volSmoothingUsingEdges(Mesh &mesh)
         auto &vinfo = mesh.VinfoMap.at(vIdx);
         if (!vinfo.isBoundary)
         {
+            /* if it is a internal point, take the average of its neighbor vertexes */
             Vert newv = Vector3d::Zero();
             for (size_t vIdx : vinfo.neighborV)
                 newv += mesh.V.at(vIdx);
@@ -183,11 +209,19 @@ void volSmoothingUsingEdges(Mesh &mesh)
         }
     }
 
+    /* modify the geometry of the mesh */
     for (auto &mapPair : volSmoothMap)
         mesh.V.at(mapPair.first) = mapPair.second;
 }
 
-void volSmoothingSubmeshUsingEdges(Mesh &mesh, Mesh &subMesh)
+/*
+ * volSmoothingSubmeshUsingEdges()
+ * DESCRIPTION: smooth internal points of the submesh according to neighboring vertexes
+ * INPUT: hex mesh, target sub mesh
+ * OUTPUT: mesh with submesh region smoothed
+ * RETURN: none
+ */
+void volSmoothingSubmeshUsingVerts(Mesh &mesh, Mesh &subMesh)
 {
     subMesh.getFaceInfo();
     subMesh.getSurface();
@@ -199,6 +233,7 @@ void volSmoothingSubmeshUsingEdges(Mesh &mesh, Mesh &subMesh)
         auto &vinfo = subMesh.VinfoMap.at(vIdx);
         if (!vinfo.isBoundary)
         {
+            /* if it is a internal point, take the average of its neighbor vertexes */
             Vert newv = Vector3d::Zero();
             for (size_t vIdx : vinfo.neighborV)
                 newv += mesh.V.at(vIdx);
@@ -207,6 +242,7 @@ void volSmoothingSubmeshUsingEdges(Mesh &mesh, Mesh &subMesh)
         }
     }
 
+    /* modify the geometry of the mesh */
     for (auto &mapPair : volSmoothMap)
         mesh.V.at(mapPair.first) = mapPair.second;
 }
