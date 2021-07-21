@@ -2,7 +2,7 @@
 #include "HexPadding.h"
 
 #define PADDING_RATIO 0.3
-#define SMOOTH_ITERNUM  2
+#define SMOOTH_ITERNUM 2
 
 using namespace std;
 using namespace Eigen;
@@ -10,11 +10,11 @@ using namespace Eigen;
 /*
  * padding()
  * DESCRIPTION: pad the target cells of a given mesh, i.e. add a layer of hex mesh
- * INPUT: hex mesh, indexes of target cells
+ * INPUT: hex mesh, indexes of target cells, flag of smoothing
  * OUTPUT: padded hex mesh
  * RETURN: none
  */
-void padding(Mesh &m, vector<size_t> markedC)
+void padding(Mesh &m, vector<size_t> markedC, bool smooth)
 {
     Mesh markedSubMesh;
 
@@ -78,12 +78,15 @@ void padding(Mesh &m, vector<size_t> markedC)
         markedC.push_back(m.addCell(c));
     }
 
-    /* smoothing */
-    Mesh smoothSubMesh;
-    getSubMesh(m, smoothSubMesh, markedC);
+    if (smooth)
+    {
+        /* smoothing */
+        Mesh smoothSubMesh;
+        getSubMesh(m, smoothSubMesh, markedC);
 
-    for (int i = 0; i < SMOOTH_ITERNUM; i++)
-        volSmoothingSubmeshUsingCells(m, smoothSubMesh);
+        for (int i = 0; i < SMOOTH_ITERNUM; i++)
+            volSmoothingSubmeshUsingCells(m, smoothSubMesh);
+    }
 }
 
 /*
@@ -121,11 +124,11 @@ void volSmoothingUsingCells(Mesh &mesh)
     vector<pair<size_t, Vert>> volSmoothMap;
     for (size_t vIdx = 0; vIdx < mesh.V.size(); vIdx++)
     {
-        auto& vinfo = mesh.VinfoMap.at(vIdx);
-        if(!vinfo.isBoundary)
+        auto &vinfo = mesh.VinfoMap.at(vIdx);
+        if (!vinfo.isBoundary)
         {
             Vert newv = Vector3d::Zero();
-            for(size_t cIdx : vinfo.neighborC)
+            for (size_t cIdx : vinfo.neighborC)
                 newv += mesh.getCellCenter(mesh.C.at(cIdx));
             newv /= vinfo.neighborC.size();
             volSmoothMap.push_back(make_pair(vIdx, newv));
@@ -145,11 +148,11 @@ void volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
     vector<pair<size_t, Vert>> volSmoothMap;
     for (size_t vIdx : subMesh.SubV)
     {
-        auto& vinfo = subMesh.VinfoMap.at(vIdx);
-        if(!vinfo.isBoundary)
+        auto &vinfo = subMesh.VinfoMap.at(vIdx);
+        if (!vinfo.isBoundary)
         {
             Vert newv = Vector3d::Zero();
-            for(size_t cIdx : vinfo.neighborC)
+            for (size_t cIdx : vinfo.neighborC)
                 newv += mesh.getCellCenter(subMesh.C.at(cIdx));
             newv /= vinfo.neighborC.size();
             volSmoothMap.push_back(make_pair(vIdx, newv));
@@ -169,11 +172,11 @@ void volSmoothingUsingEdges(Mesh &mesh)
     vector<pair<size_t, Vert>> volSmoothMap;
     for (size_t vIdx = 0; vIdx < mesh.V.size(); vIdx++)
     {
-        auto& vinfo = mesh.VinfoMap.at(vIdx);
-        if(!vinfo.isBoundary)
+        auto &vinfo = mesh.VinfoMap.at(vIdx);
+        if (!vinfo.isBoundary)
         {
             Vert newv = Vector3d::Zero();
-            for(size_t vIdx : vinfo.neighborV)
+            for (size_t vIdx : vinfo.neighborV)
                 newv += mesh.V.at(vIdx);
             newv /= vinfo.neighborV.size();
             volSmoothMap.push_back(make_pair(vIdx, newv));
@@ -193,11 +196,11 @@ void volSmoothingSubmeshUsingEdges(Mesh &mesh, Mesh &subMesh)
     vector<pair<size_t, Vert>> volSmoothMap;
     for (size_t vIdx : subMesh.SubV)
     {
-        auto& vinfo = subMesh.VinfoMap.at(vIdx);
-        if(!vinfo.isBoundary)
+        auto &vinfo = subMesh.VinfoMap.at(vIdx);
+        if (!vinfo.isBoundary)
         {
             Vert newv = Vector3d::Zero();
-            for(size_t vIdx : vinfo.neighborV)
+            for (size_t vIdx : vinfo.neighborV)
                 newv += mesh.V.at(vIdx);
             newv /= vinfo.neighborV.size();
             volSmoothMap.push_back(make_pair(vIdx, newv));

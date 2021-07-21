@@ -3,7 +3,7 @@
 
 #include "hpMesh.h"
 
-void padding(Mesh& mesh, std::vector<size_t> markedC);
+void padding(Mesh& mesh, std::vector<size_t> markedC, bool smooth);
 void volSmoothingUsingCells(Mesh& mesh);
 void volSmoothingSubmeshUsingCells(Mesh& mesh, Mesh& subMesh);
 void volSmoothingUsingEdges(Mesh& mesh);

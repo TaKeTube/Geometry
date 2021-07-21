@@ -15,12 +15,13 @@ int main(int argc, char **argv)
     char *input_file = NULL;
     char *output_file = NULL;
     char *target_file = NULL;
-    char default_file[] = "../data/8cube.vtk";
-    char default_target_file[] = "../data/8cube_target.txt";
+    char default_file[] = "../data/64cube.vtk";
+    char default_target_file[] = "../data/64cube_target.txt";
+    bool smooth_flag = false;
 
     /* 
      *  A standard command: 
-     *      ./Padding.exe -input "../data/rod.vtk" -output "padded_rod.vtk" -target "../data/rod_target.txt"
+     *      ./Padding.exe -s -input "../data/rod.vtk" -output "smoothed_padded_rod.vtk" -target "../data/rod_target.txt"
      */
     for (int i = 1; i < argc; i++)
     {
@@ -41,6 +42,10 @@ int main(int argc, char **argv)
             i++;
             assert(i < argc);
             target_file = argv[i];
+        }
+        else if (!strcmp(argv[i], "-s"))
+        {
+            smooth_flag = true;
         }
         else
         {
@@ -74,7 +79,7 @@ int main(int argc, char **argv)
     if (!meshReader((input_file == NULL) ? default_file : input_file, mesh))
     {
         /* padding */
-        padding(mesh, MarkedC);
+        padding(mesh, MarkedC, smooth_flag);
         /* output the processed mesh */
         vtkWriter((output_file == NULL) ? "output.vtk" : output_file, mesh);
     }
