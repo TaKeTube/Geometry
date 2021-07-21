@@ -86,11 +86,4 @@ public:
     Vert getCellCenter(Cell &c);
 };
 
-class SubMesh : public Mesh
-{
-public:
-    Vertexes& V;
-
-};
-
 #endif
