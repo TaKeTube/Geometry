@@ -20,12 +20,12 @@ Pad marked cells then do smoothing
 
 - **OUTPUT**: <kbd>.vtk</kbd> refined unstructured hex mesh file
 
-the default input file is <kbd>./data/8cube.vtk</kbd>, default outputs is <kbd>output.vtk</kbd>, default marked cells are described in  <kbd>./data/8cube_target.vtk</kbd>
+the default input file is <kbd>./data/8cube.vtk</kbd>, default outputs is <kbd>output.vtk</kbd>, default marked cells are described in  <kbd>./data/8cube_target.vtk</kbd>, smooth is not done by default. Add <kbd>-r</kbd> flag to do smoothing.
 
 using command line to choose input and output files, a example command is like follow:
 
 ```shell
-./Padding.exe -input "../data/rod.vtk" -output "padded_rod.vtk" -target "../data/rod_target.txt"
+./Padding.exe -r -input "../data/rod.vtk" -output "padded_rod.vtk" -target "../data/rod_target.txt"
 ```
 
 #### How to mark cells
@@ -44,3 +44,6 @@ Here is one method to get indexes of cells
 
 #### Results
 
+<img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cube1.png?raw=true" alt="points" style="zoom: 67%;" />
+
+<img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cube2.png?raw=true" alt="points" style="zoom: 67%;" />
