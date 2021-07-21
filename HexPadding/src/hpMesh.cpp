@@ -473,7 +473,7 @@ void Mesh::getSurfaceAvgLen(Mesh &superMesh)
 Vert Mesh::getCellCenter(Cell &c)
 {
     Vert v = Vector3d::Zero();
-    for (size_t vIdx = 0; vIdx < c.size(); vIdx++)
+    for (size_t vIdx : c)
         v += V.at(vIdx);
     return v/c.size();
 }
