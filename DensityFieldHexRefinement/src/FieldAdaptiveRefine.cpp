@@ -1,8 +1,9 @@
 #include "FieldAdaptiveRefine.h"
 #include "Utility.hpp"
-#include "TrivialRefine.h"
+#include "HexRefine/TrivialRefine.h"
 #include "HexEval/HexEval.h"
 
+#define HEX_SIZE 8
 #define MAX_ITER_NUM 3
 
 using namespace Eigen;
@@ -13,14 +14,14 @@ inline double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::func
              v4 = V.col(c(4)), v5 = V.col(c(5)), v6 = V.col(c(6)), v7 = V.col(c(7));
     return (DensityField(v0) + DensityField(v1) + DensityField(v2) + DensityField(v3) +
             DensityField(v4) + DensityField(v5) + DensityField(v6) + DensityField(v7)) *
-            0.125;
+           0.125;
 }
 
 inline double EvalDensity(const std::vector<Vector3d> &V, const std::function<double(Vector3d)> &DensityField)
 {
     return (DensityField(V.at(0)) + DensityField(V.at(1)) + DensityField(V.at(2)) + DensityField(V.at(3)) +
             DensityField(V.at(4)) + DensityField(V.at(5)) + DensityField(V.at(6)) + DensityField(V.at(7))) *
-            0.125;
+           0.125;
 }
 
 int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField)
@@ -29,9 +30,9 @@ int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Ve
     std::queue<int> TargetC;
     std::vector<double> HexDensity;
     HexEval::HexEvaluator evaluator;
-    evaluator.setDensityFieldMetric(HexEval::EDGE_LENGTH_METRIC);
+    HexEval::DensityMetric densityMetric = HexEval::EDGE_LENGTH_METRIC;
 
-    evaluator.EvalDensityField(V, C);
+    evaluator.EvalDensityField(V, C, densityMetric);
     HexDensity = evaluator.GetDensityField();
     if (MarkTargetHex(V, C, TargetC, DensityField, HexDensity) == -1)
         return -1;
@@ -41,7 +42,7 @@ int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Ve
         if (RefineTargetHex(V, C, TargetC, TRIVIAL_REFINE) == -1)
             return -1;
 
-        evaluator.EvalDensityField(V, C);
+        evaluator.EvalDensityField(V, C, densityMetric);
         HexDensity = evaluator.GetDensityField();
         if (MarkTargetHex(V, C, TargetC, DensityField, HexDensity) == -1)
             return -1;
@@ -82,7 +83,7 @@ int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineM
 
 int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 {
-    Mesh mesh = Mesh();
+    HexRefine::Mesh mesh = HexRefine::Mesh();
     // Matrix3Xd RefinedV;
     // MatrixXi RefinedC;
     std::vector<size_t> TargetV;
@@ -92,7 +93,7 @@ int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 
     for (int i = 0; i < C.cols(); i++)
     {
-        Cell c;
+        HexRefine::Cell c;
         for (int j = 0; j < HEX_SIZE; j++)
         {
             c.push_back(C(j, i));

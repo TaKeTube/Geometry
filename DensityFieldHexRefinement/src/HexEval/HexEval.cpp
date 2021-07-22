@@ -1,7 +1,9 @@
 #include <iostream>
 #include "HexEval.h"
-#include "Integral.h"
-#include "Utility.hpp"
+#include "heIntegral.h"
+#include "heUtility.hpp"
+
+#define HEX_SIZE    8
 
 using namespace HexEval;
 using namespace Eigen;
@@ -10,7 +12,6 @@ using namespace Eigen;
 Edge::Edge() {}
 Edge::Edge(size_t v1, size_t v2) : v1Idx(v1), v2Idx(v2) {}
 
-HexEvaluator::HexEvaluator() : densityMetric(EDGE_LENGTH_METRIC) {}
 
 int HexEvaluator::EvalDensityField(const Matrix3Xd &V, const MatrixXi &C, DensityMetric metric)
 {
@@ -18,39 +19,6 @@ int HexEvaluator::EvalDensityField(const Matrix3Xd &V, const MatrixXi &C, Densit
         return -1;
 
     switch (metric)
-    {
-    case VOLUME_METRIC:
-        EvalVolDensity(V, C);
-        break;
-    case EDGE_LENGTH_METRIC:
-        EvalLenDensity(V, C);
-        break;
-    case ANISOTROPIC_METRIC:
-        if (AnisotropicDensityField != nullptr)
-        {
-            EvalAnisotropicDensity(V, C);
-        }
-        else
-        {
-            std::cout << "HexEval::HexEvaluator::EvalDensityField Error:" << std::endl;
-            std::cout << "    Isotropic density field is not specified. Please use setRefDensityField to set reference density field." << std::endl;
-            return -1;
-        }
-        break;
-    default:
-        std::cout << "HexEval::HexEvaluator::EvalDensityField Error:" << std::endl;
-        std::cout << "    No such evaluation method." << std::endl;
-        return -1;
-    }
-    return 0;
-}
-
-int HexEvaluator::EvalDensityField(const Matrix3Xd &V, const MatrixXi &C)
-{
-    if (C.rows() != HEX_SIZE)
-        return -1;
-
-    switch (densityMetric)
     {
     case VOLUME_METRIC:
         EvalVolDensity(V, C);
@@ -159,18 +127,12 @@ void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
     }
 }
 
-void HexEvaluator::setDensityFieldMetric(DensityMetric metric)
-{
-    densityMetric = metric;
-}
-
 void HexEvaluator::setRefDensityField(const std::function<double(Vector3d)> &DensityField)
 {
     RefDensityField = DensityField;
 }
 
-void HexEvaluator::setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField)
-{
+void HexEvaluator::setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField){
     AnisotropicDensityField = DensityField;
 }
 

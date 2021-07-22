@@ -7,7 +7,8 @@
 
 enum RefineMethod
 {
-    TRIVIAL_REFINE
+    TRIVIAL_REFINE,
+    PADDING_REFINE
 };
 
 inline double EvalDensity(const Eigen::Matrix3Xd &V, const Eigen::VectorXi &c, const std::function<double(Eigen::Vector3d)> &DensityField);

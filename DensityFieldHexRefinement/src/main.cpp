@@ -1,5 +1,4 @@
 #include <iostream>
-
 #include "FieldAdaptiveRefine.h"
 #include "MeshIO.h"
 

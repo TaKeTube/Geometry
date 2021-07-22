@@ -66,14 +66,13 @@ namespace HexEval
     class HexEvaluator
     {
     public:
-        HexEvaluator();
+        // HexEvaluator() : RefDensityField(nullptr), AnisotropicDensityField(nullptr) {};
+        // ~HexEvaluator();
 
-        int EvalDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
         int EvalDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, DensityMetric metric);
         std::vector<double> GetDensityField();
 
         void setRefDensityField(const std::function<double(Eigen::Vector3d)> &DensityField);
-        void setDensityFieldMetric(DensityMetric metric);
         void setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField);
 
     private:
@@ -81,7 +80,6 @@ namespace HexEval
         std::unordered_map<Edge, double> EdgeLenMap;
         std::unordered_map<Edge, double> EdgeAnisotropicMetricMap;
 
-        DensityMetric densityMetric;
         std::function<double(Eigen::Vector3d)> RefDensityField;
         std::function<Eigen::Matrix3d(Eigen::Vector3d)> AnisotropicDensityField;
 

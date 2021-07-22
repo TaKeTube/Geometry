@@ -1,8 +1,9 @@
 #include <iostream>
 #include "TrivialRefine.h"
-#include "Utility.hpp"
+#include "hrUtility.hpp"
 
 using namespace Eigen;
+using namespace HexRefine;
 
 /* face bitmap mask */
 static unsigned char faceMask[FACE_NUM] = {0x0F, 0x33, 0x66, 0x99, 0xCC, 0xF0};
