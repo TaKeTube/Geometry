@@ -1,7 +1,7 @@
 #include "FieldAdaptiveRefine.h"
 #include "Utility.hpp"
 #include "TrivialRefine.h"
-#include "HexEval.h"
+#include "HexEval/HexEval.h"
 
 #define MAX_ITER_NUM 3
 

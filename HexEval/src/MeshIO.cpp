@@ -15,7 +15,8 @@ using namespace std;
 #include <eigen3/Eigen/Eigen>
 
 #include "MeshIO.h"
-#include "Utility.hpp"
+
+#define HEX_SIZE 8
 
 /*
  * meshReader()

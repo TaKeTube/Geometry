@@ -4,7 +4,6 @@
 #include <queue>
 #include <vector>
 #include <eigen3/Eigen/Eigen>
-#include "HexEval.h"
 
 enum RefineMethod
 {

@@ -1,7 +1,9 @@
 #include <iostream>
 #include "HexEval.h"
-#include "Integral.h"
-#include "Utility.hpp"
+#include "heIntegral.h"
+#include "heUtility.hpp"
+
+#define HEX_SIZE    8
 
 using namespace HexEval;
 using namespace Eigen;
