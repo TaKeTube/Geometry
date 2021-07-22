@@ -1,10 +1,11 @@
 #include "FieldAdaptiveRefine.h"
 #include "Utility.hpp"
 #include "HexRefine/TrivialRefine.h"
+#include "HexPadding/HexPadding.h"
 #include "HexEval/HexEval.h"
 
 #define HEX_SIZE 8
-#define MAX_ITER_NUM 3
+#define MAX_ITER_NUM 1
 
 using namespace Eigen;
 
@@ -24,7 +25,7 @@ inline double EvalDensity(const std::vector<Vector3d> &V, const std::function<do
            0.125;
 }
 
-int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField)
+int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField, RefineMethod method)
 {
     int IterCount = 0;
     std::queue<int> TargetC;
@@ -39,7 +40,7 @@ int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Ve
 
     while (!TargetC.empty() && IterCount++ < MAX_ITER_NUM)
     {
-        if (RefineTargetHex(V, C, TargetC, TRIVIAL_REFINE) == -1)
+        if (RefineTargetHex(V, C, TargetC, method) == -1)
             return -1;
 
         evaluator.EvalDensityField(V, C, densityMetric);
@@ -65,15 +66,18 @@ int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &Target
     return 0;
 }
 
-int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineMethod type)
+int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineMethod method)
 {
-    switch (type)
+    switch (method)
     {
     case TRIVIAL_REFINE:
         if (TrivialRefine(V, C, TargetC) == -1)
             return -1;
         break;
-
+    case PADDING_REFINE:
+        if (PaddingRefine(V, C, TargetC) == -1)
+            return -1;
+        break;
     default:
         break;
     }
@@ -127,6 +131,49 @@ int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 
     // V = RefinedV;
     // C = RefinedC;
+
+    return 0;
+}
+
+int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
+{
+    HexPadding::Mesh mesh = HexPadding::Mesh();
+    std::vector<size_t> markedC;
+
+    for (int i = 0; i < V.cols(); i++)
+        mesh.V.push_back(V.col(i));
+
+    for (int i = 0; i < C.cols(); i++)
+    {
+        HexPadding::Cell c;
+        for (int j = 0; j < HEX_SIZE; j++)
+        {
+            c.push_back(C(j, i));
+        }
+        mesh.C.push_back(c);
+    }
+
+    while (!TargetC.empty())
+    {
+        markedC.push_back(TargetC.front());
+        TargetC.pop();
+    }
+
+    HexPadding::padding(mesh, markedC, true);
+
+    C.resize(HEX_SIZE, mesh.C.size());
+    V.resize(3, mesh.V.size());
+
+    for (size_t i = 0; i < mesh.V.size(); i++)
+        V.col(i) = mesh.V.at(i);
+
+    for (size_t i = 0; i < mesh.C.size(); i++)
+    {
+        for (size_t j = 0; j < HEX_SIZE; j++)
+        {
+            C(j, i) = mesh.C.at(i).at(j);
+        }
+    }
 
     return 0;
 }

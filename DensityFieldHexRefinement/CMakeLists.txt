@@ -17,7 +17,10 @@ include_directories(SYSTEM "../../Library")
 SET(CMAKE_CXX_FLAGS_RELEASE "$ENV{CXXFLAGS} -O3 -Wall")
 
 aux_source_directory(src SRC)
+aux_source_directory(src/HexRefine REFINE_SRC)
+aux_source_directory(src/HexPadding PADDING_SRC)
+aux_source_directory(src/HexEval EVAL_SRC)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/out)
-add_executable(${PROJECT_NAME} ${SRC})
+add_executable(${PROJECT_NAME} ${SRC} ${REFINE_SRC} ${PADDING_SRC} ${EVAL_SRC})
 target_link_libraries(${PROJECT_NAME} ${VTK_LIBRARIES})
 

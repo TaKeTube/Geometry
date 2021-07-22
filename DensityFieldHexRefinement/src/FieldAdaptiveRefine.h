@@ -15,13 +15,13 @@ inline double EvalDensity(const Eigen::Matrix3Xd &V, const Eigen::VectorXi &c, c
 
 inline double EvalDensity(const std::vector<Eigen::Vector3d> V, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-int FieldAdaptiveRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField);
+int FieldAdaptiveRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField, RefineMethod method);
 
 int MarkTargetHex(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField, std::vector<double> &HexDensity);
 
 int TrivialMark(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField);
 
-int RefineTargetHex(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, RefineMethod type);
+int RefineTargetHex(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, RefineMethod method);
 
 int TrivialRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC);
 
