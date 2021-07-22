@@ -2,10 +2,11 @@
 #include "HexPadding.h"
 
 #define PADDING_RATIO 0.3
-#define SMOOTH_ITERNUM 2
+#define SMOOTH_ITERNUM 5
 
 using namespace std;
 using namespace Eigen;
+using namespace HexPadding;
 
 /*
  * padding()
@@ -14,7 +15,7 @@ using namespace Eigen;
  * OUTPUT: padded hex mesh
  * RETURN: none
  */
-void padding(Mesh &m, vector<size_t> markedC, bool smooth)
+void HexPadding::padding(Mesh &m, vector<size_t> markedC, bool smooth)
 {
     Mesh markedSubMesh;
 
@@ -96,7 +97,7 @@ void padding(Mesh &m, vector<size_t> markedC, bool smooth)
  * OUTPUT: submesh consisting of the marked cells
  * RETURN: none
  */
-void getSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
+void HexPadding::getSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
 {
     subMesh.SubV.clear();
 
@@ -122,7 +123,7 @@ void getSubMesh(Mesh &mesh, Mesh &subMesh, std::vector<size_t> &markedC)
  * OUTPUT: smoothed mesh
  * RETURN: none
  */
-void volSmoothingUsingCells(Mesh &mesh)
+void HexPadding::volSmoothingUsingCells(Mesh &mesh)
 {
     mesh.getFaceInfo();
     mesh.getSurface();
@@ -155,7 +156,7 @@ void volSmoothingUsingCells(Mesh &mesh)
  * OUTPUT: mesh with submesh region smoothed
  * RETURN: none
  */
-void volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
+void HexPadding::volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
 {
     subMesh.getFaceInfo();
     subMesh.getSurface();
@@ -188,7 +189,7 @@ void volSmoothingSubmeshUsingCells(Mesh &mesh, Mesh &subMesh)
  * OUTPUT: smoothed mesh
  * RETURN: none
  */
-void volSmoothingUsingVerts(Mesh &mesh)
+void HexPadding::volSmoothingUsingVerts(Mesh &mesh)
 {
     mesh.getFaceInfo();
     mesh.getSurface();
@@ -221,7 +222,7 @@ void volSmoothingUsingVerts(Mesh &mesh)
  * OUTPUT: mesh with submesh region smoothed
  * RETURN: none
  */
-void volSmoothingSubmeshUsingVerts(Mesh &mesh, Mesh &subMesh)
+void HexPadding::volSmoothingSubmeshUsingVerts(Mesh &mesh, Mesh &subMesh)
 {
     subMesh.getFaceInfo();
     subMesh.getSurface();

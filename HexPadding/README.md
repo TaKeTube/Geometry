@@ -47,3 +47,4 @@ Here is one method to get indexes of cells
 <img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cube1.png?raw=true" alt="points" style="zoom: 67%;" />
 
 <img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cube2.png?raw=true" alt="points" style="zoom: 67%;" />
+

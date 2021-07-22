@@ -3,9 +3,9 @@
 
 #include "hpMesh.h"
 
-int meshReader(const char* fname, Mesh& mesh);
-void vtkReader(const char* fname , Mesh& mesh);
-void objReader(const char* fname , Mesh& mesh);
-void vtkWriter(const char* fname , Mesh& mesh);
+int meshReader(const char* fname, HexPadding::Mesh& mesh);
+void vtkReader(const char* fname , HexPadding::Mesh& mesh);
+void objReader(const char* fname , HexPadding::Mesh& mesh);
+void vtkWriter(const char* fname , HexPadding::Mesh& mesh);
 
 #endif

@@ -7,7 +7,6 @@
  * Modified by TaKeTube
  */
 
-using namespace std;
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -23,6 +22,8 @@ using namespace std;
 
 #include "MeshIO.h"
 
+using namespace HexPadding;
+using namespace std;
 /*
  * meshReader()
  * DESCRIPTION: read mesh from file

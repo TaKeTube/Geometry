@@ -6,6 +6,7 @@
 
 using namespace std;
 using namespace Eigen;
+using namespace HexPadding;
 
 Mesh::Mesh(const Mesh& mesh)
 : V(mesh.V)

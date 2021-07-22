@@ -54,7 +54,7 @@ int main(int argc, char **argv)
         }
     }
 
-    Mesh mesh = Mesh();
+    HexPadding::Mesh mesh = HexPadding::Mesh();
 
     // std::vector<size_t> MarkedC = {
     //     2, 6, 7
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
     if (!meshReader((input_file == NULL) ? default_file : input_file, mesh))
     {
         /* padding */
-        padding(mesh, MarkedC, smooth_flag);
+        HexPadding::padding(mesh, MarkedC, smooth_flag);
         /* output the processed mesh */
         vtkWriter((output_file == NULL) ? "output.vtk" : output_file, mesh);
     }
