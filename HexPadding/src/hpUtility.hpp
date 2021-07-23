@@ -40,6 +40,11 @@ namespace HexPadding
         Eigen::Vector3d dv1 = v2 - v0;
         return (dv0.cross(dv1)).normalized();
     }
+
+    Eigen::Vector3d getClusteredNormal(const std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > V)
+    {
+        return Eigen::Vector3d::Zero();
+    }
 }
 
 #endif

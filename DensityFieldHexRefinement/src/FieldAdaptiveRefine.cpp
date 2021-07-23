@@ -159,7 +159,7 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
         TargetC.pop();
     }
 
-    HexPadding::padding(mesh, markedC, true);
+    HexPadding::padding(mesh, markedC, false);
 
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
