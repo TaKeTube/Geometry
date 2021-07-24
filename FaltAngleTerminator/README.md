@@ -113,12 +113,12 @@ I'm thinking about a method that basically adjust the position of the vertexes, 
 
 - we restrict all points on the interpolate surface. Therefore, the problem becomes **optimizing a metric <img src="http://latex.codecogs.com/svg.latex?d(v_1,\cdots,v_n)"> on a bounded 2-dimensional manifold <img src="http://latex.codecogs.com/svg.latex?M"> (or surface, generally)**
 
-<img src="http://latex.codecogs.com/svg.latex?{\underset {v_1,\cdots,v_2 \in M}{\operatorname {arg\,min} }}\,d(v_1,\cdots,v_2) \equiv {\underset {\bold{v} \in M^n}{\operatorname {arg\,min} }}\,d(\bold{v})" />
+<img src=".\img\6.png" alt="6"  />
 
 
 ​		which can be solved by Lagrange Multiplier Method using gradient descend or other effective methods:
 
-<img src="http://latex.codecogs.com/svg.latex?{\mathcal {L}}(\bold{v},\lambda) = d(\bold{v})-\lambda M(\bold{v})" />
+<img src=".\img\7.png" alt="7"  />
 
 <img src=".\img\5.png" alt="5"  />
 
