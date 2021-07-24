@@ -48,7 +48,9 @@ The quad cell highlighted by pink lines is split into 3 pieces.
 
 <img src=".\results\spot.png" alt="spot"  />
 
-**bunny**<img src=".\results\bunny.png" alt="bunny"  />
+**bunny**
+
+<img src=".\results\bunny.png" alt="bunny"  />
 
 **edge**
 
@@ -109,14 +111,14 @@ I'm thinking about a method that basically adjust the position of the vertexes, 
 
 ​		where <img src="http://latex.codecogs.com/svg.latex?n"> is the number of vertexes in this area, to measure the angle differences of interior angles of all quad cells in the area with respect to right angles. This function should be sensitive to each individual cell's angle. For example, even though the total difference is small,  a huge difference on one cell and very small differences on other cells may not get a good score.
 
-- we restrict all points on the interpolate surface. Therefore, the problem becomes **optimizing a metric <img src="http://latex.codecogs.com/svg.latex?d(v_1,\cdots,v_n)"> on a bounded 2-dimensional manifold $M$ (or surface, generally)**
+- we restrict all points on the interpolate surface. Therefore, the problem becomes **optimizing a metric <img src="http://latex.codecogs.com/svg.latex?d(v_1,\cdots,v_n)"> on a bounded 2-dimensional manifold <img src="http://latex.codecogs.com/svg.latex?M"> (or surface, generally)**
 
-<img src="http://latex.codecogs.com/svg.latex?{\underset {v_1,\cdots,v_2 \in M}{\operatorname {arg\,min} }}\,d(v_1,\cdots,v_2) \equiv {\underset {\bold{v} \in M^n}{\operatorname {arg\,min} }}\,d(\bold{v})">
+<img src="http://latex.codecogs.com/svg.latex?{\underset {v_1,\cdots,v_2 \in M}{\operatorname {arg\,min} }}\,d(v_1,\cdots,v_2) \equiv {\underset {\bold{v} \in M^n}{\operatorname {arg\,min} }}\,d(\bold{v})" />
 
 
 ​		which can be solved by Lagrange Multiplier Method using gradient descend or other effective methods:
 
-<img src="http://latex.codecogs.com/svg.latex?{\mathcal {L}}(\bold{v},\lambda) = d(\bold{v})-\lambda M(\bold{v})">
+<img src="http://latex.codecogs.com/svg.latex?{\mathcal {L}}(\bold{v},\lambda) = d(\bold{v})-\lambda M(\bold{v})" />
 
 <img src=".\img\5.png" alt="5"  />
 
