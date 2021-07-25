@@ -55,6 +55,7 @@ namespace HexPadding
         std::vector<size_t> neighborC; // neighbor cells
         bool isBoundary;
 
+        Vertexes neighborNormal;
         Eigen::Vector3d normal; // normal vector
         int surfDegree;         // surface degree
         double surfAvgLen;      // surface average length of neighbor edges

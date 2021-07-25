@@ -86,7 +86,7 @@ void HexPadding::padding(Mesh &m, vector<size_t> markedC, bool smooth)
         getSubMesh(m, smoothSubMesh, markedC);
 
         for (int i = 0; i < SMOOTH_ITERNUM; i++)
-            volSmoothingSubmeshUsingCells(m, smoothSubMesh);
+            volSmoothingSubmeshUsingVerts(m, smoothSubMesh);
     }
 }
 
