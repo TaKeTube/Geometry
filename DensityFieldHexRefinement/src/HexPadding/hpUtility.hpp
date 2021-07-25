@@ -40,6 +40,47 @@ namespace HexPadding
         Eigen::Vector3d dv1 = v2 - v0;
         return (dv0.cross(dv1)).normalized();
     }
+
+    Eigen::Vector3d getClusteredNormal(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > V)
+    {
+        size_t vsize = V.size();
+        std::vector<char> vflag(vsize, 0);
+        bool isClustered = true;
+        while(isClustered)
+        {
+            isClustered = false;
+            for(size_t i = 0; i < vsize; i++)
+            {
+                if(vflag.at(i))
+                    continue;
+                Eigen::Vector3d &v1 = V.at(i);
+                Eigen::Vector3d v = V.at(i);
+                int count = 0;
+                for(size_t j = i+1; j < vsize; j++)
+                {
+                    if(vflag.at(j))
+                        continue;
+                    Eigen::Vector3d &v2 = V.at(j);
+                    if((v1-v2).squaredNorm() < 0.3)
+                    {
+                        v += v2;
+                        count++;
+                        vflag.at(j) = 1;
+                        isClustered = true;
+                    }
+                }
+                if(count)
+                    v1 = (v/count).normalized();
+            }
+        }
+        Eigen::Vector3d vavg = Eigen::Vector3d::Zero();
+        for(size_t i = 0; i < V.size(); i++)
+        {
+            if(!vflag.at(i))
+                vavg += V.at(i);
+        }
+        return vavg.normalized();
+    }
 }
 
 #endif

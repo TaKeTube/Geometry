@@ -2,7 +2,7 @@
 #include "HexPadding.h"
 
 #define PADDING_RATIO 0.3
-#define SMOOTH_ITERNUM 5
+#define SMOOTH_ITERNUM 20
 
 using namespace std;
 using namespace Eigen;
@@ -86,7 +86,7 @@ void HexPadding::padding(Mesh &m, vector<size_t> markedC, bool smooth)
         getSubMesh(m, smoothSubMesh, markedC);
 
         for (int i = 0; i < SMOOTH_ITERNUM; i++)
-            volSmoothingSubmeshUsingCells(m, smoothSubMesh);
+            volSmoothingSubmeshUsingVerts(m, smoothSubMesh);
     }
 }
 

@@ -2,7 +2,7 @@
 #include "HexPadding.h"
 
 #define PADDING_RATIO 0.3
-#define SMOOTH_ITERNUM 5
+#define SMOOTH_ITERNUM 20
 
 using namespace std;
 using namespace Eigen;

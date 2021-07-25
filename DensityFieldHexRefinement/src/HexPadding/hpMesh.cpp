@@ -228,33 +228,45 @@ void Mesh::getSurfaceNormal()
         // else
         //     VinfoMap[v0Idx].normal += n1;
 
-        /* new method, accumulate normals of neighbor quad faces of a vertex then take average */
+        // /* new method, accumulate normals of neighbor quad faces of a vertex then take average */
+        // Vector3d n = (n0 + n1).normalized();
+
+        // if (VinfoMap.find(v0Idx) == VinfoMap.end())
+        //     VinfoMap[v0Idx].normal = n;
+        // else
+        //     VinfoMap[v0Idx].normal += n;
+
+        // if (VinfoMap.find(v1Idx) == VinfoMap.end())
+        //     VinfoMap[v1Idx].normal = n;
+        // else
+        //     VinfoMap[v1Idx].normal += n;
+
+        // if (VinfoMap.find(v2Idx) == VinfoMap.end())
+        //     VinfoMap[v2Idx].normal = n;
+        // else
+        //     VinfoMap[v2Idx].normal += n;
+
+        // if (VinfoMap.find(v3Idx) == VinfoMap.end())
+        //     VinfoMap[v3Idx].normal = n;
+        // else
+        //     VinfoMap[v3Idx].normal += n;
+
+        /* store all neighbor normals for the sake of clustering */
         Vector3d n = (n0 + n1).normalized();
 
-        if (VinfoMap.find(v0Idx) == VinfoMap.end())
-            VinfoMap[v0Idx].normal = n;
-        else
-            VinfoMap[v0Idx].normal += n;
-
-        if (VinfoMap.find(v1Idx) == VinfoMap.end())
-            VinfoMap[v1Idx].normal = n;
-        else
-            VinfoMap[v1Idx].normal += n;
-
-        if (VinfoMap.find(v2Idx) == VinfoMap.end())
-            VinfoMap[v2Idx].normal = n;
-        else
-            VinfoMap[v2Idx].normal += n;
-
-        if (VinfoMap.find(v3Idx) == VinfoMap.end())
-            VinfoMap[v3Idx].normal = n;
-        else
-            VinfoMap[v3Idx].normal += n;
+        VinfoMap[v0Idx].neighborNormal.push_back(n);
+        VinfoMap[v1Idx].neighborNormal.push_back(n);
+        VinfoMap[v2Idx].neighborNormal.push_back(n);
+        VinfoMap[v3Idx].neighborNormal.push_back(n);
     }
 
-    /* normalize the accuamlated normals */
+    // /* normalize the accuamlated normals */
+    // for (size_t vIdx : SurfaceV)
+    //     VinfoMap[vIdx].normal.normalize();
+
+    /* cluster normals then get a average normal */
     for (size_t vIdx : SurfaceV)
-        VinfoMap[vIdx].normal.normalize();
+        VinfoMap[vIdx].normal = getClusteredNormal(VinfoMap[vIdx].neighborNormal);
 }
 
 /*
@@ -306,33 +318,45 @@ void Mesh::getSurfaceNormal(Mesh &superMesh)
         // else
         //     VinfoMap[v0Idx].normal += n1;
 
-        /* new method, accumulate normals of neighbor quad faces of a vertex then take average */
+        // /* new method, accumulate normals of neighbor quad faces of a vertex then take average */
+        // Vector3d n = (n0 + n1).normalized();
+
+        // if (VinfoMap.find(v0Idx) == VinfoMap.end())
+        //     VinfoMap[v0Idx].normal = n;
+        // else
+        //     VinfoMap[v0Idx].normal += n;
+
+        // if (VinfoMap.find(v1Idx) == VinfoMap.end())
+        //     VinfoMap[v1Idx].normal = n;
+        // else
+        //     VinfoMap[v1Idx].normal += n;
+
+        // if (VinfoMap.find(v2Idx) == VinfoMap.end())
+        //     VinfoMap[v2Idx].normal = n;
+        // else
+        //     VinfoMap[v2Idx].normal += n;
+
+        // if (VinfoMap.find(v3Idx) == VinfoMap.end())
+        //     VinfoMap[v3Idx].normal = n;
+        // else
+        //     VinfoMap[v3Idx].normal += n;
+
+        /* store all neighbor normals for the sake of clustering */
         Vector3d n = (n0 + n1).normalized();
 
-        if (VinfoMap.find(v0Idx) == VinfoMap.end())
-            VinfoMap[v0Idx].normal = n;
-        else
-            VinfoMap[v0Idx].normal += n;
-
-        if (VinfoMap.find(v1Idx) == VinfoMap.end())
-            VinfoMap[v1Idx].normal = n;
-        else
-            VinfoMap[v1Idx].normal += n;
-
-        if (VinfoMap.find(v2Idx) == VinfoMap.end())
-            VinfoMap[v2Idx].normal = n;
-        else
-            VinfoMap[v2Idx].normal += n;
-
-        if (VinfoMap.find(v3Idx) == VinfoMap.end())
-            VinfoMap[v3Idx].normal = n;
-        else
-            VinfoMap[v3Idx].normal += n;
+        VinfoMap[v0Idx].neighborNormal.push_back(n);
+        VinfoMap[v1Idx].neighborNormal.push_back(n);
+        VinfoMap[v2Idx].neighborNormal.push_back(n);
+        VinfoMap[v3Idx].neighborNormal.push_back(n);
     }
 
-    /* normalize the accuamlated normals */
+    // /* normalize the accuamlated normals */
+    // for (size_t vIdx : SurfaceV)
+    //     VinfoMap[vIdx].normal.normalize();
+
+    /* cluster normals then get a average normal */
     for (size_t vIdx : SurfaceV)
-        VinfoMap[vIdx].normal.normalize();
+        VinfoMap[vIdx].normal = getClusteredNormal(VinfoMap[vIdx].neighborNormal);
 }
 
 /*
