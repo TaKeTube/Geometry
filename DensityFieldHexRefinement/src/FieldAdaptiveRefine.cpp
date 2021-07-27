@@ -1,5 +1,6 @@
 #include "FieldAdaptiveRefine.h"
 #include "Utility.hpp"
+#include "MeshIO.h"
 #include "HexRefine/TrivialRefine.h"
 #include "HexPadding/HexPadding.h"
 #include "HexEval/HexEval.h"
@@ -180,5 +181,19 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 
 int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::function<double(Vector3d)> &DensityField)
 {
+    HexEval::HexEvaluator evaluator;
+    HexEval::DensityMetric densityMetric = HexEval::EDGE_LENGTH_METRIC;
+    evaluator.setRefDensityField(DensityField);
+    if (densityMetric == HexEval::ANISOTROPIC_METRIC)
+    {
+        std::function<Eigen::Matrix3d(Eigen::Vector3d)> isotropicField = [](Vector3d v)
+        { return Eigen::MatrixXd::Identity(3, 3); };
+        evaluator.setAnisotropicDensityField(isotropicField);
+    }
+    if (evaluator.EvalDensityField(V, C, densityMetric) == -1)
+        return -1;
+    vtkWriter("Field.vtk",      V, C, evaluator.GetDensityField());
+    vtkWriter("RefField.vtk",   V, C, evaluator.GetRefDensityField(V, C));
+    vtkWriter("DiffField.vtk",  V, C, evaluator.GetDiffDensityField(V, C));
     return 0;
 }

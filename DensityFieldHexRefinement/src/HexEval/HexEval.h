@@ -70,6 +70,8 @@ namespace HexEval
         // ~HexEvaluator();
 
         int EvalDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, DensityMetric metric);
+        std::vector<double> GetRefDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
+        std::vector<double> GetDiffDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C);
         std::vector<double> GetDensityField();
 
         void setRefDensityField(const std::function<double(Eigen::Vector3d)> &DensityField);

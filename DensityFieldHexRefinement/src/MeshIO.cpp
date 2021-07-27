@@ -99,7 +99,7 @@ void vtkReader(const char* fname, Matrix3Xd &V, MatrixXi &C)
  * OUTPUT: vtk file
  * RETURN: none
  */
-void vtkWriter(const char* fname, Matrix3Xd &V, MatrixXi &C)
+void vtkWriter(const char* fname, const Matrix3Xd &V, const MatrixXi &C)
 {
     const size_t vnum = V.cols();
     const size_t cnum = C.cols();
@@ -133,7 +133,7 @@ void vtkWriter(const char* fname, Matrix3Xd &V, MatrixXi &C)
         ofs << idType << endl;
 }
 
-void vtkWriter(const char* fname, Matrix3Xd &V, MatrixXi &C, std::vector<double> densityField)
+void vtkWriter(const char* fname, const Matrix3Xd &V, const MatrixXi &C, std::vector<double> densityField)
 {
     vtkWriter(fname, V, C);
     std::ofstream density(fname, std::ios_base::app);
