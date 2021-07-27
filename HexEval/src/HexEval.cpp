@@ -127,6 +127,28 @@ void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
     }
 }
 
+std::vector<double> HexEvaluator::GetRefDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C)
+{
+    std::vector<double> refField;
+    for (int cIdx = 0; cIdx < C.cols(); cIdx++)
+    {
+        MatrixXi c = C.col(cIdx);
+        refField.push_back(EvalDensity(V, c, RefDensityField));
+    }
+    return refField;
+}
+
+std::vector<double> HexEvaluator::GetDiffDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C)
+{
+    std::vector<double> diffField;
+    for (int cIdx = 0; cIdx < C.cols(); cIdx++)
+    {
+        MatrixXi c = C.col(cIdx);
+        diffField.push_back(EvalDensity(V, c, RefDensityField)-DensityField.at(cIdx));
+    }
+    return diffField;
+}
+
 void HexEvaluator::setRefDensityField(const std::function<double(Vector3d)> &DensityField)
 {
     RefDensityField = DensityField;
