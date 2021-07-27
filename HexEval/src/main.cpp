@@ -70,8 +70,13 @@ int main(int argc, char **argv)
         return -1;
     }
 
+    std::string outputString = (output_file == NULL) ? "output.vtk" : output_file;
+    outputString.erase(outputString.length()-4, 4);
+
     if (!meshReader((input_file == NULL) ? default_file : input_file, V, C))
     {
+        evaluator.setRefDensityField([](Vector3d v)
+                                     { return 195 * sin(v.y() * 3); });
         if (densityMetric == HexEval::ANISOTROPIC_METRIC)
         {
             std::function<Eigen::Matrix3d(Eigen::Vector3d)> isotropicField = [](Vector3d v)
@@ -80,6 +85,8 @@ int main(int argc, char **argv)
         }
         if (evaluator.EvalDensityField(V, C, densityMetric) == -1)
             return -1;
-        vtkWriter((output_file == NULL) ? "output.vtk" : output_file, V, C, evaluator.GetDensityField());
+        vtkWriter((outputString + ".vtk").c_str(), V, C, evaluator.GetDensityField());
+        vtkWriter((outputString + "_reffield.vtk").c_str(), V, C, evaluator.GetRefDensityField(V, C));
+        vtkWriter((outputString + "_difffield.vtk").c_str(), V, C, evaluator.GetDiffDensityField(V, C));
     }
 }
