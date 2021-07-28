@@ -18,6 +18,7 @@ int main(int argc, char **argv)
     char default_file[] = "../data/64cube.vtk";
     char default_target_file[] = "../data/64cube_target.txt";
     bool smooth_flag = false;
+    bool mark_flag = false;
 
     /* 
      *  A standard command: 
@@ -46,6 +47,10 @@ int main(int argc, char **argv)
         else if (!strcmp(argv[i], "-s"))
         {
             smooth_flag = true;
+        }
+        else if (!strcmp(argv[i], "-m"))
+        {
+            mark_flag = true;
         }
         else
         {
@@ -79,9 +84,18 @@ int main(int argc, char **argv)
     if (!meshReader((input_file == NULL) ? default_file : input_file, mesh))
     {
         /* padding */
-        HexPadding::padding(mesh, MarkedC, smooth_flag);
+        HexPadding::padding(mesh, MarkedC, smooth_flag, mark_flag);
         /* output the processed mesh */
-        vtkWriter((output_file == NULL) ? "output.vtk" : output_file, mesh);
+        std::string out_name = (output_file == NULL) ? "output.vtk" : output_file;
+        vtkWriter(out_name.c_str(), mesh);
+        /* mark padded cells if needed */
+        if (mark_flag)
+        {
+            std::vector<int> PaddedFlag(mesh.C.size(), 0);
+            for (size_t cIdx : mesh.PaddedC)
+                PaddedFlag.at(cIdx) = 1;
+            vtkScalarWriter(out_name.c_str(), mesh, PaddedFlag);
+        }
     }
     else
     {

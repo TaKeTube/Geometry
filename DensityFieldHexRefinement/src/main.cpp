@@ -42,8 +42,10 @@ int main(int argc, char **argv)
     {
         // FieldAdaptiveRefine(V, C, [](Vector3d v){return
         // 258*exp(-v.squaredNorm()/2)/sqrt(2*M_PI);});
+        // FieldAdaptiveRefine(V, C, [](Vector3d v)
+        //                     { return 195 * sin(v.y() * 3); }, PADDING_REFINE);
         FieldAdaptiveRefine(V, C, [](Vector3d v)
-                            { return 195 * sin(v.y() * 3); }, PADDING_REFINE);
+                            { return 50 * (1 + sin(v.y() * 3)); }, PADDING_REFINE);
         vtkWriter((output_file == NULL) ? "output.vtk" : output_file, V, C);
     }
 }

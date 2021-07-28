@@ -147,3 +147,16 @@ void vtkWriter(const char* fname , Mesh& mesh)
     for (size_t i = 0; i < cnum; i++)
         ofs << idType << endl;
 }
+
+void vtkScalarWriter(const char* fname, Mesh& mesh, std::vector<int> scalarVec)
+{
+    std::ofstream f(fname, std::ios_base::app);
+    f << "CELL_DATA " << mesh.C.size() << std::endl
+            << "SCALARS scalars int 1" << std::endl
+            << "LOOKUP_TABLE default" << std::endl;
+    for (size_t i = 0; i < scalarVec.size(); i++)
+    {
+        f << scalarVec.at(i) << std::endl;
+    }
+    f.close();
+}

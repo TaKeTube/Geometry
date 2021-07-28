@@ -144,7 +144,7 @@ std::vector<double> HexEvaluator::GetDiffDensityField(const Eigen::Matrix3Xd &V,
     for (int cIdx = 0; cIdx < C.cols(); cIdx++)
     {
         MatrixXi c = C.col(cIdx);
-        diffField.push_back(EvalDensity(V, c, RefDensityField)-DensityField.at(cIdx));
+        diffField.push_back(DensityField.at(cIdx)-EvalDensity(V, c, RefDensityField));
     }
     return diffField;
 }

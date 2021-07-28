@@ -76,7 +76,7 @@ int main(int argc, char **argv)
     if (!meshReader((input_file == NULL) ? default_file : input_file, V, C))
     {
         evaluator.setRefDensityField([](Vector3d v)
-                                     { return 195 * sin(v.y() * 3); });
+                                    { return 50 * (1 + sin(v.y() * 3)); });
         if (densityMetric == HexEval::ANISOTROPIC_METRIC)
         {
             std::function<Eigen::Matrix3d(Eigen::Vector3d)> isotropicField = [](Vector3d v)

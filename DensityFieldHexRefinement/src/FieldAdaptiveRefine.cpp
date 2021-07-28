@@ -6,7 +6,7 @@
 #include "HexEval/HexEval.h"
 
 #define HEX_SIZE 8
-#define MAX_ITER_NUM 1
+#define MAX_ITER_NUM 3
 
 using namespace Eigen;
 
@@ -160,7 +160,7 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
         TargetC.pop();
     }
 
-    HexPadding::padding(mesh, markedC, false);
+    HexPadding::padding(mesh, markedC, true);
 
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
