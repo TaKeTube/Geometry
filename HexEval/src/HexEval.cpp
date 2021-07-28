@@ -12,7 +12,23 @@ using namespace Eigen;
 Edge::Edge() {}
 Edge::Edge(size_t v1, size_t v2) : v1Idx(v1), v2Idx(v2) {}
 
-
+/*
+ * EvalDensityField()
+ * DESCRIPTION: evaluate density field of a hex mesh. There are three types of metric
+ *              len - reciprocal of the average of edges of a hex cell
+ *              vol - reciprocal of the volume of a hex cell
+ *              anisotropic - average of edge metrics described in 
+ *                            Automated refinement of conformal quadrilateral and hexahedral meshes
+ *                                                   - Tchon KF, Dompierre J, Camarero R*  
+ *                            of a hex cell
+ *                            PS: By using the average of edge metrics, the metric is actually not anisotropic
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        metric - density metric
+ * OUTPUT: densityfield in HexEvaluator
+ * RETURN: 0 if success, 01 if failed
+ */
 int HexEvaluator::EvalDensityField(const Matrix3Xd &V, const MatrixXi &C, DensityMetric metric)
 {
     if (C.rows() != HEX_SIZE)
@@ -46,6 +62,15 @@ int HexEvaluator::EvalDensityField(const Matrix3Xd &V, const MatrixXi &C, Densit
     return 0;
 }
 
+/*
+ * EvalVolDensity()
+ * DESCRIPTION: evaluate density of a mesh using vol metric
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ * OUTPUT: densityfield in HexEvaluator
+ * RETURN: none
+ */
 void HexEvaluator::EvalVolDensity(const Matrix3Xd &V, const MatrixXi &C)
 {
     DensityField.clear();
@@ -54,6 +79,15 @@ void HexEvaluator::EvalVolDensity(const Matrix3Xd &V, const MatrixXi &C)
         DensityField.push_back(1 / HexVolume(V, C.col(cIdx)));
 }
 
+/*
+ * EvalLenDensity()
+ * DESCRIPTION: evaluate density of a mesh using len metric
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ * OUTPUT: densityfield in HexEvaluator
+ * RETURN: none
+ */
 void HexEvaluator::EvalLenDensity(const Matrix3Xd &V, const MatrixXi &C)
 {
     double edgeLen = 0;
@@ -61,6 +95,7 @@ void HexEvaluator::EvalLenDensity(const Matrix3Xd &V, const MatrixXi &C)
     DensityField.clear();
     EdgeLenMap.clear();
 
+    /* record length of every edges */
     for (int cIdx = 0; cIdx < C.cols(); cIdx++)
     {
         Edge e;
@@ -73,6 +108,7 @@ void HexEvaluator::EvalLenDensity(const Matrix3Xd &V, const MatrixXi &C)
         }
     }
 
+    /* calculate reciprocal of average length of edges of a hex cell */
     for (int cIdx = 0; cIdx < C.cols(); cIdx++)
     {
         Edge e;
@@ -87,6 +123,15 @@ void HexEvaluator::EvalLenDensity(const Matrix3Xd &V, const MatrixXi &C)
     }
 }
 
+/*
+ * EvalAnisotropicDensity()
+ * DESCRIPTION: evaluate density of a mesh using anisotropic metric
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ * OUTPUT: densityfield in HexEvaluator
+ * RETURN: none
+ */
 void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
 {
     double edgeLen = 0;
@@ -94,6 +139,7 @@ void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
     DensityField.clear();
     EdgeAnisotropicMetricMap.clear();
 
+    /* record anisotropic metric of every edges */
     for (int cIdx = 0; cIdx < C.cols(); cIdx++)
     {
         Edge e;
@@ -113,6 +159,7 @@ void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
         }
     }
 
+    /* calculate reciprocal of average metric of edges of a hex cell */
     for (int cIdx = 0; cIdx < C.cols(); cIdx++)
     {
         Edge e;
@@ -127,6 +174,16 @@ void HexEvaluator::EvalAnisotropicDensity(const Matrix3Xd &V, const MatrixXi &C)
     }
 }
 
+/*
+ * GetRefDensityField()
+ * DESCRIPTION: evaluate density of each cell of a mesh using reference field
+ *              for each cell, evaluate the average of values of the reference field at 8 vertexes
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ * OUTPUT: reference density field in HexEvaluator
+ * RETURN: none
+ */
 std::vector<double> HexEvaluator::GetRefDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C)
 {
     std::vector<double> refField;
@@ -138,6 +195,15 @@ std::vector<double> HexEvaluator::GetRefDensityField(const Eigen::Matrix3Xd &V, 
     return refField;
 }
 
+/*
+ * GetDiffDensityField()
+ * DESCRIPTION: evaluate difference of reference field and actual field
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ * OUTPUT: difference density field in HexEvaluator
+ * RETURN: none
+ */
 std::vector<double> HexEvaluator::GetDiffDensityField(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C)
 {
     std::vector<double> diffField;
@@ -149,15 +215,36 @@ std::vector<double> HexEvaluator::GetDiffDensityField(const Eigen::Matrix3Xd &V,
     return diffField;
 }
 
+/*
+ * setRefDensityField()
+ * DESCRIPTION: set reference density field
+ * INPUT: reference density field
+ * OUTPUT: reference density field in HexEvaluator
+ * RETURN: none
+ */
 void HexEvaluator::setRefDensityField(const std::function<double(Vector3d)> &DensityField)
 {
     RefDensityField = DensityField;
 }
 
+/*
+ * setAnisotropicDensityField()
+ * DESCRIPTION: set anisotropic reference density field
+ * INPUT: anisotropic reference density field
+ * OUTPUT: anisotropic reference density field in HexEvaluator
+ * RETURN: none
+ */
 void HexEvaluator::setAnisotropicDensityField(std::function<Eigen::Matrix3d(Eigen::Vector3d)> &DensityField){
     AnisotropicDensityField = DensityField;
 }
 
+/*
+ * GetDensityField()
+ * DESCRIPTION: get evaluated density field
+ * INPUT: none
+ * OUTPUT: evaluated density field in HexEvaluator
+ * RETURN: none
+ */
 std::vector<double> HexEvaluator::GetDensityField()
 {
     return DensityField;
