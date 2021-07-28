@@ -56,7 +56,7 @@ Hex density using len metric
 
 <img src=".\img\eval.png" alt="eval" />
 
-Reference field
+Reference field <img src="http://latex.codecogs.com/svg.latex?50(1 + \sin{3y})">
 
 <img src=".\img\ref.png" alt="ref" />
 
