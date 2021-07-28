@@ -11,10 +11,10 @@ Evaluate the density of a Hex mesh then output the mesh with scalar field indica
 
 - **INPUT**: <kbd>.vtk</kbd> unstructured hex mesh file
 - **OUTPUT**: <kbd>.vtk</kbd> unstructured hex mesh file
-- <kbd>-i arg</kbd> : input, arg: input file name, default: ../data/cad.vtk
+- <kbd>-i arg</kbd> : input, arg: input file name, default: <kbd>../data/cad.vtk</kbd>
 
-- <kbd>-o arg</kbd> : output, arg: output file name, default: output.vtk
-- <kbd>-m arg</kbd> : density metric, arg: **len/vol/anisotropic**
+- <kbd>-o arg</kbd> : output, arg: output file name, default: <kbd>output.vtk</kbd>
+- <kbd>-m arg</kbd> : density metric, arg: <kbd>len</kbd>/<kbd>vol</kbd>/<kbd>anisotropic</kbd>
 - <kbd>-r</kbd>   : output reference field if setted
 - <kbd>-d</kbd>   : output the difference between the actual density field and the reference field
 - <kbd>-h</kbd>   : help

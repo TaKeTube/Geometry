@@ -17,15 +17,20 @@ Pad marked cells then do smoothing
 #### I/O
 
 - **INPUT**: <kbd>.vtk</kbd> unstructured hex mesh file & <kbd>.txt</kbd> contains indexes of target cells
-
 - **OUTPUT**: <kbd>.vtk</kbd> padded unstructured hex mesh file
+- <kbd>-i arg</kbd> : input vtk file, arg: input file name, default: <kbd>../data/64cube.vtk</kbd>
+- <kbd>-o arg</kbd> : output vtk file, arg: output file name, default: <kbd>output.vtk</kbd>
+- <kbd>-t arg</kbd> : target cell indexes in txt file, arg: target txt file name, default: <kbd>../data/64cube_target.txt"</kbd>
+- <kbd>-s</kbd>   : smooth the padded mesh
+- <kbd>-m</kbd>   : output mesh with padded element marked using scalar 1
+- <kbd>-h</kbd>   : help
 
-the default input file is <kbd>./data/8cube.vtk</kbd>, default outputs is <kbd>output.vtk</kbd>, default marked cells are described in  <kbd>./data/8cube_target.vtk</kbd>, smooth is not done by default. Add <kbd>-r</kbd> flag to do smoothing.
+you could change the macro in HexPadding.cpp to change the number of smoothing time and shrink ratio when padding 
 
 using command line to choose input and output files, a example command is like follow:
 
 ```shell
-./Padding.exe -r -input "../data/rod.vtk" -output "padded_rod.vtk" -target "../data/rod_target.txt"
+./Padding.exe -i "../data/rod.vtk" -o "smoothed_padded_rod.vtk" -t "../data/rod_target.txt" -s -m
 ```
 
 #### How to mark cells
@@ -33,18 +38,22 @@ using command line to choose input and output files, a example command is like f
 Here is one method to get indexes of cells
 
 1. Open the target mesh using **ParaView**
-2. Click the button <kbd>Select Cells On</kbd> on the top of the display window ![button](https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/button.png?raw=true)
+2. Click the button <kbd>Select Cells On</kbd> on the top of the display window <img src="./img/button.png" alt="button"  />
 3. You will see Selection Display Inspector on the right of the display window. Click <kbd>Cell Labels</kbd> and tick the ID option :white_check_mark:
 
-![ID](https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/ID.png?raw=true)
+<img src="./img/ID.png" alt="ID"  />
 
 4. Then you will see the index when your cursor is on the cell. Write cell indexes into a txt file then run the program.
 
-<img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cell.png?raw=true" alt="points" style="zoom: 67%;" />
+<img src="./img/cell.png" alt="cell" style="zoom: 67%;" />
 
 #### Results
 
-<img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cube1.png?raw=true" alt="points" style="zoom: 67%;" />
+<img src="./img/cube1.png" alt="cube1" style="zoom: 67%;" />
 
-<img src="https://github.com/TaKeTube/Geometry/blob/main/HexPadding/img/cube2.png?raw=true" alt="points" style="zoom: 67%;" />
+<img src="./img/cube2.png" alt="cube2" style="zoom: 67%;" />
+
+padded element marked 
+
+<img src="./img/mark.png" alt="mark" style="zoom: 67%;" />
 

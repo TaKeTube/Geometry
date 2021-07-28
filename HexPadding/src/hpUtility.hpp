@@ -47,8 +47,8 @@ namespace HexPadding
      *              at concave vertex, average normal is not correct
      *              |-|  |  |--|
      *              |-|  |  |--|
-     *              \-| /*\ |-/
-     *               \/    \/     - at the star point
+     *              \-| /+\ |-/
+     *               \/    \/     - at the + point
      *              it is basically an iteration algorithm
      * INPUT: vector of normals
      * OUTPUT: none
