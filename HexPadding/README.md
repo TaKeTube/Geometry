@@ -18,7 +18,7 @@ Pad marked cells then do smoothing
 
 - **INPUT**: <kbd>.vtk</kbd> unstructured hex mesh file & <kbd>.txt</kbd> contains indexes of target cells
 
-- **OUTPUT**: <kbd>.vtk</kbd> refined unstructured hex mesh file
+- **OUTPUT**: <kbd>.vtk</kbd> padded unstructured hex mesh file
 
 the default input file is <kbd>./data/8cube.vtk</kbd>, default outputs is <kbd>output.vtk</kbd>, default marked cells are described in  <kbd>./data/8cube_target.vtk</kbd>, smooth is not done by default. Add <kbd>-r</kbd> flag to do smoothing.
 

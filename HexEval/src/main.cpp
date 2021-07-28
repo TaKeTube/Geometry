@@ -17,7 +17,7 @@ int main(int argc, char **argv)
 
     /* 
      *  A standard command: 
-     *      ./HexEval.exe -i "../data/rod.vtk" -o "rod_output.vtk" -m "len"
+     *      ./HexEval.exe -i "../data/rod.vtk" -o "rod_output.vtk" -m "len" -r -d
      */
     for (int i = 1; i < argc; i++)
     {
@@ -63,8 +63,8 @@ int main(int argc, char **argv)
     {
         std::cout << "Evaluate hex density." << std::endl;
         std::cout << "HELP:" << std::endl;
-        std::cout << "-i arg : arg: input file name" << std::endl;
-        std::cout << "-o arg : arg: output file name" << std::endl;
+        std::cout << "-i arg : input, arg: input file name, default: ../data/cad.vtk" << std::endl;
+        std::cout << "-o arg : output, arg: output file name, default: output.vtk" << std::endl;
         std::cout << "-m arg : density metric, arg: len/vol/anisotropic" << std::endl;
         std::cout << "-r     : output reference field if setted" << std::endl;
         std::cout << "-d     : output the difference between the actual density field and the reference field" << std::endl;
@@ -130,6 +130,9 @@ int main(int argc, char **argv)
         /* output density field */
         vtkWriter((outputString + ".vtk").c_str(), V, C, evaluator.GetDensityField());
         
+        /* if using anisotropic metric, there is no such thing called reference and difference field */
+        if (densityMetric == HexEval::ANISOTROPIC_METRIC) return 0;
+
         /* output refernce field */
         if (ref_flag)
             vtkWriter((outputString + "_reffield.vtk").c_str(), V, C, evaluator.GetRefDensityField(V, C));
