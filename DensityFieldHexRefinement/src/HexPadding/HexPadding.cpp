@@ -15,7 +15,7 @@ using namespace HexPadding;
  * OUTPUT: padded hex mesh
  * RETURN: none
  */
-void HexPadding::padding(Mesh &m, vector<size_t> markedC, bool smooth)
+void HexPadding::padding(Mesh &m, vector<size_t> markedC, bool smooth, bool markPadded)
 {
     Mesh markedSubMesh;
 
@@ -76,7 +76,10 @@ void HexPadding::padding(Mesh &m, vector<size_t> markedC, bool smooth)
             c.at(i + 4) = vMap.at(f.at(i));
         }
 
-        markedC.push_back(m.addCell(c));
+        size_t cIdx = m.addCell(c);
+        markedC.push_back(cIdx);
+        /* mark padded cells if needed */
+        if (markPadded) m.PaddedC.push_back(cIdx);
     }
 
     if (smooth)

@@ -76,6 +76,7 @@ namespace HexPadding
         std::vector<size_t> SubV; // valid vertexes index for submesh
         std::vector<size_t> SurfaceF;
         std::vector<size_t> SurfaceV;
+        std::vector<size_t> PaddedC;
         MeshType cellType;
 
         Mesh();
