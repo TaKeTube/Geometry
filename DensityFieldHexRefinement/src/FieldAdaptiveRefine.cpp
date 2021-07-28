@@ -6,60 +6,56 @@
 #include "HexEval/HexEval.h"
 
 #define HEX_SIZE 8
-#define MAX_ITER_NUM 3
 
 using namespace Eigen;
 
-inline double EvalDensity(const Matrix3Xd &V, const VectorXi &c, const std::function<double(Vector3d)> &DensityField)
-{
-    Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),
-             v4 = V.col(c(4)), v5 = V.col(c(5)), v6 = V.col(c(6)), v7 = V.col(c(7));
-    return (DensityField(v0) + DensityField(v1) + DensityField(v2) + DensityField(v3) +
-            DensityField(v4) + DensityField(v5) + DensityField(v6) + DensityField(v7)) *
-           0.125;
-}
-
-inline double EvalDensity(const std::vector<Vector3d> &V, const std::function<double(Vector3d)> &DensityField)
-{
-    return (DensityField(V.at(0)) + DensityField(V.at(1)) + DensityField(V.at(2)) + DensityField(V.at(3)) +
-            DensityField(V.at(4)) + DensityField(V.at(5)) + DensityField(V.at(6)) + DensityField(V.at(7))) *
-           0.125;
-}
-
-int FieldAdaptiveRefine(Matrix3Xd &V, MatrixXi &C, const std::function<double(Vector3d)> &DensityField, RefineMethod method)
+int FieldAdaptiveRefine(
+                        Matrix3Xd &V,
+                        MatrixXi &C,
+                        const std::function<double(Vector3d)> &DensityField, 
+                        RefineMethod method,
+                        HexEval::DensityMetric metric,
+                        int iterNum,
+                        bool smooth,
+                        bool mark,
+                        bool eval
+                        )
 {
     int IterCount = 0;
     std::queue<int> TargetC;
     std::vector<double> HexDensity;
+    std::vector<double> RefDensity;
     HexEval::HexEvaluator evaluator;
-    HexEval::DensityMetric densityMetric = HexEval::EDGE_LENGTH_METRIC;
 
-    evaluator.EvalDensityField(V, C, densityMetric);
-    HexDensity = evaluator.GetDensityField();
-    if (MarkTargetHex(V, C, TargetC, DensityField, HexDensity) == -1)
-        return -1;
-
-    while (!TargetC.empty() && IterCount++ < MAX_ITER_NUM)
+    while ((!TargetC.empty()) && (IterCount++ < iterNum))
     {
-        if (RefineTargetHex(V, C, TargetC, method) == -1)
+        /* evaluate hex density */
+        evaluator.EvalDensityField(V, C, metric);
+        evaluator.setRefDensityField(DensityField);
+        HexDensity = evaluator.GetDensityField();
+        RefDensity = evaluator.GetRefDensityField(V, C);
+
+        /* according to hex density and reference field, mark target hex cells */
+        if (MarkTargetHex(V, C, TargetC, RefDensity, HexDensity) == -1)
             return -1;
 
-        evaluator.EvalDensityField(V, C, densityMetric);
-        HexDensity = evaluator.GetDensityField();
-        if (MarkTargetHex(V, C, TargetC, DensityField, HexDensity) == -1)
+        /* refine according to target hex cells */
+        if (RefineTargetHex(V, C, TargetC, method, smooth, mark) == -1)
             return -1;
     }
 
-    EvalFieldAdaptiveMesh(V, C, DensityField);
+    /* evaluate result hex */
+    if(eval)
+        EvalFieldAdaptiveMesh(V, C, DensityField);
     return 0;
 }
 
-int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Vector3d)> &DensityField, std::vector<double> &HexDensity)
+int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, std::vector<double> &RefDensity, std::vector<double> &HexDensity)
 {
     for (int i = 0; i < C.cols(); i++)
     {
         MatrixXi c = C.col(i);
-        if (EvalDensity(V, c, DensityField) > HexDensity.at(i))
+        if (RefDensity.at(i) > HexDensity.at(i))
         {
             TargetC.push(i);
         }
@@ -67,7 +63,7 @@ int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &Target
     return 0;
 }
 
-int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineMethod method)
+int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineMethod method, bool smooth, bool mark)
 {
     switch (method)
     {
@@ -76,7 +72,7 @@ int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineM
             return -1;
         break;
     case PADDING_REFINE:
-        if (PaddingRefine(V, C, TargetC) == -1)
+        if (PaddingRefine(V, C, TargetC, smooth, mark) == -1)
             return -1;
         break;
     default:
@@ -89,8 +85,6 @@ int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineM
 int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 {
     HexRefine::Mesh mesh = HexRefine::Mesh();
-    // Matrix3Xd RefinedV;
-    // MatrixXi RefinedC;
     std::vector<size_t> TargetV;
 
     for (int i = 0; i < V.cols(); i++)
@@ -130,13 +124,10 @@ int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
         }
     }
 
-    // V = RefinedV;
-    // C = RefinedC;
-
     return 0;
 }
 
-int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
+int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark)
 {
     HexPadding::Mesh mesh = HexPadding::Mesh();
     std::vector<size_t> markedC;
@@ -160,7 +151,7 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
         TargetC.pop();
     }
 
-    HexPadding::padding(mesh, markedC, true);
+    HexPadding::padding(mesh, markedC, smooth, mark);
 
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
@@ -179,18 +170,17 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
     return 0;
 }
 
-int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::function<double(Vector3d)> &DensityField)
+int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::function<double(Vector3d)> &DensityField, HexEval::DensityMetric metric)
 {
     HexEval::HexEvaluator evaluator;
-    HexEval::DensityMetric densityMetric = HexEval::EDGE_LENGTH_METRIC;
     evaluator.setRefDensityField(DensityField);
-    if (densityMetric == HexEval::ANISOTROPIC_METRIC)
+    if (metric == HexEval::ANISOTROPIC_METRIC)
     {
-        std::function<Eigen::Matrix3d(Eigen::Vector3d)> isotropicField = [](Vector3d v)
+        std::function<Eigen::Matrix3d(Eigen::Vector3d)> anisotropicField = [](Vector3d v)
         { return Eigen::MatrixXd::Identity(3, 3); };
-        evaluator.setAnisotropicDensityField(isotropicField);
+        evaluator.setAnisotropicDensityField(anisotropicField);
     }
-    if (evaluator.EvalDensityField(V, C, densityMetric) == -1)
+    if (evaluator.EvalDensityField(V, C, metric) == -1)
         return -1;
     vtkWriter("Field.vtk",      V, C, evaluator.GetDensityField());
     vtkWriter("RefField.vtk",   V, C, evaluator.GetRefDensityField(V, C));

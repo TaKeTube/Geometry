@@ -6,14 +6,14 @@
 namespace HexEval
 {
     /*
- * HexVolume()
- * DESCRIPTION: calculate volume of a hex cell using algorithm described in
- *              J. Grandy. Efficient computation of volume of hexahedral cells. 
- *              Lawrence Livermore National Laboratory, October 1997. UCRL-ID-128886.
- * INPUT: sets of all vertexes, a vector of vertex index of a hex cell
- * OUTPUT: none
- * RETURN: volume of hex cell
- */
+     * HexVolume()
+     * DESCRIPTION: calculate volume of a hex cell using algorithm described in
+     *              J. Grandy. Efficient computation of volume of hexahedral cells. 
+     *              Lawrence Livermore National Laboratory, October 1997. UCRL-ID-128886.
+     * INPUT: sets of all vertexes, a vector of vertex index of a hex cell
+     * OUTPUT: none
+     * RETURN: volume of hex cell
+     */
     inline double HexVolume(const Eigen::Matrix3Xd &V, const Eigen::VectorXi &c)
     {
         Eigen::Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),
@@ -25,6 +25,15 @@ namespace HexEval
         return (M1.determinant() + M2.determinant() + M3.determinant()) / 6.;
     }
 
+    /*
+     * EvalDensity()
+     * DESCRIPTION: get the average of values of the reference field at 8 vertexes
+     * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+     *        c - 8x1 Vector, contains 8 indexes of 8 vertexes in V, following vtk convention
+     *        DensityField - density field
+     * OUTPUT: average of values of the reference field at 8 vertexes
+     * RETURN: none
+     */
     inline double EvalDensity(const Eigen::Matrix3Xd &V, const Eigen::VectorXi &c, const std::function<double(Eigen::Vector3d)> &DensityField)
     {
         Eigen::Vector3d v0 = V.col(c(0)), v1 = V.col(c(1)), v2 = V.col(c(2)), v3 = V.col(c(3)),

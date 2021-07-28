@@ -65,7 +65,7 @@ int main(int argc, char **argv)
         std::cout << "HELP:" << std::endl;
         std::cout << "-i arg : input, arg: input file name, default: ../data/cad.vtk" << std::endl;
         std::cout << "-o arg : output, arg: output file name, default: output.vtk" << std::endl;
-        std::cout << "-m arg : density metric, arg: len/vol/anisotropic" << std::endl;
+        std::cout << "-m arg : density metric, arg: len/vol/anisotropic, default: len" << std::endl;
         std::cout << "-r     : output reference field if setted" << std::endl;
         std::cout << "-d     : output the difference between the actual density field and the reference field" << std::endl;
         std::cout << "-h     : help" << std::endl;
