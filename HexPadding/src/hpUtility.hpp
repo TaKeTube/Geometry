@@ -28,12 +28,12 @@ namespace HexPadding
             {3, 4, 6}};
 
     /*
- * getNormal()
- * DESCRIPTION: get normal vector of a triangle, return (v1-v0) x (v2-v0)
- * INPUT: vertexes of a triangle
- * OUTPUT: (v1-v0) x (v2-v0)
- * RETURN: (v1-v0) x (v2-v0)
- */
+     * getNormal()
+     * DESCRIPTION: get normal vector of a triangle, return (v1-v0) x (v2-v0)
+     * INPUT: vertexes of a triangle
+     * OUTPUT: (v1-v0) x (v2-v0)
+     * RETURN: (v1-v0) x (v2-v0)
+     */
     inline Eigen::Vector3d getNormal(const Eigen::Vector3d &v0, const Eigen::Vector3d &v1, const Eigen::Vector3d &v2)
     {
         Eigen::Vector3d dv0 = v1 - v0;
@@ -41,11 +41,25 @@ namespace HexPadding
         return (dv0.cross(dv1)).normalized();
     }
 
+    /*
+     * getClusteredNormal()
+     * DESCRIPTION: get clustered normal vector, then evaluate the average to avoid that 
+     *              at concave vertex, average normal is not correct
+     *              |-|  |  |--|
+     *              |-|  |  |--|
+     *              \-| /*\ |-/
+     *               \/    \/     - at the star point
+     *              it is basically an iteration algorithm
+     * INPUT: vector of normals
+     * OUTPUT: none
+     * RETURN: average of clustered normal vectors
+     */
     Eigen::Vector3d getClusteredNormal(std::vector<Eigen::Vector3d, Eigen::aligned_allocator<Eigen::Vector3d> > V)
     {
         size_t vsize = V.size();
         std::vector<char> vflag(vsize, 0);
         bool isClustered = true;
+        /* if the clustering happend */
         while(isClustered)
         {
             isClustered = false;
@@ -61,6 +75,7 @@ namespace HexPadding
                     if(vflag.at(j))
                         continue;
                     Eigen::Vector3d &v2 = V.at(j);
+                    /* if two normals are closed */
                     if((v1-v2).squaredNorm() < 0.3)
                     {
                         v += v2;
