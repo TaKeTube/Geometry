@@ -25,7 +25,7 @@ int RefineTargetHex(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &Ta
 
 int TrivialRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC);
 
-int PaddingRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark);
+int PaddingRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark, std::vector<int> &PaddedC);
 
 int EvalFieldAdaptiveMesh(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField);
 

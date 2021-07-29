@@ -133,16 +133,30 @@ void vtkWriter(const char* fname, const Matrix3Xd &V, const MatrixXi &C)
         ofs << idType << endl;
 }
 
-void vtkWriter(const char* fname, const Matrix3Xd &V, const MatrixXi &C, std::vector<double> densityField)
+void vtkWriter(const char* fname, const Matrix3Xd &V, const MatrixXi &C, std::vector<double> Scalar)
 {
     vtkWriter(fname, V, C);
     std::ofstream density(fname, std::ios_base::app);
     density << "CELL_DATA " << C.cols() << std::endl
             << "SCALARS scalars float 1" << std::endl
             << "LOOKUP_TABLE default" << std::endl;
-    for (size_t i = 0; i < densityField.size(); i++)
+    for (size_t i = 0; i < Scalar.size(); i++)
     {
-        density << densityField.at(i) << std::endl;
+        density << Scalar.at(i) << std::endl;
+    }
+    density.close();
+}
+
+void vtkWriter(const char* fname, const Matrix3Xd &V, const MatrixXi &C, std::vector<int> Scalar)
+{
+    vtkWriter(fname, V, C);
+    std::ofstream density(fname, std::ios_base::app);
+    density << "CELL_DATA " << C.cols() << std::endl
+            << "SCALARS scalars int 1" << std::endl
+            << "LOOKUP_TABLE default" << std::endl;
+    for (size_t i = 0; i < Scalar.size(); i++)
+    {
+        density << Scalar.at(i) << std::endl;
     }
     density.close();
 }

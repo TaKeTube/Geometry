@@ -9,17 +9,32 @@
 
 using namespace Eigen;
 
+/*
+ * FieldAdaptiveRefine()
+ * DESCRIPTION: refine field according to the given density field
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        DensityField - scalar function of a 3D vector
+ *        method - refine method, having two choices, padding or trivial method
+ *        metric - density metric to evaluate the density of a hex cell, having two choices, len or vol metric
+ *        iterNum - number of iteration
+ *        smooth - whether smooth after each padding - no use for trivial refine
+ *        mark - whether output mesh with padded element marked after each padding - no use for trivial refine
+ *        eval - whether evaluate the result mesh and output actual field, referece field and difference field
+ * OUTPUT: field adaptive refined mesh
+ * RETURN: 0 if success, -1 if failed
+ */
 int FieldAdaptiveRefine(
-                        Matrix3Xd &V,
-                        MatrixXi &C,
-                        const std::function<double(Vector3d)> &DensityField, 
-                        RefineMethod method,
-                        HexEval::DensityMetric metric,
-                        int iterNum,
-                        bool smooth,
-                        bool mark,
-                        bool eval
-                        )
+    Matrix3Xd &V,
+    MatrixXi &C,
+    const std::function<double(Vector3d)> &DensityField,
+    RefineMethod method,
+    HexEval::DensityMetric metric,
+    int iterNum,
+    bool smooth,
+    bool mark,
+    bool eval)
 {
     int IterCount = 0;
     std::queue<int> TargetC;
@@ -45,7 +60,7 @@ int FieldAdaptiveRefine(
     }
 
     /* evaluate result hex */
-    if(eval)
+    if (eval)
         EvalFieldAdaptiveMesh(V, C, DensityField);
     return 0;
 }
@@ -129,6 +144,8 @@ int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 
 int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark)
 {
+    static int PadNum = 1;
+
     HexPadding::Mesh mesh = HexPadding::Mesh();
     std::vector<size_t> markedC;
 
@@ -153,6 +170,15 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
 
     HexPadding::padding(mesh, markedC, smooth, mark);
 
+    if (mark)
+    {
+        std::string outName = std::to_string(PadNum) + "times_paded";
+        std::vector<int> PaddedFlag(mesh.C.size(), 0);
+        for (size_t cIdx : mesh.PaddedC)
+            PaddedFlag.at(cIdx) = 1;
+        vtkWriter(outName.c_str(), V, C, PaddedFlag);
+    }
+
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
 
@@ -174,16 +200,12 @@ int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::func
 {
     HexEval::HexEvaluator evaluator;
     evaluator.setRefDensityField(DensityField);
-    if (metric == HexEval::ANISOTROPIC_METRIC)
-    {
-        std::function<Eigen::Matrix3d(Eigen::Vector3d)> anisotropicField = [](Vector3d v)
-        { return Eigen::MatrixXd::Identity(3, 3); };
-        evaluator.setAnisotropicDensityField(anisotropicField);
-    }
+
     if (evaluator.EvalDensityField(V, C, metric) == -1)
         return -1;
-    vtkWriter("Field.vtk",      V, C, evaluator.GetDensityField());
-    vtkWriter("RefField.vtk",   V, C, evaluator.GetRefDensityField(V, C));
-    vtkWriter("DiffField.vtk",  V, C, evaluator.GetDiffDensityField(V, C));
+
+    vtkWriter("Field.vtk", V, C, evaluator.GetDensityField());
+    vtkWriter("RefField.vtk", V, C, evaluator.GetRefDensityField(V, C));
+    vtkWriter("DiffField.vtk", V, C, evaluator.GetDiffDensityField(V, C));
     return 0;
 }

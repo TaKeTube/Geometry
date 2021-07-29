@@ -20,17 +20,17 @@ int main(int argc, char **argv)
 
     /*
    *  A standard command:
-   *      ./HexRefinement.exe -input "../data/rod.vtk" -output "refined_rod.vtk"
+   *      ./HexRefinement.exe -i "../data/rod.vtk" -o "refined_rod.vtk"
    */
     for (int i = 1; i < argc; i++)
     {
-        if (!strcmp(argv[i], "-input"))
+        if (!strcmp(argv[i], "-i"))
         {
             i++;
             assert(i < argc);
             input_file = argv[i];
         }
-        else if (!strcmp(argv[i], "-output"))
+        else if (!strcmp(argv[i], "-o"))
         {
             i++;
             assert(i < argc);
@@ -77,6 +77,23 @@ int main(int argc, char **argv)
         }
     }
 
+    /* output help info */
+    if (help_flag)
+    {
+        std::cout << "Refine hex mesh according to a density field." << std::endl;
+        std::cout << "HELP:" << std::endl;
+        std::cout << "-i arg : input vtk file, arg: input vtk file name, default: ../data/cad.vtk" << std::endl;
+        std::cout << "-o arg : output vtk file, arg: output vtk file name, default: output.vtk" << std::endl;
+        std::cout << "-d arg : density metric, arg: len/vol, default: len" << std::endl;
+        std::cout << "-r arg : refine method, arg: padding/trivial, default: padding" << std::endl;
+        std::cout << "-t arg : number of iterations, arg: number of iterations, default: 3" << std::endl;
+        std::cout << "-s     : smooth the padded mesh" << std::endl;
+        std::cout << "-m     : output mesh with padded element marked using scalar 1" << std::endl;
+        std::cout << "-e     : evaluate the results, output field of the result mesh, reference & difference field" << std::endl;
+        std::cout << "-h     : help" << std::endl;
+        return 0;
+    }
+
     /* decide density metric */
     HexEval::DensityMetric densityMetric;
     if (density_metric.empty() || density_metric == "len")
@@ -90,16 +107,6 @@ int main(int argc, char **argv)
         /* using volume metric (1/V) */
         densityMetric = HexEval::VOLUME_METRIC;
         std::cout << "Using volume density metric" << std::endl;
-    }
-    else if (density_metric == "anisotropic")
-    {
-        /* 
-         * using anisotropic metric described in 
-         * Automated refinement of conformal quadrilateral and hexahedral meshes 
-         *                              - Tchon KF, Dompierre J, Camarero R
-         */
-        densityMetric = HexEval::ANISOTROPIC_METRIC;
-        std::cout << "Using anisotropic density metric" << std::endl;
     }
     else
     {
