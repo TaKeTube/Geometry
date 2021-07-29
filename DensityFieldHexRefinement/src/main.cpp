@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 
     /*
    *  A standard command:
-   *      ./HexRefinement.exe -i "../data/rod.vtk" -o "refined_rod.vtk"
+   *      ./HexRefinement.exe -i "../data/rod.vtk" -o "refined_rod.vtk" -s -e
    */
     for (int i = 1; i < argc; i++)
     {

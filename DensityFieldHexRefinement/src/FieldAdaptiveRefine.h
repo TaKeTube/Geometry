@@ -5,6 +5,8 @@
 #include <vector>
 #include <eigen3/Eigen/Eigen>
 
+#include "HexEval/HexEval.h"
+
 enum RefineMethod
 {
     TRIVIAL_REFINE,
@@ -17,7 +19,7 @@ inline double EvalDensity(const std::vector<Eigen::Vector3d> V, const std::funct
 
 int FieldAdaptiveRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField, RefineMethod method, HexEval::DensityMetric, int iterNum, bool smooth, bool mark, bool eval);
 
-int MarkTargetHex(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField, std::vector<double> &HexDensity);
+int MarkTargetHex(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, std::vector<double> &RefDensity, std::vector<double> &HexDensity);
 
 int TrivialMark(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, std::queue<int> &TargetC, const std::function<double(Eigen::Vector3d)> &DensityField);
 
@@ -25,8 +27,8 @@ int RefineTargetHex(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &Ta
 
 int TrivialRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC);
 
-int PaddingRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark, std::vector<int> &PaddedC);
+int PaddingRefine(Eigen::Matrix3Xd &V, Eigen::MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark);
 
-int EvalFieldAdaptiveMesh(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField);
+int EvalFieldAdaptiveMesh(const Eigen::Matrix3Xd &V, const Eigen::MatrixXi &C, const std::function<double(Eigen::Vector3d)> &DensityField, HexEval::DensityMetric metric);
 
 #endif

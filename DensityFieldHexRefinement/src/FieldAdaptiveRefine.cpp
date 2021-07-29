@@ -42,8 +42,22 @@ int FieldAdaptiveRefine(
     std::vector<double> RefDensity;
     HexEval::HexEvaluator evaluator;
 
+    /* evaluate hex density */
+    evaluator.EvalDensityField(V, C, metric);
+    evaluator.setRefDensityField(DensityField);
+    HexDensity = evaluator.GetDensityField();
+    RefDensity = evaluator.GetRefDensityField(V, C);
+
+    /* according to hex density and reference field, mark target hex cells */
+    if (MarkTargetHex(V, C, TargetC, RefDensity, HexDensity) == -1)
+        return -1;
+
     while ((!TargetC.empty()) && (IterCount++ < iterNum))
     {
+        /* refine according to target hex cells */
+        if (RefineTargetHex(V, C, TargetC, method, smooth, mark) == -1)
+            return -1;
+
         /* evaluate hex density */
         evaluator.EvalDensityField(V, C, metric);
         evaluator.setRefDensityField(DensityField);
@@ -53,15 +67,11 @@ int FieldAdaptiveRefine(
         /* according to hex density and reference field, mark target hex cells */
         if (MarkTargetHex(V, C, TargetC, RefDensity, HexDensity) == -1)
             return -1;
-
-        /* refine according to target hex cells */
-        if (RefineTargetHex(V, C, TargetC, method, smooth, mark) == -1)
-            return -1;
     }
 
     /* evaluate result hex */
     if (eval)
-        EvalFieldAdaptiveMesh(V, C, DensityField);
+        EvalFieldAdaptiveMesh(V, C, DensityField, metric);
     return 0;
 }
 
@@ -223,16 +233,6 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
     /* refine */
     HexPadding::padding(mesh, markedC, smooth, mark);
 
-    /* output mesh with marked elements */
-    if (mark)
-    {
-        std::string outName = std::to_string(PadNum) + "times_paded";
-        std::vector<int> PaddedFlag(mesh.C.size(), 0);
-        for (size_t cIdx : mesh.PaddedC)
-            PaddedFlag.at(cIdx) = 1;
-        vtkWriter(outName.c_str(), V, C, PaddedFlag);
-    }
-
     /* set C, V from mesh */
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
@@ -246,6 +246,16 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
         {
             C(j, i) = mesh.C.at(i).at(j);
         }
+    }
+
+    /* output mesh with marked elements */
+    if (mark)
+    {
+        std::string outName = std::to_string(PadNum++) + "times_paded.vtk";
+        std::vector<int> PaddedFlag(mesh.C.size(), 0);
+        for (size_t cIdx : mesh.PaddedC)
+            PaddedFlag.at(cIdx) = 1;
+        vtkWriter(outName.c_str(), V, C, PaddedFlag);
     }
 
     return 0;
