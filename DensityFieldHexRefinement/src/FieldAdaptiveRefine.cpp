@@ -1,3 +1,4 @@
+#include <iostream>
 #include "FieldAdaptiveRefine.h"
 #include "Utility.hpp"
 #include "MeshIO.h"
@@ -43,35 +44,48 @@ int FieldAdaptiveRefine(
     HexEval::HexEvaluator evaluator;
 
     /* evaluate hex density */
+    std::cout << "\nEvaluate Hex Density..." << std::endl;
     evaluator.EvalDensityField(V, C, metric);
     evaluator.setRefDensityField(DensityField);
     HexDensity = evaluator.GetDensityField();
     RefDensity = evaluator.GetRefDensityField(V, C);
 
     /* according to hex density and reference field, mark target hex cells */
+    std::cout << "Mark Target Cells..." << std::endl;
     if (MarkTargetHex(V, C, TargetC, RefDensity, HexDensity) == -1)
         return -1;
 
     while ((!TargetC.empty()) && (IterCount++ < iterNum))
     {
         /* refine according to target hex cells */
+        std::cout << "Refine Hex Mesh..." << std::endl;
+        std::cout << "Iterations:" << IterCount-1 << "\n" << std::endl;
         if (RefineTargetHex(V, C, TargetC, method, smooth, mark) == -1)
             return -1;
 
         /* evaluate hex density */
+        std::cout << "Evaluate Hex Density..." << std::endl;
         evaluator.EvalDensityField(V, C, metric);
         evaluator.setRefDensityField(DensityField);
         HexDensity = evaluator.GetDensityField();
         RefDensity = evaluator.GetRefDensityField(V, C);
 
         /* according to hex density and reference field, mark target hex cells */
+        std::cout << "Mark Target Cells..." << std::endl;
         if (MarkTargetHex(V, C, TargetC, RefDensity, HexDensity) == -1)
             return -1;
     }
 
+    std::cout << "Refinement Finished!\n" << std::endl;
+
     /* evaluate result hex */
     if (eval)
-        EvalFieldAdaptiveMesh(V, C, DensityField, metric);
+    {
+        std::cout << "Evaluate Result Hex..." << std::endl;
+        if (EvalFieldAdaptiveMesh(V, C, DensityField, metric) == -1)
+            return -1;
+    }
+    std::cout << "Final Evaluation Finished!\n" << std::endl;
     return 0;
 }
 
