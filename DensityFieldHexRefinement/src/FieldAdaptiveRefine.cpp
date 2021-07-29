@@ -65,6 +65,17 @@ int FieldAdaptiveRefine(
     return 0;
 }
 
+/*
+ * MarkTargetHex()
+ * DESCRIPTION: mark target hex cells according to reference field
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        RefDensity - reference density field
+ *        HexDensity - density of each element
+ * OUTPUT: TargetC  -indexes of target cells
+ * RETURN: 0 if success, -1 if failed
+ */
 int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &TargetC, std::vector<double> &RefDensity, std::vector<double> &HexDensity)
 {
     for (int i = 0; i < C.cols(); i++)
@@ -78,6 +89,20 @@ int MarkTargetHex(const Matrix3Xd &V, const MatrixXi &C, std::queue<int> &Target
     return 0;
 }
 
+/*
+ * RefineTargetHex()
+ * DESCRIPTION: refine target hex cells of the given mesh
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        TargetC - indexes of target hex cell
+ *        method - refine method, having two choices, padding or trivial method
+ *        smooth - whether smooth after each padding - no use for trivial refine
+ *        mark - whether output mesh with padded element marked after each padding - no use for trivial refine
+ * OUTPUT: refined mesh (represented by V, C)
+ *         vtk mesh file with padded element marked after each padding if padding method is used and mark flag is active
+ * RETURN: 0 if success, -1 if failed
+ */
 int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineMethod method, bool smooth, bool mark)
 {
     switch (method)
@@ -97,11 +122,22 @@ int RefineTargetHex(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, RefineM
     return 0;
 }
 
+/*
+ * TrivialRefine()
+ * DESCRIPTION: refine target hex cells of the given mesh using trivial method
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        TargetC - indexes of target hex cell
+ * OUTPUT: refined mesh (represented by V, C)
+ * RETURN: 0 if success, -1 if failed
+ */
 int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
 {
     HexRefine::Mesh mesh = HexRefine::Mesh();
     std::vector<size_t> TargetV;
 
+    /* set mesh from C, V */
     for (int i = 0; i < V.cols(); i++)
         mesh.V.push_back(V.col(i));
 
@@ -122,9 +158,11 @@ int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
         TargetC.pop();
     }
 
+    /* refine */
     mesh.getVI_CI();
     mesh.refine(TargetV);
 
+    /* set C & V from mesh */
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
 
@@ -142,6 +180,19 @@ int TrivialRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC)
     return 0;
 }
 
+/*
+ * PaddingRefine()
+ * DESCRIPTION: refine target hex cells of the given mesh using padding method
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        TargetC - indexes of target hex cell
+ *        smooth - whether smooth after each padding
+ *        mark - whether output mesh with padded element marked after each padding
+ * OUTPUT: refined mesh (represented by V, C)
+ *         vtk mesh file with padded element marked after each padding if mark flag is active
+ * RETURN: 0 if success, -1 if failed
+ */
 int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smooth, bool mark)
 {
     static int PadNum = 1;
@@ -149,6 +200,7 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
     HexPadding::Mesh mesh = HexPadding::Mesh();
     std::vector<size_t> markedC;
 
+    /* set mesh from C, V */
     for (int i = 0; i < V.cols(); i++)
         mesh.V.push_back(V.col(i));
 
@@ -168,8 +220,10 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
         TargetC.pop();
     }
 
+    /* refine */
     HexPadding::padding(mesh, markedC, smooth, mark);
 
+    /* output mesh with marked elements */
     if (mark)
     {
         std::string outName = std::to_string(PadNum) + "times_paded";
@@ -179,6 +233,7 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
         vtkWriter(outName.c_str(), V, C, PaddedFlag);
     }
 
+    /* set C, V from mesh */
     C.resize(HEX_SIZE, mesh.C.size());
     V.resize(3, mesh.V.size());
 
@@ -196,6 +251,17 @@ int PaddingRefine(Matrix3Xd &V, MatrixXi &C, std::queue<int> &TargetC, bool smoo
     return 0;
 }
 
+/*
+ * EvalFieldAdaptiveMesh()
+ * DESCRIPTION: evaluate the density of result mesh
+ * INPUT: V - 3xd matrix, each column is a vertex of a mesh
+ *        C - 8xd matrix, each column is a cell of a mesh, each cells contains 8 indexes of 8 vertexes in V
+ *            following vtk convention
+ *        DensityField - indexes of target hex cell
+ *        metric - density metric to evaluate the density of a hex cell, having two choices, len or vol metric
+ * OUTPUT: vtk files of meshes with actual field, reference field and difference field
+ * RETURN: 0 if success, -1 if failed
+ */
 int EvalFieldAdaptiveMesh(const Matrix3Xd &V, const MatrixXi &C, const std::function<double(Vector3d)> &DensityField, HexEval::DensityMetric metric)
 {
     HexEval::HexEvaluator evaluator;
