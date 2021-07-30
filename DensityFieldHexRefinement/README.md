@@ -29,6 +29,8 @@ see README of HexRefinement, HexPadding, HexEval for more information.
 - <kbd>-e</kbd>   : evaluate the results, output field of the result mesh, reference & difference field
 - <kbd>-h</kbd>   : help
 
+Please modify **line 148/149 in main.cpp** to edit the density field.
+
 using command line to choose input and output files, a example command is like follow:
 
 ```shell
